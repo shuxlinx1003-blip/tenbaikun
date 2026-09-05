@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>転売君 Ver.4</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 15px;
+    background: #f3f3f3;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    color: #111;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    font-size: 30px;
+}
+
+.box {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+h2 {
+    font-size: 25px;
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 14px;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 14px;
+    margin-top: 6px;
+    font-size: 17px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: white;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 14px;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    background: #333;
+    touch-action: manipulation;
+}
+
+button:active {
+    opacity: 0.7;
+}
+
+.save-sale {
+    background: #438f4c;
+}
+
+.export-button {
+    background: #1769aa;
+}
+
+.import-button {
+    background: #6b4fa1;
+}
+
+.delete-button {
+    background: #d05b52;
+}
+
+.delete-all {
+    background: #555;
+}
+
+.good {
+    color: green;
+    font-weight: bold;
+}
+
+.bad {
+    color: #cf352e;
+    font-weight: bold;
+}
+
+.warning {
+    color: #c87900;
+    font-weight: bold;
+}
+
+.result {
+    font-size: 18px;
+    line-height: 1.9;
+    margin-top: 18px;
+}
+
+.monthly {
+    font-size: 18px;
+    line-height: 2;
+}
+
+.sale-item {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 13px;
+    padding: 14px;
+    margin-top: 14px;
+}
+
+.sale-name {
+    font-size: 21px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.message {
+    margin-top: 12px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.big-price {
+    font-size: 31px;
+    font-weight: bold;
+}
+
+#importFile {
+    display: none;
+}
+
+.small {
+    color: #666;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💰 転売君 Ver.4</h1>
+
+
+<!-- 利益計算 -->
+
+<div class="box">
+
+<h2>📊 利益計算</h2>
+
+<label>商品名</label>
+
+<input
+type="text"
+id="productName"
+placeholder="例：ワンピース"
+>
+
+
+<label>仕入れ価格</label>
+
+<input
+type="number"
+id="purchase"
+placeholder="例：1000"
+>
+
+
+<label>販売価格</label>
+
+<input
+type="number"
+id="sale"
+placeholder="例：2000"
+>
+
+
+<label>販売手数料（%）</label>
+
+<input
+type="number"
+id="feeRate"
+value="10"
+>
+
+
+<label>送料</label>
+
+<select id="shippingSelect">
+
+<option value="160">
+ゆうパケットmini 160円
+</option>
+
+<option value="210">
+ネコポス 210円
+</option>
+
+<option value="215">
+ゆうパケットポスト 215円
+</option>
+
+<option value="230">
+ゆうパケット 230円
+</option>
+
+<option value="other">
+その他
+</option>
+
+</select>
+
+
+<input
+type="number"
+id="shippingOther"
+placeholder="送料を入力"
+style="display:none;"
+>
+
+
+<button
+type="button"
+id="calculateButton"
+>
+利益を計算
+</button>
+
+
+<div
+id="result"
+class="result">
+</div>
+
+
+<button
+type="button"
+id="saveSaleButton"
+class="save-sale"
+>
+💰 売れた商品として記録
+</button>
+
+
+<div
+id="saveMessage"
+class="message">
+</div>
+
+</div>
+
+
+
+<!-- 500円利益 -->
+
+<div class="box">
+
+<h2>🎯 500円利益</h2>
+
+<button
+type="button"
+id="requiredPriceButton"
+>
+500円利益に必要な販売価格
+</button>
+
+<div
+id="requiredPrice"
+class="result">
+</div>
+
+</div>
+
+
+
+<!-- 今月 -->
+
+<div class="box">
+
+<h2>📅 今月の売上</h2>
+
+<div
+id="monthlyResult"
+class="monthly">
+</div>
+
+</div>
+
+
+
+<!-- ファイル保存 -->
+
+<div class="box">
+
+<h2>💾 データ保存</h2>
+
+<p class="small">
+売上を残したいときは「データをファイルに保存」を押してください。
+次回は保存したファイルを読み込めば復元できます。
+</p>
+
+<button
+type="button"
+id="exportButton"
+class="export-button"
+>
+💾 データをファイルに保存
+</button>
+
+
+<button
+type="button"
+id="importButton"
+class="import-button"
+>
+📂 保存データを読み込む
+</button>
+
+
+<input
+type="file"
+id="importFile"
+accept=".json,application/json"
+>
+
+
+<div
+id="fileMessage"
+class="message">
+</div>
+
+</div>
+
+
+
+<!-- 売上履歴 -->
+
+<div class="box">
+
+<h2>📚 売上履歴</h2>
+
+<div id="salesHistory"></div>
+
+
+<button
+type="button"
+id="deleteAllButton"
+class="delete-all"
+>
+🗑 売上履歴を全部削除
+</button>
+
+
+<div
+id="deleteMessage"
+class="message">
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ==============================
+   データ
+============================== */
+
+let salesData = [];
+
+
+/* ==============================
+   送料
+============================== */
+
+function getShipping() {
+
+    const value =
+        document.getElementById(
+            "shippingSelect"
+        ).value;
+
+
+    if (value === "other") {
+
+        return Number(
+            document.getElementById(
+                "shippingOther"
+            ).value
+        ) || 0;
+
+    }
+
+
+    return Number(value) || 0;
+
+}
+
+
+document
+.getElementById("shippingSelect")
+.addEventListener("change", function() {
+
+    const other =
+        document.getElementById(
+            "shippingOther"
+        );
+
+
+    other.style.display =
+        this.value === "other"
+        ? "block"
+        : "none";
+
+});
+
+
+/* ==============================
+   利益計算
+============================== */
+
+function calculate() {
+
+    const purchase =
+        Number(
+            document.getElementById(
+                "purchase"
+            ).value
+        );
+
+
+    const sale =
+        Number(
+            document.getElementById(
+                "sale"
+            ).value
+        );
+
+
+    const feeRate =
+        Number(
+            document.getElementById(
+                "feeRate"
+            ).value
+        );
+
+
+    const shipping =
+        getShipping();
+
+
+    if (
+        purchase <= 0 ||
+        sale <= 0
+    ) {
+
+        document.getElementById(
+            "result"
+        ).innerHTML =
+
+        '<span class="bad">' +
+        '仕入れ価格と販売価格を入力してください。' +
+        '</span>';
+
+        return;
+
+    }
+
+
+    const fee =
+        Math.round(
+            sale * feeRate / 100
+        );
+
+
+    const profit =
+        sale -
+        purchase -
+        fee -
+        shipping;
+
+
+    const rate =
+        (
+            profit /
+            purchase *
+            100
+        ).toFixed(1);
+
+
+    let judge = "";
+
+
+    if (
+        profit >= 500 &&
+        Number(rate) >= 30
+    ) {
+
+        judge =
+        '<div class="good">' +
+        '🟢 仕入れOK！かなり良い商品' +
+        '</div>';
+
+    }
+
+    else if (
+        profit >= 500 &&
+        Number(rate) >= 20
+    ) {
+
+        judge =
+        '<div class="good">' +
+        '🟢 仕入れOK！利益500円以上' +
+        '</div>';
+
+    }
+
+    else if (
+        profit >= 500
+    ) {
+
+        judge =
+        '<div class="warning">' +
+        '🟡 利益は500円以上ですが利益率は低め' +
+        '</div>';
+
+    }
+
+    else {
+
+        judge =
+        '<div class="bad">' +
+        '🔴 仕入れはおすすめしません' +
+        '</div>';
+
+    }
+
+
+    document.getElementById(
+        "result"
+    ).innerHTML =
+
+        "販売手数料：" +
+        fee.toLocaleString() +
+        "円<br>" +
+
+        "送料：" +
+        shipping.toLocaleString() +
+        "円<br>" +
+
+        "<strong>利益：" +
+        profit.toLocaleString() +
+        "円</strong><br>" +
+
+        "利益率：" +
+        rate +
+        "%<br><br>" +
+
+        judge;
+
+}
+
+
+/* ==============================
+   売れた商品を記録
+============================== */
+
+function addSale() {
+
+    const name =
+        document.getElementById(
+            "productName"
+        ).value.trim();
+
+
+    const purchase =
+        Number(
+            document.getElementById(
+                "purchase"
+            ).value
+        );
+
+
+    const sale =
+        Number(
+            document.getElementById(
+                "sale"
+            ).value
+        );
+
+
+    const feeRate =
+        Number(
+            document.getElementById(
+                "feeRate"
+            ).value
+        );
+
+
+    const shipping =
+        getShipping();
+
+
+    if (!name) {
+
+        document.getElementById(
+            "saveMessage"
+        ).innerHTML =
+
+        '<span class="bad">' +
+        '商品名を入力してください。' +
+        '</span>';
+
+        return;
+
+    }
+
+
+    if (
+        purchase <= 0 ||
+        sale <= 0
+    ) {
+
+        document.getElementById(
+            "saveMessage"
+        ).innerHTML =
+
+        '<span class="bad">' +
+        '価格を確認してください。' +
+        '</span>';
+
+        return;
+
+    }
+
+
+    const fee =
+        Math.round(
+            sale *
+            feeRate /
+            100
+        );
+
+
+    const profit =
+        sale -
+        purchase -
+        fee -
+        shipping;
+
+
+    const profitRate =
+        (
+            profit /
+            purchase *
+            100
+        ).toFixed(1);
+
+
+
+    const now =
+        new Date();
+
+
+    const year =
+        now.getFullYear();
+
+
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
+
+
+    const day =
+        String(
+            now.getDate()
+        ).padStart(2, "0");
+
+
+    const date =
+        year +
+        "-" +
+        month +
+        "-" +
+        day;
+
+
+    salesData.push({
+
+        id:
+            Date.now() +
+            Math.random(),
+
+        name:
+            name,
+
+        purchase:
+            purchase,
+
+        sale:
+            sale,
+
+        fee:
+            fee,
+
+        shipping:
+            shipping,
+
+        profit:
+            profit,
+
+        profitRate:
+            profitRate,
+
+        date:
+            date
+
+    });
+
+
+    displaySales();
+
+    calculateMonthly();
+
+
+    document.getElementById(
+        "saveMessage"
+    ).innerHTML =
+
+    '<span class="good">' +
+    '✅ 売上に追加しました' +
+    '</span>';
+
+}
+
+
+/* ==============================
+   履歴表示
+============================== */
+
+function displaySales() {
+
+    const area =
+        document.getElementById(
+            "salesHistory"
+        );
+
+
+    area.innerHTML = "";
+
+
+    if (
+        salesData.length === 0
+    ) {
+
+        area.textContent =
+            "まだ売上記録がありません。";
+
+        return;
+
+    }
+
+
+    for (
+        let i =
+            salesData.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const item =
+            salesData[i];
+
+
+        const box =
+            document.createElement(
+                "div"
+            );
+
+
+        box.className =
+            "sale-item";
+
+
+        const name =
+            document.createElement(
+                "div"
+            );
+
+
+        name.className =
+            "sale-name";
+
+
+        name.textContent =
+            "📦 " +
+            item.name;
+
+
+
+        const detail =
+            document.createElement(
+                "div"
+            );
+
+
+        detail.innerHTML =
+
+            "販売日：" +
+            item.date +
+            "<br>" +
+
+            "仕入れ：" +
+            Number(
+                item.purchase
+            ).toLocaleString() +
+            "円<br>" +
+
+            "販売：" +
+            Number(
+                item.sale
+            ).toLocaleString() +
+            "円<br>" +
+
+            "手数料：" +
+            Number(
+                item.fee
+            ).toLocaleString() +
+            "円<br>" +
+
+            "送料：" +
+            Number(
+                item.shipping
+            ).toLocaleString() +
+            "円<br>" +
+
+            "<strong>利益：" +
+            Number(
+                item.profit
+            ).toLocaleString() +
+            "円</strong><br>" +
+
+            "利益率：" +
+            item.profitRate +
+            "%";
+
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.type =
+            "button";
+
+
+        button.className =
+            "delete-button";
+
+
+        button.textContent =
+            "🗑 この記録を削除";
+
+
+        const itemId =
+            item.id;
+
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                deleteSale(
+                    itemId
+                );
+
+            }
+        );
+
+
+        box.appendChild(name);
+
+        box.appendChild(detail);
+
+        box.appendChild(button);
+
+        area.appendChild(box);
+
+    }
+
+}
+
+
+/* ==============================
+   1件削除
+============================== */
+
+function deleteSale(id) {
+
+    salesData =
+        salesData.filter(
+            function(item) {
+
+                return (
+                    item.id !== id
+                );
+
+            }
+        );
+
+
+    displaySales();
+
+    calculateMonthly();
+
+
+    document.getElementById(
+        "deleteMessage"
+    ).innerHTML =
+
+    '<span class="good">' +
+    '✅ 記録を削除しました' +
+    '</span>';
+
+}
+
+
+/* ==============================
+   全削除
+============================== */
+
+function deleteAll() {
+
+    salesData = [];
+
+
+    displaySales();
+
+    calculateMonthly();
+
+
+    document.getElementById(
+        "deleteMessage"
+    ).innerHTML =
+
+    '<span class="good">' +
+    '✅ 売上履歴を全部削除しました' +
+    '</span>';
+
+}
+
+
+/* ==============================
+   月間集計
+============================== */
+
+function calculateMonthly() {
+
+    const now =
+        new Date();
+
+
+    const target =
+        now.getFullYear() +
+        "-" +
+        String(
+            now.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    let count = 0;
+
+    let totalSales = 0;
+
+    let totalPurchase = 0;
+
+    let totalProfit = 0;
+
+
+    salesData.forEach(
+        function(item) {
+
+            if (
+                typeof item.date ===
+                "string" &&
+
+                item.date.startsWith(
+                    target
+                )
+            ) {
+
+                count++;
+
+                totalSales +=
+                    Number(
+                        item.sale
+                    ) || 0;
+
+                totalPurchase +=
+                    Number(
+                        item.purchase
+                    ) || 0;
+
+                totalProfit +=
+                    Number(
+                        item.profit
+                    ) || 0;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "monthlyResult"
+    ).innerHTML =
+
+        "📦 売れた商品数：" +
+        count +
+        "件<br>" +
+
+        "💴 売上：" +
+        totalSales.toLocaleString() +
+        "円<br>" +
+
+        "🛒 仕入れ：" +
+        totalPurchase.toLocaleString() +
+        "円<br>" +
+
+        "💰 利益：" +
+        totalProfit.toLocaleString() +
+        "円";
+
+}
+
+
+/* ==============================
+   500円利益
+============================== */
+
+function calculateRequiredPrice() {
+
+    const purchase =
+        Number(
+            document.getElementById(
+                "purchase"
+            ).value
+        );
+
+
+    const feeRate =
+        Number(
+            document.getElementById(
+                "feeRate"
+            ).value
+        );
+
+
+    const shipping =
+        getShipping();
+
+
+    if (
+        purchase <= 0
+    ) {
+
+        document.getElementById(
+            "requiredPrice"
+        ).innerHTML =
+
+        '<span class="bad">' +
+        '仕入れ価格を入力してください。' +
+        '</span>';
+
+        return;
+
+    }
+
+
+    let price = 1;
+
+
+    while (price < 10000000) {
+
+        const fee =
+            Math.round(
+                price *
+                feeRate /
+                100
+            );
+
+
+        const profit =
+            price -
+            purchase -
+            shipping -
+            fee;
+
+
+        if (
+            profit >= 500
+        ) {
+
+            break;
+
+        }
+
+
+        price++;
+
+    }
+
+
+    const fee =
+        Math.round(
+            price *
+            feeRate /
+            100
+        );
+
+
+    const profit =
+        price -
+        purchase -
+        shipping -
+        fee;
+
+
+    document.getElementById(
+        "requiredPrice"
+    ).innerHTML =
+
+        "利益500円を出すための<br>" +
+
+        "最低販売価格<br><br>" +
+
+        '<span class="big-price">' +
+
+        price.toLocaleString() +
+
+        "円</span><br><br>" +
+
+        "手数料：" +
+        fee.toLocaleString() +
+        "円<br>" +
+
+        "送料：" +
+        shipping.toLocaleString() +
+        "円<br>" +
+
+        "<strong>利益：" +
+        profit.toLocaleString() +
+        "円</strong>";
+
+}
+
+
+/* ==============================
+   ファイルに保存
+============================== */
+
+async function exportData() {
+
+    if (
+        salesData.length === 0
+    ) {
+
+        document.getElementById(
+            "fileMessage"
+        ).innerHTML =
+
+        '<span class="bad">' +
+        '保存する売上データがありません。' +
+        '</span>';
+
+        return;
+
+    }
+
+
+    const backup = {
+
+        app:
+            "転売君",
+
+        version:
+            "4",
+
+        savedAt:
+            new Date().toISOString(),
+
+        sales:
+            salesData
+
+    };
+
+
+    const text =
+        JSON.stringify(
+            backup,
+            null,
+            2
+        );
+
+
+    const blob =
+        new Blob(
+            [text],
+            {
+                type:
+                "application/json"
+            }
+        );
+
+
+    const today =
+        new Date();
+
+
+    const filename =
+        "転売君_" +
+        today.getFullYear() +
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0") +
+        String(
+            today.getDate()
+        ).padStart(2, "0") +
+        ".json";
+
+
+    const file =
+        new File(
+            [blob],
+            filename,
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    /*
+       iPhone共有画面が使える場合
+    */
+
+    try {
+
+        if (
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({
+                files: [file]
+            })
+        ) {
+
+            await navigator.share({
+                files:
+                    [file],
+
+                title:
+                    "転売君 売上データ"
+            });
+
+
+            document.getElementById(
+                "fileMessage"
+            ).innerHTML =
+
+            '<span class="good">' +
+            '✅ 保存画面を開きました' +
+            '</span>';
+
+            return;
+
+        }
+
+    }
+
+    catch (error) {
+
+        /*
+          キャンセルした場合などは
+          下の方法も試す
+        */
+
+    }
+
+
+    /*
+       通常ダウンロード
+    */
+
+    try {
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const a =
+            document.createElement(
+                "a"
+            );
+
+
+        a.href =
+            url;
+
+
+        a.download =
+            filename;
+
+
+        document.body.appendChild(
+            a
+        );
+
+
+        a.click();
+
+
+        document.body.removeChild(
+            a
+        );
+
+
+        setTimeout(
+            function() {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            },
+            1000
+        );
+
+
+        document.getElementById(
+            "fileMessage"
+        ).innerHTML =
+
+        '<span class="good">' +
+        '✅ 保存処理を実行しました' +
+        '</span>';
+
+    }
+
+    catch (error) {
+
+        document.getElementById(
+            "fileMessage"
+        ).innerHTML =
+
+        '<span class="bad">' +
+        'この表示アプリではファイル書き出しが使えません。' +
+        '</span>';
+
+    }
+
+}
+
+
+/* ==============================
+   ファイル読み込みボタン
+============================== */
+
+function openImport() {
+
+    document.getElementById(
+        "importFile"
+    ).click();
+
+}
+
+
+/* ==============================
+   ファイルから復元
+============================== */
+
+function importData(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+
+        return;
+
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(e) {
+
+            try {
+
+                const data =
+                    JSON.parse(
+                        e.target.result
+                    );
+
+
+                let loadedSales =
+                    null;
+
+
+                /*
+                   Ver.4形式
+                */
+
+                if (
+                    data &&
+                    Array.isArray(
+                        data.sales
+                    )
+                ) {
+
+                    loadedSales =
+                        data.sales;
+
+                }
+
+
+                /*
+                   配列そのものの場合も対応
+                */
+
+                else if (
+                    Array.isArray(data)
+                ) {
+
+                    loadedSales =
+                        data;
+
+                }
+
+
+                if (
+                    loadedSales === null
+                ) {
+
+                    throw new Error(
+                        "形式エラー"
+                    );
+
+                }
+
+
+                salesData =
+                    loadedSales;
+
+
+                displaySales();
+
+                calculateMonthly();
+
+
+                document.getElementById(
+                    "fileMessage"
+                ).innerHTML =
+
+                '<span class="good">' +
+                '✅ 売上データを読み込みました' +
+                '</span>';
+
+            }
+
+            catch (error) {
+
+                document.getElementById(
+                    "fileMessage"
+                ).innerHTML =
+
+                '<span class="bad">' +
+                'このファイルは読み込めません。' +
+                '</span>';
+
+            }
+
+
+            event.target.value =
+                "";
+
+        };
+
+
+    reader.readAsText(
+        file
+    );
+
+}
+
+
+/* ==============================
+   ボタン
+============================== */
+
+document
+.getElementById(
+    "calculateButton"
+)
+.addEventListener(
+    "click",
+    calculate
+);
+
+
+document
+.getElementById(
+    "saveSaleButton"
+)
+.addEventListener(
+    "click",
+    addSale
+);
+
+
+document
+.getElementById(
+    "requiredPriceButton"
+)
+.addEventListener(
+    "click",
+    calculateRequiredPrice
+);
+
+
+document
+.getElementById(
+    "deleteAllButton"
+)
+.addEventListener(
+    "click",
+    deleteAll
+);
+
+
+document
+.getElementById(
+    "exportButton"
+)
+.addEventListener(
+    "click",
+    exportData
+);
+
+
+document
+.getElementById(
+    "importButton"
+)
+.addEventListener(
+    "click",
+    openImport
+);
+
+
+document
+.getElementById(
+    "importFile"
+)
+.addEventListener(
+    "change",
+    importData
+);
+
+
+/* ==============================
+   起動
+============================== */
+
+displaySales();
+
+calculateMonthly();
+
+</script>
+
+</body>
+</html>
