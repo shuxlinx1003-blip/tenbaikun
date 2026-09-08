@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>転売君 Ver.4</title>
+<title>転売君 Ver.4 - 備品代対応</title>
 <style>
 :root{
   --navy:#0f2a4b;--navy2:#16395f;--blue:#1578f6;--orange:#ff8a00;
@@ -29,7 +29,7 @@ main{max-width:1120px;margin:auto;padding:18px 14px 95px}
 h2{margin:0;font-size:24px}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 label{display:block;font-weight:900;margin:9px 0 6px}
 input,select{width:100%;padding:13px;border:1.4px solid #cbd5e1;border-radius:11px;font-size:17px;background:#fff}
 .btn{border:0;border-radius:11px;padding:11px 14px;font-weight:900}
@@ -122,6 +122,10 @@ th{background:#f7f9fc}
           <input id="shipping" type="number" inputmode="numeric" placeholder="例）210（手入力）">
         </div>
         <div>
+          <label>📦 備品代（円）</label>
+          <input id="supplies" type="number" inputmode="numeric" placeholder="例）30">
+        </div>
+        <div>
           <label>販売日</label>
           <input id="saleDate" type="date">
         </div>
@@ -149,7 +153,7 @@ th{background:#f7f9fc}
       </div>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>日付</th><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
+          <thead><tr><th>日付</th><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>備品代</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
           <tbody id="historyBody"></tbody>
         </table>
       </div>
@@ -203,7 +207,7 @@ th{background:#f7f9fc}
       </div>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
+          <thead><tr><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>備品代</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
           <tbody id="detailBody"></tbody>
         </table>
       </div>
@@ -255,12 +259,12 @@ if(!Array.isArray(sales)||!sales.length){
 sales=sales.map((s,i)=>{
   const sale=+(s.sale??s.salePrice??s.price??0);
   const purchase=+(s.purchase??s.cost??s.purchasePrice??0);
-  const shipping=+(s.shipping??s.postage??0);
+  const shipping=+(s.shipping??s.postage??0);\n  const supplies=+(s.supplies??s.supplyCost??s.materialCost??0);
   const feeRate=+(s.feeRate??10);
   const feeRaw=s.fee??s.feeAmount;
   const fee=Number.isFinite(Number(feeRaw)) ? Number(feeRaw) : Math.round(sale*feeRate/100);
   const profitRaw=s.profit??s.profitAmount;
-  const profit=Number.isFinite(Number(profitRaw)) ? Number(profitRaw) : sale-purchase-shipping-fee;
+  const profit=Number.isFinite(Number(profitRaw)) ? Number(profitRaw) : sale-purchase-shipping-supplies-fee;
 
   return {
     id:s.id||Date.now()+i,
@@ -268,6 +272,7 @@ sales=sales.map((s,i)=>{
     purchase,
     sale,
     shipping,
+    supplies,
     fee,
     profit,
     date:normalizeDate(s.date||s.saleDate||s.soldDate)
@@ -294,16 +299,17 @@ function calc(){
   const purchase=+$("purchase").value||0;
   const sale=+$("salePrice").value||0;
   const shipping=+$("shipping").value||0;
+  const supplies=+$("supplies").value||0;
   const feeRate=+$("feeRate").value||0;
   const fee=Math.round(sale*feeRate/100);
-  const profit=sale-purchase-shipping-fee;
+  const profit=sale-purchase-shipping-supplies-fee;
   $("calcPreview").textContent=sale?`販売手数料 ${yen(fee)}　／　予想利益 ${yen(profit)}`:"";
-  return {purchase,sale,shipping,feeRate,fee,profit};
+  return {purchase,sale,shipping,supplies,feeRate,fee,profit};
 }
-["purchase","salePrice","shipping","feeRate"].forEach(id=>$(id).addEventListener("input",calc));
+["purchase","salePrice","shipping","supplies","feeRate"].forEach(id=>$(id).addEventListener("input",calc));
 
 $("clearBtn").onclick=()=>{
-  ["name","purchase","salePrice","shipping"].forEach(id=>$(id).value="");
+  ["name","purchase","salePrice","shipping","supplies"].forEach(id=>$(id).value="");
   $("feeRate").value=10;$("saleDate").value=localISO();calc();
 };
 
@@ -316,6 +322,7 @@ $("addBtn").onclick=()=>{
     purchase:c.purchase,
     sale:c.sale,
     shipping:c.shipping,
+    supplies:c.supplies,
     fee:c.fee,
     profit:c.profit,
     date:$("saleDate").value||localISO()
@@ -343,9 +350,9 @@ function renderHistory(){
   body.innerHTML=arr.length?arr.map(s=>`
     <tr>
       <td>${s.date.replaceAll("-","/")}</td><td>${escapeHtml(s.name)}</td>
-      <td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td><td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
+      <td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td><td>${yen(s.supplies||0)}</td><td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
       <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
-    </tr>`).join(""):'<tr><td colspan="7">まだ売上記録がありません。</td></tr>';
+    </tr>`).join(""):'<tr><td colspan="8">まだ売上記録がありません。</td></tr>';
 }
 window.deleteSale=id=>{
   if(confirm("この売上記録を削除しますか？")){
@@ -355,7 +362,7 @@ window.deleteSale=id=>{
 window.editSale=id=>{
   const s=sales.find(x=>x.id===id);if(!s)return;
   $("name").value=s.name;$("purchase").value=s.purchase;$("salePrice").value=s.sale;
-  $("shipping").value=s.shipping;$("saleDate").value=s.date;
+  $("shipping").value=s.shipping;$("supplies").value=s.supplies||0;$("saleDate").value=s.date;
   sales=sales.filter(x=>x.id!==id);save();calc();
   document.querySelector('[data-page="home"]').click();scrollTo({top:0,behavior:"smooth"});
 };
@@ -366,7 +373,7 @@ $("deleteAll").onclick=()=>{
   }
 };
 $("csvBtn").onclick=()=>{
-  const rows=[["日付","商品名","仕入れ価格","送料","販売価格","手数料","利益"],...sales.map(s=>[s.date,s.name,s.purchase,s.shipping,s.sale,s.fee,s.profit])];
+  const rows=[["日付","商品名","仕入れ価格","送料","備品代","販売価格","手数料","利益"],...sales.map(s=>[s.date,s.name,s.purchase,s.shipping,s.supplies||0,s.sale,s.fee,s.profit])];
   const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="tenbaikun_sales.csv";a.click();
 };
@@ -444,10 +451,10 @@ function renderDetail(){
   $("detailTitle").textContent=`${d.getMonth()+1}月${d.getDate()}日`;
   $("detailBody").innerHTML=arr.length?arr.map(s=>`
     <tr>
-      <td>${escapeHtml(s.name)}</td><td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td>
+      <td>${escapeHtml(s.name)}</td><td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td><td>${yen(s.supplies||0)}</td>
       <td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
       <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
-    </tr>`).join(""):'<tr><td colspan="6">この日の売上記録はありません。</td></tr>';
+    </tr>`).join(""):'<tr><td colspan="7">この日の売上記録はありません。</td></tr>';
 }
 
 function renderAll(){renderHome();renderHistory();renderChart();renderCalendar()}
