@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>転売君 Ver.4</title>
+<style>
+:root{
+  --navy:#0f2a4b;--navy2:#16395f;--blue:#1578f6;--orange:#ff8a00;
+  --green:#19a44a;--purple:#6447dd;--red:#ef2b2d;--bg:#f4f6f9;
+  --line:#dbe2ea;--text:#0f1827;--muted:#718096;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+header{
+  background:linear-gradient(135deg,var(--navy),var(--navy2));
+  color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:30;box-shadow:0 2px 12px #0002
+}
+.brand{font-size:28px;font-weight:900;letter-spacing:.2px}
+.brand small{font-size:14px;font-weight:700;margin-left:8px;opacity:.95}
+.ver{font-size:18px;font-weight:800}
+main{max-width:1120px;margin:auto;padding:18px 14px 95px}
+.card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 3px 16px #21324610;margin-bottom:16px}
+.topnav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.navbtn{border:1px solid #e4e9ef;background:#fff;border-radius:14px;padding:13px 7px;font-weight:900;color:#314054}
+.navbtn.active{background:linear-gradient(135deg,#1380ff,#0e6ee7);color:#fff;border-color:transparent}
+.page{display:none}.page.active{display:block}
+h2{margin:0;font-size:24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+label{display:block;font-weight:900;margin:9px 0 6px}
+input,select{width:100%;padding:13px;border:1.4px solid #cbd5e1;border-radius:11px;font-size:17px;background:#fff}
+.btn{border:0;border-radius:11px;padding:11px 14px;font-weight:900}
+.btn.gray{background:#f4f6f8;color:#4a5a6d;border:1px solid #ccd6e1}
+.btn.green{width:100%;background:linear-gradient(135deg,#1faf4a,#179b40);color:#fff;font-size:18px;padding:15px;margin-top:16px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.metric{border-radius:14px;padding:14px;text-align:center;font-weight:900}
+.metric .label{font-size:15px}.metric .value{font-size:28px;margin-top:6px}
+.m1{background:#edf6ff;color:#0b72e6}.m2{background:#fff5e8;color:#f07f00}.m3{background:#edfaef;color:#14913e}.m4{background:#f3efff;color:#593bd2}
+.calendar-wrap{overflow:hidden;border:1px solid var(--line);border-radius:14px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr)}
+.dow,.day{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.dow:nth-child(7n),.day:nth-child(7n){border-right:0}
+.dow{padding:9px 2px;text-align:center;background:#f9fbfd;font-weight:900}
+.dow.sun{color:var(--red)}.dow.sat{color:var(--blue)}
+.day{min-height:112px;padding:7px;background:#fff;cursor:pointer}
+.day.other{background:#fafbfd;color:#b9c1cc}
+.day.selected{background:#eaf4ff;box-shadow:inset 0 0 0 2px var(--blue)}
+.date{font-weight:900;font-size:16px}
+.day.sun .date{color:var(--red)} .day.sat .date{color:var(--blue)}
+.daystats{margin-top:6px;font-size:12px;line-height:1.6;font-weight:900}
+.sale{color:var(--blue)}.cost{color:var(--orange)}.profit{color:var(--green)}
+.legend{text-align:center;margin-top:12px;font-weight:800;font-size:13px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin:0 5px 0 14px;vertical-align:-1px}
+.calnav{display:flex;align-items:center;gap:8px}
+.calnav button{width:44px;height:44px;border:1px solid #cbd5e1;background:#fff;border-radius:11px;font-size:23px;font-weight:900}
+.calnav span{min-width:120px;text-align:center;font-weight:900}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:730px}
+th,td{border:1px solid var(--line);padding:10px;text-align:center}
+th{background:#f7f9fc}
+.edit,.del{border:0;border-radius:8px;color:#fff;padding:7px 10px;font-weight:900}
+.edit{background:var(--blue)}.del{background:var(--red)}
+.chart{height:300px;border-left:1px solid #aeb9c7;border-bottom:1px solid #aeb9c7;display:flex;align-items:flex-end;gap:12px;overflow-x:auto;padding:20px 10px 0}
+.monthbar{height:100%;min-width:66px;display:flex;align-items:flex-end;justify-content:center;gap:3px;position:relative;padding-bottom:30px}
+.bar{width:16px;border-radius:5px 5px 0 0}.bar.blue{background:var(--blue)}.bar.orange{background:var(--orange)}.bar.green{background:var(--green)}
+.mlabel{position:absolute;bottom:4px;font-weight:900;font-size:12px}
+.history-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px}
+.btn.redline{background:#fff;color:var(--red);border:1px solid var(--red)}
+.btn.blueline{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+@media(max-width:720px){
+  header{padding:14px}.brand{font-size:24px}.brand small{display:none}.ver{font-size:15px}
+  main{padding:12px 9px 90px}.card{padding:13px;border-radius:16px}.topnav{position:sticky;top:58px;z-index:20;background:var(--bg);padding:5px 0}
+  .navbtn{font-size:12px;padding:11px 3px}.grid2,.grid3{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.metric .value{font-size:23px}
+  .section-head{align-items:flex-start}.section-head.stack{flex-direction:column}.calnav{align-self:flex-end}
+  .day{min-height:88px;padding:4px}.date{font-size:14px}.daystats{font-size:10px;line-height:1.5}
+  h2{font-size:20px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">転売君 📊 <small>利益を見える化、もっと簡単に。</small></div>
+  <div class="ver">Ver.4 ⚙️</div>
+</header>
+
+<main>
+  <div class="topnav">
+    <button class="navbtn active" data-page="home">🏠 ホーム</button>
+    <button class="navbtn" data-page="history">☷ 売上履歴</button>
+    <button class="navbtn" data-page="chartPage">▥ 月別グラフ</button>
+    <button class="navbtn" data-page="calendarPage">📅 カレンダー</button>
+  </div>
+
+  <section id="home" class="page active">
+    <div class="card">
+      <div class="section-head">
+        <h2>✏️ 商品を登録する</h2>
+        <button class="btn gray" id="clearBtn">↻ 入力をクリア</button>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>商品名</label>
+          <input id="name" placeholder="商品名を入力（例：ポケモンカード）">
+        </div>
+        <div>
+          <label>仕入れ価格（円）</label>
+          <input id="purchase" type="number" inputmode="numeric" placeholder="例）1000">
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div>
+          <label>販売価格（円）</label>
+          <input id="salePrice" type="number" inputmode="numeric" placeholder="例）2000">
+        </div>
+        <div>
+          <label>送料（円）</label>
+          <input id="shipping" type="number" inputmode="numeric" placeholder="例）210（手入力）">
+        </div>
+        <div>
+          <label>販売日</label>
+          <input id="saleDate" type="date">
+        </div>
+      </div>
+
+      <label>販売手数料（%）</label>
+      <input id="feeRate" type="number" inputmode="decimal" value="10" style="max-width:220px">
+
+      <button class="btn green" id="addBtn">＋ 売れた商品として記録する</button>
+      <div id="calcPreview" style="margin-top:12px;font-weight:900"></div>
+    </div>
+
+    <div class="card">
+      <h2>📅 今月の売上</h2>
+      <div class="metrics" id="homeMetrics"></div>
+    </div>
+  </section>
+
+  <section id="history" class="page">
+    <div class="card">
+      <div class="section-head"><h2>📚 売上履歴</h2></div>
+      <div class="history-actions">
+        <button class="btn redline" id="deleteAll">🗑 すべて削除</button>
+        <button class="btn blueline" id="csvBtn">⬇ CSV出力</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>日付</th><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="chartPage" class="page">
+    <div class="card">
+      <div class="section-head">
+        <h2>📊 月別 売上・仕入れ・利益</h2>
+        <select id="chartYear" style="width:auto"></select>
+      </div>
+      <div class="legend">
+        <span class="dot" style="background:#1578f6"></span>売上
+        <span class="dot" style="background:#ff8a00"></span>仕入れ
+        <span class="dot" style="background:#19a44a"></span>利益
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="metrics" id="chartMetrics"></div>
+    </div>
+  </section>
+
+  <section id="calendarPage" class="page">
+    <div class="card">
+      <div class="section-head stack">
+        <h2>📅 <span id="calTitle"></span>のカレンダー</h2>
+        <div class="calnav">
+          <button id="prevMonth">‹</button>
+          <span id="calMonth"></span>
+          <button id="nextMonth">›</button>
+        </div>
+      </div>
+
+      <div class="metrics" id="calMetrics"></div>
+
+      <div class="calendar-wrap">
+        <div class="calendar" id="calendar"></div>
+      </div>
+
+      <div class="legend">
+        <span class="dot" style="background:#1578f6"></span>売上（円）
+        <span class="dot" style="background:#ff8a00"></span>仕入れ（円）
+        <span class="dot" style="background:#19a44a"></span>利益（円）
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2>📅 <span id="detailTitle">日付を選択</span>の売上詳細</h2>
+        <button class="btn" style="background:#1578f6;color:#fff" id="addForSelected">＋ この日に商品を登録</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const STORAGE_KEY="tenbaikun_sales";
+const ALT_KEYS=["salesData","tenbaikun_sales_v3","tenbaikun_sales_v4","tenbaikun_sales_v5"];
+
+function localISO(d=new Date()){
+  const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+  return x.toISOString().slice(0,10);
+}
+function yen(n){return Math.round(Number(n)||0).toLocaleString("ja-JP")+"円"}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+let sales=[];
+try{sales=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){sales=[]}
+if(!Array.isArray(sales)||!sales.length){
+  for(const k of ALT_KEYS){
+    try{
+      const x=JSON.parse(localStorage.getItem(k)||"[]");
+      if(Array.isArray(x)&&x.length){sales=x;break}
+    }catch(e){}
+  }
+}
+sales=sales.map((s,i)=>({
+  id:s.id||Date.now()+i,
+  name:s.name||s.productName||"商品",
+  purchase:+(s.purchase??s.cost??s.purchasePrice??0),
+  sale:+(s.sale??s.salePrice??s.price??0),
+  shipping:+(s.shipping??0),
+  fee:+(s.fee??Math.round(+(s.sale??s.salePrice??0)*((s.feeRate??10)/100))),
+  profit:+(s.profit??0),
+  date:(s.date||s.saleDate||localISO()).slice(0,10)
+}));
+
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(sales))}
+function totals(arr){
+  return arr.reduce((a,s)=>{
+    a.count++;a.sale+=s.sale;a.purchase+=s.purchase;a.profit+=s.profit;return a
+  },{count:0,sale:0,purchase:0,profit:0});
+}
+function metricsHTML(t){
+  return `
+  <div class="metric m1"><div class="label">📊 月の売上</div><div class="value">${yen(t.sale)}</div></div>
+  <div class="metric m2"><div class="label">🛒 月の仕入れ</div><div class="value">${yen(t.purchase)}</div></div>
+  <div class="metric m3"><div class="label">💰 月の利益</div><div class="value">${yen(t.profit)}</div></div>
+  <div class="metric m4"><div class="label">📦 販売数</div><div class="value">${t.count}件</div></div>`;
+}
+
+$("saleDate").value=localISO();
+
+function calc(){
+  const purchase=+$("purchase").value||0;
+  const sale=+$("salePrice").value||0;
+  const shipping=+$("shipping").value||0;
+  const feeRate=+$("feeRate").value||0;
+  const fee=Math.round(sale*feeRate/100);
+  const profit=sale-purchase-shipping-fee;
+  $("calcPreview").textContent=sale?`販売手数料 ${yen(fee)}　／　予想利益 ${yen(profit)}`:"";
+  return {purchase,sale,shipping,feeRate,fee,profit};
+}
+["purchase","salePrice","shipping","feeRate"].forEach(id=>$(id).addEventListener("input",calc));
+
+$("clearBtn").onclick=()=>{
+  ["name","purchase","salePrice","shipping"].forEach(id=>$(id).value="");
+  $("feeRate").value=10;$("saleDate").value=localISO();calc();
+};
+
+$("addBtn").onclick=()=>{
+  const c=calc();
+  if(!c.sale){alert("販売価格を入力してください");return}
+  sales.push({
+    id:Date.now(),
+    name:$("name").value.trim()||"商品",
+    purchase:c.purchase,
+    sale:c.sale,
+    shipping:c.shipping,
+    fee:c.fee,
+    profit:c.profit,
+    date:$("saleDate").value||localISO()
+  });
+  save();renderAll();$("clearBtn").click();alert("売上を記録しました！");
+};
+
+document.querySelectorAll(".navbtn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");$(btn.dataset.page).classList.add("active");
+    if(btn.dataset.page==="calendarPage")renderCalendar();
+  };
+});
+
+function renderHome(){
+  const d=new Date(),ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+  $("homeMetrics").innerHTML=metricsHTML(totals(sales.filter(s=>s.date.startsWith(ym))));
+}
+
+function renderHistory(){
+  const body=$("historyBody");
+  const arr=[...sales].sort((a,b)=>b.date.localeCompare(a.date));
+  body.innerHTML=arr.length?arr.map(s=>`
+    <tr>
+      <td>${s.date.replaceAll("-","/")}</td><td>${escapeHtml(s.name)}</td>
+      <td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td><td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
+      <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
+    </tr>`).join(""):'<tr><td colspan="7">まだ売上記録がありません。</td></tr>';
+}
+window.deleteSale=id=>{
+  if(confirm("この売上記録を削除しますか？")){
+    sales=sales.filter(s=>s.id!==id);save();renderAll();
+  }
+};
+window.editSale=id=>{
+  const s=sales.find(x=>x.id===id);if(!s)return;
+  $("name").value=s.name;$("purchase").value=s.purchase;$("salePrice").value=s.sale;
+  $("shipping").value=s.shipping;$("saleDate").value=s.date;
+  sales=sales.filter(x=>x.id!==id);save();calc();
+  document.querySelector('[data-page="home"]').click();scrollTo({top:0,behavior:"smooth"});
+};
+
+$("deleteAll").onclick=()=>{
+  if(sales.length&&confirm("売上履歴をすべて削除しますか？")){
+    sales=[];save();renderAll();
+  }
+};
+$("csvBtn").onclick=()=>{
+  const rows=[["日付","商品名","仕入れ価格","送料","販売価格","手数料","利益"],...sales.map(s=>[s.date,s.name,s.purchase,s.shipping,s.sale,s.fee,s.profit])];
+  const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="tenbaikun_sales.csv";a.click();
+};
+
+function availableYears(){
+  const y=new Date().getFullYear();
+  return [...new Set([y,...sales.map(s=>+s.date.slice(0,4))])].sort((a,b)=>b-a);
+}
+function renderChart(){
+  const sel=$("chartYear"),keep=+sel.value||new Date().getFullYear();
+  sel.innerHTML=availableYears().map(y=>`<option ${y===keep?"selected":""}>${y}</option>`).join("");
+  const year=+sel.value;
+  const arr=sales.filter(s=>+s.date.slice(0,4)===year);
+  const monthTotals=Array.from({length:12},(_,m)=>totals(arr.filter(s=>+s.date.slice(5,7)===m+1)));
+  const max=Math.max(1,...monthTotals.flatMap(t=>[t.sale,t.purchase,Math.max(0,t.profit)]));
+  $("chart").innerHTML=monthTotals.map((t,m)=>`
+    <div class="monthbar">
+      <div class="bar blue" style="height:${t.sale?Math.max(5,t.sale/max*235):0}px" title="売上 ${yen(t.sale)}"></div>
+      <div class="bar orange" style="height:${t.purchase?Math.max(5,t.purchase/max*235):0}px" title="仕入れ ${yen(t.purchase)}"></div>
+      <div class="bar green" style="height:${t.profit>0?Math.max(5,t.profit/max*235):0}px" title="利益 ${yen(t.profit)}"></div>
+      <div class="mlabel">${m+1}月</div>
+    </div>`).join("");
+  $("chartMetrics").innerHTML=metricsHTML(totals(arr));
+}
+$("chartYear").onchange=renderChart;
+
+let calDate=new Date();calDate.setDate(1);
+let selectedDate=localISO();
+
+$("prevMonth").onclick=()=>{calDate.setMonth(calDate.getMonth()-1);renderCalendar()};
+$("nextMonth").onclick=()=>{calDate.setMonth(calDate.getMonth()+1);renderCalendar()};
+
+function renderCalendar(){
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  const ym=`${y}-${String(m+1).padStart(2,"0")}`;
+  $("calTitle").textContent=`${y}年${m+1}月`;
+  $("calMonth").textContent=`${y}年${m+1}月`;
+  $("calMetrics").innerHTML=metricsHTML(totals(sales.filter(s=>s.date.startsWith(ym))));
+
+  const first=new Date(y,m,1);
+  const start=new Date(y,m,1-first.getDay());
+
+  let h='<div class="dow sun">日</div><div class="dow">月</div><div class="dow">火</div><div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow sat">土</div>';
+
+  for(let i=0;i<42;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);
+    const ds=localISO(d),same=d.getMonth()===m;
+    const t=totals(sales.filter(s=>s.date===ds));
+    const cls=`day ${same?"":"other"} ${d.getDay()===0?"sun":d.getDay()===6?"sat":""} ${ds===selectedDate?"selected":""}`;
+    h+=`<div class="${cls}" onclick="selectDay('${ds}')">
+      <div class="date">${d.getDate()}</div>
+      ${t.count?`<div class="daystats"><div class="sale">売 ${t.sale.toLocaleString()}</div><div class="cost">仕 ${t.purchase.toLocaleString()}</div><div class="profit">利 ${t.profit.toLocaleString()}</div></div>`:""}
+    </div>`;
+  }
+  $("calendar").innerHTML=h;
+  renderDetail();
+}
+
+window.selectDay=ds=>{
+  selectedDate=ds;
+  const d=new Date(ds+"T00:00:00");
+  calDate=new Date(d.getFullYear(),d.getMonth(),1);
+  renderCalendar();
+};
+
+$("addForSelected").onclick=()=>{
+  $("saleDate").value=selectedDate;
+  document.querySelector('[data-page="home"]').click();
+  scrollTo({top:0,behavior:"smooth"});
+};
+
+function renderDetail(){
+  const arr=sales.filter(s=>s.date===selectedDate);
+  const d=new Date(selectedDate+"T00:00:00");
+  $("detailTitle").textContent=`${d.getMonth()+1}月${d.getDate()}日`;
+  $("detailBody").innerHTML=arr.length?arr.map(s=>`
+    <tr>
+      <td>${escapeHtml(s.name)}</td><td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td>
+      <td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
+      <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
+    </tr>`).join(""):'<tr><td colspan="6">この日の売上記録はありません。</td></tr>';
+}
+
+function renderAll(){renderHome();renderHistory();renderChart();renderCalendar()}
+renderAll();
+</script>
+</body>
+</html>
