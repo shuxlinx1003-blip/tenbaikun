@@ -1,96 +1,427 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#102542">
 <title>転売君 Ver.4</title>
 <style>
-:root{--navy:#102542;--bg:#f4f7fb;--card:#fff;--text:#152238;--muted:#6c7a90;--line:#e4e9f1;--blue:#2f80ed;--orange:#f2994a;--green:#27ae60;--purple:#6c4ce3;--red:#e5484d;--shadow:0 6px 24px rgba(23,42,68,.07)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Yu Gothic UI",sans-serif;padding-bottom:92px}.wrap{max-width:980px;margin:0 auto;padding:18px}.topbar{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#122844,#0e2037);color:#fff;box-shadow:0 2px 14px rgba(0,0,0,.12)}.topbar-inner{max-width:980px;margin:auto;padding:15px 18px;display:flex;align-items:center;gap:12px}.brand{font-size:27px;font-weight:900;letter-spacing:.02em}.tagline{font-size:14px;opacity:.9;flex:1}.version{font-weight:800;font-size:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:18px;box-shadow:var(--shadow)}.card h2{margin:0;font-size:24px;display:flex;align-items:center;gap:8px}.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field label{display:block;font-size:15px;font-weight:800;margin-bottom:7px}.field input,.field select{width:100%;border:1px solid #ccd5e2;border-radius:12px;padding:13px 14px;font-size:17px;background:#fff;color:var(--text);outline:none}.field input:focus,.field select:focus{border-color:#78a7f5;box-shadow:0 0 0 3px rgba(47,128,237,.12)}.span2{grid-column:1/-1}.btn{border:0;border-radius:12px;padding:14px 17px;font-size:16px;font-weight:900;cursor:pointer}.btn-primary{background:linear-gradient(135deg,#1fb14e,#169d42);color:#fff;width:100%;font-size:18px}.btn-soft{background:#f5f7fb;color:#526174;border:1px solid #dce2eb}.btn-danger{background:#fff;color:var(--red);border:1px solid #ffb4b7}.btn-blue{background:#fff;color:var(--blue);border:1px solid #8bb8fb}.calc-strip{margin-top:14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.mini{border-radius:14px;padding:12px;text-align:center;font-weight:800;border:1px solid var(--line);background:#fafbfd}.mini .v{font-size:20px;margin-top:3px}.mini.blue{background:#f1f7ff;color:#176fd8}.mini.orange{background:#fff7ed;color:#db7a15}.mini.green{background:#eefaf2;color:#189848}.mini.purple{background:#f5f1ff;color:#6444d6}.chart-wrap{position:relative;height:330px;border-left:1px solid #d8dee8;border-bottom:1px solid #d8dee8;margin-top:8px;padding:16px 8px 28px;overflow:visible}.gridline{position:absolute;left:0;right:0;height:1px;background:#edf0f5}.gridlabel{position:absolute;left:-4px;transform:translate(-100%,50%);font-size:11px;color:#7a8798}.bars{height:100%;display:grid;grid-template-columns:repeat(12,1fr);gap:5px;align-items:end}.month{height:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;position:relative;padding-bottom:25px;min-width:0}.bar{width:26%;min-width:5px;border-radius:5px 5px 0 0;position:relative;transition:.25s}.bar.sales{background:var(--blue)}.bar.purchase{background:var(--orange)}.bar.profit{background:var(--green)}.bar-value{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-3px) rotate(-90deg);transform-origin:center;font-size:10px;font-weight:900;white-space:nowrap;color:#263445;display:none}.bar.nonzero .bar-value{display:block}.month-label{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:12px;font-weight:800}.legend{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:8px;font-size:14px;font-weight:800}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}.summary-card{border:1px solid var(--line);border-radius:15px;padding:14px;text-align:center}.summary-card .label{font-weight:800;font-size:14px}.summary-card .value{font-size:25px;font-weight:900;margin-top:6px}.summary-card.sales{background:#f1f7ff;color:#176fd8}.summary-card.purchase{background:#fff7ed;color:#db7a15}.summary-card.profit{background:#eefaf2;color:#189848}.summary-card.count{background:#f5f1ff;color:#6444d6}.year-select{width:auto;min-width:115px;border:1px solid #ccd5e2;border-radius:11px;padding:10px 12px;font-size:16px;font-weight:800;background:#fff}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px}.history-table{width:100%;border-collapse:collapse;min-width:760px}.history-table th,.history-table td{padding:12px 10px;border-bottom:1px solid var(--line);font-size:14px;text-align:center}.history-table th{background:#f7f9fc;font-weight:900}.history-table tr:last-child td{border-bottom:0}.icon-btn{border:0;border-radius:9px;color:#fff;font-weight:900;padding:9px 11px;margin:2px}.edit{background:var(--blue)}.del{background:var(--red)}.empty{text-align:center;color:var(--muted);padding:22px}.history-actions{display:flex;gap:8px;flex-wrap:wrap}.bottom-nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:30}.bottom-inner{max-width:980px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);padding:7px 10px calc(7px + env(safe-area-inset-bottom))}.navbtn{border:0;background:transparent;color:#647186;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800}.navbtn span{display:block;font-size:22px;line-height:1.1;margin-bottom:3px}.navbtn.active{background:var(--blue);color:#fff}.toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%);background:#14263f;color:#fff;padding:11px 16px;border-radius:999px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:50}.toast.show{opacity:1}.modal{position:fixed;inset:0;background:rgba(14,25,42,.4);display:none;align-items:center;justify-content:center;padding:20px;z-index:60}.modal.show{display:flex}.modal-box{background:#fff;width:min(520px,100%);border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.2)}.modal-box h3{margin:0 0 14px}.modal-actions{display:flex;gap:9px;margin-top:14px}.modal-actions .btn{flex:1}
-@media(max-width:700px){.wrap{padding:12px}.tagline{display:none}.grid{grid-template-columns:1fr}.span2{grid-column:auto}.calc-strip,.summary-grid{grid-template-columns:repeat(2,1fr)}.chart-wrap{height:300px;margin-left:28px}.bar-value{font-size:9px}.card{padding:15px;border-radius:18px}.card h2{font-size:22px}.brand{font-size:25px}.history-actions{width:100%}.history-actions .btn{flex:1}.topbar-inner{padding:13px 14px}}
+:root{
+  --navy:#0f2a4b;--navy2:#16395f;--blue:#1578f6;--orange:#ff8a00;
+  --green:#19a44a;--purple:#6447dd;--red:#ef2b2d;--bg:#f4f6f9;
+  --line:#dbe2ea;--text:#0f1827;--muted:#718096;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+header{
+  background:linear-gradient(135deg,var(--navy),var(--navy2));
+  color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:30;box-shadow:0 2px 12px #0002
+}
+.brand{font-size:28px;font-weight:900;letter-spacing:.2px}
+.brand small{font-size:14px;font-weight:700;margin-left:8px;opacity:.95}
+.ver{font-size:18px;font-weight:800}
+main{max-width:1120px;margin:auto;padding:18px 14px 95px}
+.card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 3px 16px #21324610;margin-bottom:16px}
+.topnav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.navbtn{border:1px solid #e4e9ef;background:#fff;border-radius:14px;padding:13px 7px;font-weight:900;color:#314054}
+.navbtn.active{background:linear-gradient(135deg,#1380ff,#0e6ee7);color:#fff;border-color:transparent}
+.page{display:none}.page.active{display:block}
+h2{margin:0;font-size:24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+label{display:block;font-weight:900;margin:9px 0 6px}
+input,select{width:100%;padding:13px;border:1.4px solid #cbd5e1;border-radius:11px;font-size:17px;background:#fff}
+.btn{border:0;border-radius:11px;padding:11px 14px;font-weight:900}
+.btn.gray{background:#f4f6f8;color:#4a5a6d;border:1px solid #ccd6e1}
+.btn.green{width:100%;background:linear-gradient(135deg,#1faf4a,#179b40);color:#fff;font-size:18px;padding:15px;margin-top:16px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.metric{border-radius:14px;padding:14px;text-align:center;font-weight:900}
+.metric .label{font-size:15px}.metric .value{font-size:28px;margin-top:6px}
+.m1{background:#edf6ff;color:#0b72e6}.m2{background:#fff5e8;color:#f07f00}.m3{background:#edfaef;color:#14913e}.m4{background:#f3efff;color:#593bd2}
+.calendar-wrap{overflow:hidden;border:1px solid var(--line);border-radius:14px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr)}
+.dow,.day{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.dow:nth-child(7n),.day:nth-child(7n){border-right:0}
+.dow{padding:9px 2px;text-align:center;background:#f9fbfd;font-weight:900}
+.dow.sun{color:var(--red)}.dow.sat{color:var(--blue)}
+.day{min-height:112px;padding:7px;background:#fff;cursor:pointer}
+.day.other{background:#fafbfd;color:#b9c1cc}
+.day.selected{background:#eaf4ff;box-shadow:inset 0 0 0 2px var(--blue)}
+.date{font-weight:900;font-size:16px}
+.day.sun .date{color:var(--red)} .day.sat .date{color:var(--blue)}
+.daystats{margin-top:6px;font-size:12px;line-height:1.6;font-weight:900}
+.sale{color:var(--blue)}.cost{color:var(--orange)}.profit{color:var(--green)}
+.legend{text-align:center;margin-top:12px;font-weight:800;font-size:13px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin:0 5px 0 14px;vertical-align:-1px}
+.calnav{display:flex;align-items:center;gap:8px}
+.calnav button{width:44px;height:44px;border:1px solid #cbd5e1;background:#fff;border-radius:11px;font-size:23px;font-weight:900}
+.calnav span{min-width:120px;text-align:center;font-weight:900}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:730px}
+th,td{border:1px solid var(--line);padding:10px;text-align:center}
+th{background:#f7f9fc}
+.edit,.del{border:0;border-radius:8px;color:#fff;padding:7px 10px;font-weight:900}
+.edit{background:var(--blue)}.del{background:var(--red)}
+.chart{height:300px;border-left:1px solid #aeb9c7;border-bottom:1px solid #aeb9c7;display:flex;align-items:flex-end;gap:12px;overflow-x:auto;padding:20px 10px 0}
+.monthbar{height:100%;min-width:66px;display:flex;align-items:flex-end;justify-content:center;gap:3px;position:relative;padding-bottom:30px}
+.bar{width:16px;border-radius:5px 5px 0 0}.bar.blue{background:var(--blue)}.bar.orange{background:var(--orange)}.bar.green{background:var(--green)}
+.mlabel{position:absolute;bottom:4px;font-weight:900;font-size:12px}
+.history-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px}
+.btn.redline{background:#fff;color:var(--red);border:1px solid var(--red)}
+.btn.blueline{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+@media(max-width:720px){
+  header{padding:14px}.brand{font-size:24px}.brand small{display:none}.ver{font-size:15px}
+  main{padding:12px 9px 90px}.card{padding:13px;border-radius:16px}.topnav{position:sticky;top:58px;z-index:20;background:var(--bg);padding:5px 0}
+  .navbtn{font-size:12px;padding:11px 3px}.grid2,.grid3{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.metric .value{font-size:23px}
+  .section-head{align-items:flex-start}.section-head.stack{flex-direction:column}.calnav{align-self:flex-end}
+  .day{min-height:88px;padding:4px}.date{font-size:14px}.daystats{font-size:10px;line-height:1.5}
+  h2{font-size:20px}
+}
 </style>
 </head>
 <body>
-<header class="topbar"><div class="topbar-inner"><div class="brand">転売君 📊</div><div class="tagline">利益を見える化、もっと簡単に。</div><div class="version">Ver.4</div></div></header>
-<main class="wrap">
-<section class="card" id="home">
- <div class="card-head"><h2>✏️ 商品を登録する</h2><button class="btn btn-soft" id="clearBtn">↻ 入力をクリア</button></div>
- <div class="grid">
-  <div class="field span2"><label>商品名</label><input id="productName" placeholder="商品名を入力（例：ポケモンカード）"></div>
-  <div class="field"><label>仕入れ価格（円）</label><input id="purchase" type="number" min="0" inputmode="numeric" placeholder="例）1000"></div>
-  <div class="field"><label>販売価格（円）</label><input id="sale" type="number" min="0" inputmode="numeric" placeholder="例）2000"></div>
-  <div class="field"><label>送料（円）</label><input id="shipping" type="number" min="0" inputmode="numeric" placeholder="例）210（手入力）"></div>
-  <div class="field"><label>販売手数料（%）</label><input id="feeRate" type="number" min="0" max="99" step="0.1" value="10" inputmode="decimal"></div>
-  <div class="field span2"><label>販売日</label><input id="saleDate" type="date"></div>
- </div>
- <div class="calc-strip">
-  <div class="mini blue">売上<div class="v" id="liveSale">0円</div></div>
-  <div class="mini orange">仕入れ<div class="v" id="livePurchase">0円</div></div>
-  <div class="mini green">利益<div class="v" id="liveProfit">0円</div></div>
-  <div class="mini purple">利益率<div class="v" id="liveRate">0%</div></div>
- </div>
- <button class="btn btn-primary" id="saveBtn">＋ 売れた商品として記録する</button>
-</section>
+<header>
+  <div class="brand">転売君 📊 <small>利益を見える化、もっと簡単に。</small></div>
+  <div class="ver">Ver.4 ⚙️</div>
+</header>
 
-<section class="card" id="chartSection">
- <div class="card-head"><h2>📊 月別 売上・仕入れ・利益</h2><select id="chartYear" class="year-select"></select></div>
- <div class="legend"><span><i style="background:#2f80ed"></i>売上</span><span><i style="background:#f2994a"></i>仕入れ</span><span><i style="background:#27ae60"></i>利益</span></div>
- <div class="chart-wrap" id="chartWrap"><div id="gridlines"></div><div class="bars" id="bars"></div></div>
- <div class="summary-grid">
-  <div class="summary-card sales"><div class="label">📈 今月の売上</div><div class="value" id="sumSales">0円</div></div>
-  <div class="summary-card purchase"><div class="label">🛒 今月の仕入れ</div><div class="value" id="sumPurchase">0円</div></div>
-  <div class="summary-card profit"><div class="label">💰 今月の利益</div><div class="value" id="sumProfit">0円</div></div>
-  <div class="summary-card count"><div class="label">📦 今月の販売数</div><div class="value" id="sumCount">0件</div></div>
- </div>
-</section>
+<main>
+  <div class="topnav">
+    <button class="navbtn active" data-page="home">🏠 ホーム</button>
+    <button class="navbtn" data-page="history">☷ 売上履歴</button>
+    <button class="navbtn" data-page="chartPage">▥ 月別グラフ</button>
+    <button class="navbtn" data-page="calendarPage">📅 カレンダー</button>
+  </div>
 
-<section class="card" id="historySection">
- <div class="card-head"><h2>📚 売上履歴</h2><div class="history-actions"><button class="btn btn-blue" id="csvBtn">⬇ CSV出力</button><button class="btn btn-danger" id="deleteSelectedBtn">🗑 選択した行を削除</button></div></div>
- <div class="table-wrap"><table class="history-table"><thead><tr><th>選択</th><th>日付</th><th>商品名</th><th>仕入れ</th><th>送料</th><th>販売</th><th>利益</th><th>編集</th></tr></thead><tbody id="historyBody"></tbody></table></div>
- <div id="emptyHistory" class="empty">まだ売上記録がありません。</div>
-</section>
+  <section id="home" class="page active">
+    <div class="card">
+      <div class="section-head">
+        <h2>✏️ 商品を登録する</h2>
+        <button class="btn gray" id="clearBtn">↻ 入力をクリア</button>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>商品名</label>
+          <input id="name" placeholder="商品名を入力（例：ポケモンカード）">
+        </div>
+        <div>
+          <label>仕入れ価格（円）</label>
+          <input id="purchase" type="number" inputmode="numeric" placeholder="例）1000">
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div>
+          <label>販売価格（円）</label>
+          <input id="salePrice" type="number" inputmode="numeric" placeholder="例）2000">
+        </div>
+        <div>
+          <label>送料（円）</label>
+          <input id="shipping" type="number" inputmode="numeric" placeholder="例）210（手入力）">
+        </div>
+        <div>
+          <label>販売日</label>
+          <input id="saleDate" type="date">
+        </div>
+      </div>
+
+      <label>販売手数料（%）</label>
+      <input id="feeRate" type="number" inputmode="decimal" value="10" style="max-width:220px">
+
+      <button class="btn green" id="addBtn">＋ 売れた商品として記録する</button>
+      <div id="calcPreview" style="margin-top:12px;font-weight:900"></div>
+    </div>
+
+    <div class="card">
+      <h2>📅 今月の売上</h2>
+      <div class="metrics" id="homeMetrics"></div>
+    </div>
+  </section>
+
+  <section id="history" class="page">
+    <div class="card">
+      <div class="section-head"><h2>📚 売上履歴</h2></div>
+      <div class="history-actions">
+        <button class="btn redline" id="deleteAll">🗑 すべて削除</button>
+        <button class="btn blueline" id="csvBtn">⬇ CSV出力</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>日付</th><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="chartPage" class="page">
+    <div class="card">
+      <div class="section-head">
+        <h2>📊 月別 売上・仕入れ・利益</h2>
+        <select id="chartYear" style="width:auto"></select>
+      </div>
+      <div class="legend">
+        <span class="dot" style="background:#1578f6"></span>売上
+        <span class="dot" style="background:#ff8a00"></span>仕入れ
+        <span class="dot" style="background:#19a44a"></span>利益
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="metrics" id="chartMetrics"></div>
+    </div>
+  </section>
+
+  <section id="calendarPage" class="page">
+    <div class="card">
+      <div class="section-head stack">
+        <h2>📅 <span id="calTitle"></span>のカレンダー</h2>
+        <div class="calnav">
+          <button id="prevMonth">‹</button>
+          <span id="calMonth"></span>
+          <button id="nextMonth">›</button>
+        </div>
+      </div>
+
+      <div class="metrics" id="calMetrics"></div>
+
+      <div class="calendar-wrap">
+        <div class="calendar" id="calendar"></div>
+      </div>
+
+      <div class="legend">
+        <span class="dot" style="background:#1578f6"></span>売上（円）
+        <span class="dot" style="background:#ff8a00"></span>仕入れ（円）
+        <span class="dot" style="background:#19a44a"></span>利益（円）
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2>📅 <span id="detailTitle">日付を選択</span>の売上詳細</h2>
+        <button class="btn" style="background:#1578f6;color:#fff" id="addForSelected">＋ この日に商品を登録</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 </main>
 
-<nav class="bottom-nav"><div class="bottom-inner">
-<button class="navbtn active" data-target="home"><span>🏠</span>ホーム</button>
-<button class="navbtn" data-target="historySection"><span>☷</span>売上履歴</button>
-<button class="navbtn" data-target="chartSection"><span>📊</span>月別グラフ</button>
-<button class="navbtn" id="settingsBtn"><span>⚙️</span>設定</button>
-</div></nav>
-<div class="toast" id="toast"></div>
-<div class="modal" id="editModal"><div class="modal-box"><h3>売上記録を編集</h3><div class="grid"><div class="field span2"><label>商品名</label><input id="editName"></div><div class="field"><label>仕入れ</label><input id="editPurchase" type="number"></div><div class="field"><label>販売</label><input id="editSale" type="number"></div><div class="field"><label>送料</label><input id="editShipping" type="number"></div><div class="field"><label>手数料（%）</label><input id="editFeeRate" type="number" step="0.1"></div><div class="field span2"><label>販売日</label><input id="editDate" type="date"></div></div><div class="modal-actions"><button class="btn btn-soft" id="cancelEdit">キャンセル</button><button class="btn btn-primary" id="saveEdit">保存する</button></div></div></div>
 <script>
-const STORAGE_KEY='tenbaikun_sales';
-const LEGACY_KEYS=['tenbaikun_sales','salesData','tenbaikun_sales_v3','tenbaikun_sales_v4','tenbaikun_sales_v5'];
-let salesData=[];let editingId=null;
-const $=id=>document.getElementById(id);const yen=n=>(Math.round(Number(n)||0)).toLocaleString('ja-JP')+'円';
-function localDate(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function loadData(){for(const k of LEGACY_KEYS){try{const p=JSON.parse(localStorage.getItem(k)||'null');if(Array.isArray(p)){salesData=p;break}}catch(e){}}salesData=salesData.map((x,i)=>normalize(x,i));saveData()}
-function normalize(x,i){const sale=Number(x.sale??x.salePrice??0),purchase=Number(x.purchase??x.purchasePrice??0),shipping=Number(x.shipping??0),feeRate=Number(x.feeRate??10);const fee=Number.isFinite(Number(x.fee))?Number(x.fee):Math.round(sale*feeRate/100);const profit=Number.isFinite(Number(x.profit))?Number(x.profit):sale-purchase-shipping-fee;return{id:x.id||('old-'+Date.now()+'-'+i),name:x.name||x.productName||'商品名なし',purchase,sale,shipping,feeRate,fee,profit,profitRate:purchase>0?profit/purchase*100:0,date:x.date||localDate()}}
-function saveData(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(salesData));return true}catch(e){showToast('保存できませんでした');return false}}
-function calc(purchase,sale,shipping,feeRate){const fee=Math.round(sale*feeRate/100);const profit=sale-purchase-shipping-fee;return{fee,profit,profitRate:purchase>0?profit/purchase*100:0}}
-function liveCalc(){const purchase=Number($('purchase').value)||0,sale=Number($('sale').value)||0,shipping=Number($('shipping').value)||0,feeRate=Number($('feeRate').value)||0,r=calc(purchase,sale,shipping,feeRate);$('liveSale').textContent=yen(sale);$('livePurchase').textContent=yen(purchase);$('liveProfit').textContent=yen(r.profit);$('liveRate').textContent=(r.profitRate||0).toFixed(1)+'%'}
-function clearForm(){['productName','purchase','sale','shipping'].forEach(id=>$(id).value='');$('feeRate').value='10';$('saleDate').value=localDate();liveCalc()}
-function addSale(){const name=$('productName').value.trim(),purchase=Number($('purchase').value),sale=Number($('sale').value),shipping=Number($('shipping').value||0),feeRate=Number($('feeRate').value||0),date=$('saleDate').value||localDate();if(!name){showToast('商品名を入力してください');return}if(!(purchase>=0)||!(sale>0)||shipping<0||feeRate<0||feeRate>=100){showToast('入力内容を確認してください');return}const r=calc(purchase,sale,shipping,feeRate);salesData.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),name,purchase,sale,shipping,feeRate,fee:r.fee,profit:r.profit,profitRate:r.profitRate,date});saveData();renderAll();showToast('売上を記録しました');clearForm()}
-function monthRows(year){const rows=Array.from({length:12},(_,i)=>({month:i+1,sales:0,purchase:0,profit:0,count:0}));salesData.forEach(x=>{const m=String(x.date||'').match(/^(\d{4})-(\d{2})/);if(!m||Number(m[1])!==Number(year))return;const r=rows[Number(m[2])-1];if(!r)return;r.sales+=Number(x.sale)||0;r.purchase+=Number(x.purchase)||0;r.profit+=Number(x.profit)||0;r.count++});return rows}
-function setupYears(){const old=$('chartYear').value,ys=new Set([new Date().getFullYear()]);salesData.forEach(x=>{const y=Number(String(x.date).slice(0,4));if(y)ys.add(y)});$('chartYear').innerHTML=[...ys].sort((a,b)=>b-a).map(y=>`<option value="${y}">${y}年</option>`).join('');$('chartYear').value=old&&ys.has(Number(old))?old:String(new Date().getFullYear())}
-function niceMax(v){if(v<=0)return 1000;const pow=Math.pow(10,Math.floor(Math.log10(v)));const n=v/pow;const nice=n<=1?1:n<=2?2:n<=5?5:10;return nice*pow}
-function renderChart(){const year=Number($('chartYear').value),rows=monthRows(year),rawMax=Math.max(0,...rows.flatMap(r=>[r.sales,r.purchase,Math.max(0,r.profit)])),max=niceMax(rawMax);$('gridlines').innerHTML='';for(let i=0;i<=4;i++){const pct=i*25,line=document.createElement('div');line.className='gridline';line.style.bottom=(28+pct*2.66)+'px';line.style.left='0';line.style.right='0';const lab=document.createElement('span');lab.className='gridlabel';lab.style.bottom=(28+pct*2.66)+'px';lab.textContent=Math.round(max*(i/4)).toLocaleString();$('gridlines').append(line,lab)}$('bars').innerHTML='';rows.forEach(r=>{const m=document.createElement('div');m.className='month';[['sales',r.sales],['purchase',r.purchase],['profit',Math.max(0,r.profit)]].forEach(([cls,val])=>{const b=document.createElement('div');b.className='bar '+cls+(val>0?' nonzero':'');b.style.height=(val>0?Math.max(3,val/max*100):1)+'%';b.innerHTML=`<span class="bar-value">${Math.round(val).toLocaleString()}</span>`;m.appendChild(b)});const l=document.createElement('div');l.className='month-label';l.textContent=r.month+'月';m.appendChild(l);$('bars').appendChild(m)});renderCurrentMonth()}
-function renderCurrentMonth(){const d=new Date(),key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');let s=0,p=0,pr=0,c=0;salesData.forEach(x=>{if(String(x.date).startsWith(key)){s+=Number(x.sale)||0;p+=Number(x.purchase)||0;pr+=Number(x.profit)||0;c++}});$('sumSales').textContent=yen(s);$('sumPurchase').textContent=yen(p);$('sumProfit').textContent=yen(pr);$('sumCount').textContent=c+'件'}
-function renderHistory(){const body=$('historyBody');body.innerHTML='';$('emptyHistory').style.display=salesData.length?'none':'block';[...salesData].sort((a,b)=>String(b.date).localeCompare(String(a.date))).forEach(x=>{const tr=document.createElement('tr');tr.innerHTML=`<td><input type="checkbox" class="rowcheck" data-id="${x.id}"></td><td>${String(x.date).replaceAll('-','/')}</td><td>${escapeHtml(x.name)}</td><td>${yen(x.purchase)}</td><td>${yen(x.shipping)}</td><td>${yen(x.sale)}</td><td><strong>${yen(x.profit)}</strong></td><td><button class="icon-btn edit" data-edit="${x.id}">✎</button><button class="icon-btn del" data-del="${x.id}">🗑</button></td>`;body.appendChild(tr)});body.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteOne(b.dataset.del));body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit))}
-function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function deleteOne(id){if(!confirm('この売上記録を削除しますか？'))return;salesData=salesData.filter(x=>x.id!==id);saveData();renderAll();showToast('削除しました')}
-function deleteSelected(){const ids=[...document.querySelectorAll('.rowcheck:checked')].map(x=>x.dataset.id);if(!ids.length){showToast('削除する行を選択してください');return}if(!confirm(ids.length+'件を削除しますか？'))return;salesData=salesData.filter(x=>!ids.includes(x.id));saveData();renderAll();showToast('選択した記録を削除しました')}
-function openEdit(id){const x=salesData.find(v=>v.id===id);if(!x)return;editingId=id;$('editName').value=x.name;$('editPurchase').value=x.purchase;$('editSale').value=x.sale;$('editShipping').value=x.shipping;$('editFeeRate').value=x.feeRate??10;$('editDate').value=x.date;$('editModal').classList.add('show')}
-function saveEdit(){const x=salesData.find(v=>v.id===editingId);if(!x)return;const purchase=Number($('editPurchase').value),sale=Number($('editSale').value),shipping=Number($('editShipping').value||0),feeRate=Number($('editFeeRate').value||0),r=calc(purchase,sale,shipping,feeRate);Object.assign(x,{name:$('editName').value.trim()||'商品名なし',purchase,sale,shipping,feeRate,fee:r.fee,profit:r.profit,profitRate:r.profitRate,date:$('editDate').value||localDate()});saveData();$('editModal').classList.remove('show');renderAll();showToast('編集内容を保存しました')}
-function exportCSV(){if(!salesData.length){showToast('出力する売上履歴がありません');return}const head=['日付','商品名','仕入れ価格','送料','販売価格','手数料','利益','利益率'];const rows=salesData.map(x=>[x.date,x.name,x.purchase,x.shipping,x.sale,x.fee,x.profit,Number(x.profitRate).toFixed(1)]);const esc=v=>'"'+String(v).replaceAll('"','""')+'"';const csv='\uFEFF'+[head,...rows].map(r=>r.map(esc).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tenbaikun_sales.csv';a.click();URL.revokeObjectURL(a.href)}
-function renderAll(){setupYears();renderChart();renderHistory()}
-function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),1800)}
-['purchase','sale','shipping','feeRate'].forEach(id=>$(id).addEventListener('input',liveCalc));$('clearBtn').onclick=clearForm;$('saveBtn').onclick=addSale;$('chartYear').onchange=renderChart;$('deleteSelectedBtn').onclick=deleteSelected;$('csvBtn').onclick=exportCSV;$('cancelEdit').onclick=()=>$('editModal').classList.remove('show');$('saveEdit').onclick=saveEdit;$('settingsBtn').onclick=()=>showToast('設定は今後追加できます');document.querySelectorAll('.navbtn[data-target]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.navbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.target).scrollIntoView({behavior:'smooth',block:'start'})});$('editModal').addEventListener('click',e=>{if(e.target===$('editModal'))$('editModal').classList.remove('show')});
-$('saleDate').value=localDate();loadData();liveCalc();renderAll();
+const $=id=>document.getElementById(id);
+const STORAGE_KEY="tenbaikun_sales";
+const ALT_KEYS=["salesData","tenbaikun_sales_v3","tenbaikun_sales_v4","tenbaikun_sales_v5"];
+
+function localISO(d=new Date()){
+  const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+  return x.toISOString().slice(0,10);
+}
+function yen(n){return Math.round(Number(n)||0).toLocaleString("ja-JP")+"円"}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+let sales=[];
+try{sales=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){sales=[]}
+if(!Array.isArray(sales)||!sales.length){
+  for(const k of ALT_KEYS){
+    try{
+      const x=JSON.parse(localStorage.getItem(k)||"[]");
+      if(Array.isArray(x)&&x.length){sales=x;break}
+    }catch(e){}
+  }
+}
+sales=sales.map((s,i)=>({
+  id:s.id||Date.now()+i,
+  name:s.name||s.productName||"商品",
+  purchase:+(s.purchase??s.cost??s.purchasePrice??0),
+  sale:+(s.sale??s.salePrice??s.price??0),
+  shipping:+(s.shipping??0),
+  fee:+(s.fee??Math.round(+(s.sale??s.salePrice??0)*((s.feeRate??10)/100))),
+  profit:+(s.profit??0),
+  date:(s.date||s.saleDate||localISO()).slice(0,10)
+}));
+
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(sales))}
+function totals(arr){
+  return arr.reduce((a,s)=>{
+    a.count++;a.sale+=s.sale;a.purchase+=s.purchase;a.profit+=s.profit;return a
+  },{count:0,sale:0,purchase:0,profit:0});
+}
+function metricsHTML(t){
+  return `
+  <div class="metric m1"><div class="label">📊 月の売上</div><div class="value">${yen(t.sale)}</div></div>
+  <div class="metric m2"><div class="label">🛒 月の仕入れ</div><div class="value">${yen(t.purchase)}</div></div>
+  <div class="metric m3"><div class="label">💰 月の利益</div><div class="value">${yen(t.profit)}</div></div>
+  <div class="metric m4"><div class="label">📦 販売数</div><div class="value">${t.count}件</div></div>`;
+}
+
+$("saleDate").value=localISO();
+
+function calc(){
+  const purchase=+$("purchase").value||0;
+  const sale=+$("salePrice").value||0;
+  const shipping=+$("shipping").value||0;
+  const feeRate=+$("feeRate").value||0;
+  const fee=Math.round(sale*feeRate/100);
+  const profit=sale-purchase-shipping-fee;
+  $("calcPreview").textContent=sale?`販売手数料 ${yen(fee)}　／　予想利益 ${yen(profit)}`:"";
+  return {purchase,sale,shipping,feeRate,fee,profit};
+}
+["purchase","salePrice","shipping","feeRate"].forEach(id=>$(id).addEventListener("input",calc));
+
+$("clearBtn").onclick=()=>{
+  ["name","purchase","salePrice","shipping"].forEach(id=>$(id).value="");
+  $("feeRate").value=10;$("saleDate").value=localISO();calc();
+};
+
+$("addBtn").onclick=()=>{
+  const c=calc();
+  if(!c.sale){alert("販売価格を入力してください");return}
+  sales.push({
+    id:Date.now(),
+    name:$("name").value.trim()||"商品",
+    purchase:c.purchase,
+    sale:c.sale,
+    shipping:c.shipping,
+    fee:c.fee,
+    profit:c.profit,
+    date:$("saleDate").value||localISO()
+  });
+  save();renderAll();$("clearBtn").click();alert("売上を記録しました！");
+};
+
+document.querySelectorAll(".navbtn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");$(btn.dataset.page).classList.add("active");
+    if(btn.dataset.page==="calendarPage")renderCalendar();
+  };
+});
+
+function renderHome(){
+  const d=new Date(),ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+  $("homeMetrics").innerHTML=metricsHTML(totals(sales.filter(s=>s.date.startsWith(ym))));
+}
+
+function renderHistory(){
+  const body=$("historyBody");
+  const arr=[...sales].sort((a,b)=>b.date.localeCompare(a.date));
+  body.innerHTML=arr.length?arr.map(s=>`
+    <tr>
+      <td>${s.date.replaceAll("-","/")}</td><td>${escapeHtml(s.name)}</td>
+      <td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td><td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
+      <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
+    </tr>`).join(""):'<tr><td colspan="7">まだ売上記録がありません。</td></tr>';
+}
+window.deleteSale=id=>{
+  if(confirm("この売上記録を削除しますか？")){
+    sales=sales.filter(s=>s.id!==id);save();renderAll();
+  }
+};
+window.editSale=id=>{
+  const s=sales.find(x=>x.id===id);if(!s)return;
+  $("name").value=s.name;$("purchase").value=s.purchase;$("salePrice").value=s.sale;
+  $("shipping").value=s.shipping;$("saleDate").value=s.date;
+  sales=sales.filter(x=>x.id!==id);save();calc();
+  document.querySelector('[data-page="home"]').click();scrollTo({top:0,behavior:"smooth"});
+};
+
+$("deleteAll").onclick=()=>{
+  if(sales.length&&confirm("売上履歴をすべて削除しますか？")){
+    sales=[];save();renderAll();
+  }
+};
+$("csvBtn").onclick=()=>{
+  const rows=[["日付","商品名","仕入れ価格","送料","販売価格","手数料","利益"],...sales.map(s=>[s.date,s.name,s.purchase,s.shipping,s.sale,s.fee,s.profit])];
+  const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="tenbaikun_sales.csv";a.click();
+};
+
+function availableYears(){
+  const y=new Date().getFullYear();
+  return [...new Set([y,...sales.map(s=>+s.date.slice(0,4))])].sort((a,b)=>b-a);
+}
+function renderChart(){
+  const sel=$("chartYear"),keep=+sel.value||new Date().getFullYear();
+  sel.innerHTML=availableYears().map(y=>`<option ${y===keep?"selected":""}>${y}</option>`).join("");
+  const year=+sel.value;
+  const arr=sales.filter(s=>+s.date.slice(0,4)===year);
+  const monthTotals=Array.from({length:12},(_,m)=>totals(arr.filter(s=>+s.date.slice(5,7)===m+1)));
+  const max=Math.max(1,...monthTotals.flatMap(t=>[t.sale,t.purchase,Math.max(0,t.profit)]));
+  $("chart").innerHTML=monthTotals.map((t,m)=>`
+    <div class="monthbar">
+      <div class="bar blue" style="height:${t.sale?Math.max(5,t.sale/max*235):0}px" title="売上 ${yen(t.sale)}"></div>
+      <div class="bar orange" style="height:${t.purchase?Math.max(5,t.purchase/max*235):0}px" title="仕入れ ${yen(t.purchase)}"></div>
+      <div class="bar green" style="height:${t.profit>0?Math.max(5,t.profit/max*235):0}px" title="利益 ${yen(t.profit)}"></div>
+      <div class="mlabel">${m+1}月</div>
+    </div>`).join("");
+  $("chartMetrics").innerHTML=metricsHTML(totals(arr));
+}
+$("chartYear").onchange=renderChart;
+
+let calDate=new Date();calDate.setDate(1);
+let selectedDate=localISO();
+
+$("prevMonth").onclick=()=>{calDate.setMonth(calDate.getMonth()-1);renderCalendar()};
+$("nextMonth").onclick=()=>{calDate.setMonth(calDate.getMonth()+1);renderCalendar()};
+
+function renderCalendar(){
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  const ym=`${y}-${String(m+1).padStart(2,"0")}`;
+  $("calTitle").textContent=`${y}年${m+1}月`;
+  $("calMonth").textContent=`${y}年${m+1}月`;
+  $("calMetrics").innerHTML=metricsHTML(totals(sales.filter(s=>s.date.startsWith(ym))));
+
+  const first=new Date(y,m,1);
+  const start=new Date(y,m,1-first.getDay());
+
+  let h='<div class="dow sun">日</div><div class="dow">月</div><div class="dow">火</div><div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow sat">土</div>';
+
+  for(let i=0;i<42;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);
+    const ds=localISO(d),same=d.getMonth()===m;
+    const t=totals(sales.filter(s=>s.date===ds));
+    const cls=`day ${same?"":"other"} ${d.getDay()===0?"sun":d.getDay()===6?"sat":""} ${ds===selectedDate?"selected":""}`;
+    h+=`<div class="${cls}" onclick="selectDay('${ds}')">
+      <div class="date">${d.getDate()}</div>
+      ${t.count?`<div class="daystats"><div class="sale">売 ${t.sale.toLocaleString()}</div><div class="cost">仕 ${t.purchase.toLocaleString()}</div><div class="profit">利 ${t.profit.toLocaleString()}</div></div>`:""}
+    </div>`;
+  }
+  $("calendar").innerHTML=h;
+  renderDetail();
+}
+
+window.selectDay=ds=>{
+  selectedDate=ds;
+  const d=new Date(ds+"T00:00:00");
+  calDate=new Date(d.getFullYear(),d.getMonth(),1);
+  renderCalendar();
+};
+
+$("addForSelected").onclick=()=>{
+  $("saleDate").value=selectedDate;
+  document.querySelector('[data-page="home"]').click();
+  scrollTo({top:0,behavior:"smooth"});
+};
+
+function renderDetail(){
+  const arr=sales.filter(s=>s.date===selectedDate);
+  const d=new Date(selectedDate+"T00:00:00");
+  $("detailTitle").textContent=`${d.getMonth()+1}月${d.getDate()}日`;
+  $("detailBody").innerHTML=arr.length?arr.map(s=>`
+    <tr>
+      <td>${escapeHtml(s.name)}</td><td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td>
+      <td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
+      <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
+    </tr>`).join(""):'<tr><td colspan="6">この日の売上記録はありません。</td></tr>';
+}
+
+function renderAll(){renderHome();renderHistory();renderChart();renderCalendar()}
+renderAll();
 </script>
 </body>
 </html>
