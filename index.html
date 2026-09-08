@@ -220,6 +220,25 @@ function localISO(d=new Date()){
   const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);
   return x.toISOString().slice(0,10);
 }
+function normalizeDate(v){
+  if(!v) return localISO();
+  let s=String(v).trim();
+
+  // 2026/09/08, 2026.09.08, 2026年9月8日 → 2026-09-08
+  let m=s.match(/^(\d{4})[\/.\-年](\d{1,2})[\/.\-月](\d{1,2})日?/);
+  if(m){
+    return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+  }
+
+  // ISO日時など
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+
+  const d=new Date(s);
+  if(!Number.isNaN(d.getTime())) return localISO(d);
+
+  return localISO();
+}
 function yen(n){return Math.round(Number(n)||0).toLocaleString("ja-JP")+"円"}
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 
@@ -233,16 +252,27 @@ if(!Array.isArray(sales)||!sales.length){
     }catch(e){}
   }
 }
-sales=sales.map((s,i)=>({
-  id:s.id||Date.now()+i,
-  name:s.name||s.productName||"商品",
-  purchase:+(s.purchase??s.cost??s.purchasePrice??0),
-  sale:+(s.sale??s.salePrice??s.price??0),
-  shipping:+(s.shipping??0),
-  fee:+(s.fee??Math.round(+(s.sale??s.salePrice??0)*((s.feeRate??10)/100))),
-  profit:+(s.profit??0),
-  date:(s.date||s.saleDate||localISO()).slice(0,10)
-}));
+sales=sales.map((s,i)=>{
+  const sale=+(s.sale??s.salePrice??s.price??0);
+  const purchase=+(s.purchase??s.cost??s.purchasePrice??0);
+  const shipping=+(s.shipping??s.postage??0);
+  const feeRate=+(s.feeRate??10);
+  const feeRaw=s.fee??s.feeAmount;
+  const fee=Number.isFinite(Number(feeRaw)) ? Number(feeRaw) : Math.round(sale*feeRate/100);
+  const profitRaw=s.profit??s.profitAmount;
+  const profit=Number.isFinite(Number(profitRaw)) ? Number(profitRaw) : sale-purchase-shipping-fee;
+
+  return {
+    id:s.id||Date.now()+i,
+    name:s.name||s.productName||s.itemName||"商品",
+    purchase,
+    sale,
+    shipping,
+    fee,
+    profit,
+    date:normalizeDate(s.date||s.saleDate||s.soldDate)
+  };
+});
 
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(sales))}
 function totals(arr){
