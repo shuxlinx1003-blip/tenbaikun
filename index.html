@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>転売君 Ver.4.2</title>
+<title>転売君 Ver.4.3</title>
 <style>
 :root{
   --navy:#0f2a4b;--navy2:#16395f;--blue:#1578f6;--orange:#ff8a00;
@@ -83,7 +83,7 @@ th{background:#f7f9fc}
 <body>
 <header>
   <div class="brand">転売君 📊 <small>利益を見える化、もっと簡単に。</small></div>
-  <div class="ver">Ver.4.2 ⚙️</div>
+  <div class="ver">Ver.4.3 ⚙️</div>
 </header>
 
 <main>
@@ -249,29 +249,12 @@ function yen(n){return Math.round(Number(n)||0).toLocaleString("ja-JP")+"円"}
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 
 let sales=[];
-// 2026-09-09に救出したCSV 30件。初回だけ既存データへ安全に統合する
-const RECOVERY_KEY="tenbaikun_recovery_20260909_v1";
-const RECOVERY_SALES=[{"id":"csv-20260909-001","date":"2026-09-06","name":"ファミマ　ソックス","purchase":660,"shipping":210,"supplies":0,"sale":1200,"fee":120,"profit":210},{"id":"csv-20260909-002","date":"2026-09-06","name":"ディズニー一番くじ","purchase":781,"shipping":190,"supplies":0,"sale":1,"fee":0,"profit":-970},{"id":"csv-20260909-003","date":"2026-09-06","name":"サンリオ一番くじ","purchase":13200,"shipping":700,"supplies":0,"sale":1,"fee":0,"profit":-13899},{"id":"csv-20260909-004","date":"2026-09-07","name":"ファミマ　ソックス","purchase":660,"shipping":240,"supplies":0,"sale":1150,"fee":115,"profit":135},{"id":"csv-20260909-005","date":"2026-09-07","name":"ワンピース一番くじ","purchase":3500,"shipping":1050,"supplies":0,"sale":9900,"fee":990,"profit":4360},{"id":"csv-20260909-006","date":"2026-09-07","name":"ステッカー","purchase":300,"shipping":175,"supplies":0,"sale":800,"fee":40,"profit":285},{"id":"csv-20260909-007","date":"2026-09-07","name":"ぬいぐるみ　サンリオ","purchase":1,"shipping":275,"supplies":0,"sale":1500,"fee":150,"profit":1074},{"id":"csv-20260909-008","date":"2026-09-07","name":"ジャンプ　ワンピースカード","purchase":340,"shipping":250,"supplies":0,"sale":1500,"fee":150,"profit":760},{"id":"csv-20260909-009","date":"2026-09-07","name":"ファミマ　ステッカー","purchase":300,"shipping":190,"supplies":0,"sale":777,"fee":78,"profit":209},{"id":"csv-20260909-010","date":"2026-09-08","name":"ファミマ　ステッカー","purchase":300,"shipping":190,"supplies":0,"sale":800,"fee":40,"profit":270},{"id":"csv-20260909-011","date":"2026-09-08","name":"ファミマ　ステッカー","purchase":300,"shipping":190,"supplies":0,"sale":800,"fee":40,"profit":270},{"id":"csv-20260909-012","date":"2026-09-08","name":"ファミマ　ソックス","purchase":300,"shipping":190,"supplies":0,"sale":700,"fee":70,"profit":140},{"id":"csv-20260909-013","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":800,"fee":40,"profit":280},{"id":"csv-20260909-014","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":800,"fee":40,"profit":280},{"id":"csv-20260909-015","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":850,"fee":43,"profit":327},{"id":"csv-20260909-016","date":"2026-09-08","name":"ポケモンカード","purchase":40,"shipping":180,"supplies":0,"sale":300,"fee":30,"profit":50},{"id":"csv-20260909-017","date":"2026-09-08","name":"ファミステッカー","purchase":900,"shipping":190,"supplies":0,"sale":2000,"fee":100,"profit":810},{"id":"csv-20260909-018","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":190,"supplies":0,"sale":800,"fee":40,"profit":270},{"id":"csv-20260909-019","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":190,"supplies":0,"sale":700,"fee":70,"profit":140},{"id":"csv-20260909-020","date":"2026-09-08","name":"ステッカー","purchase":900,"shipping":180,"supplies":0,"sale":1600,"fee":160,"profit":360},{"id":"csv-20260909-021","date":"2026-09-08","name":"雑誌","purchase":1890,"shipping":210,"supplies":0,"sale":3333,"fee":333,"profit":900},{"id":"csv-20260909-022","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":700,"fee":70,"profit":150},{"id":"csv-20260909-023","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":700,"fee":70,"profit":150},{"id":"csv-20260909-024","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":700,"fee":70,"profit":150},{"id":"csv-20260909-025","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":710,"fee":71,"profit":159},{"id":"csv-20260909-026","date":"2026-09-08","name":"ステッカー","purchase":600,"shipping":180,"supplies":0,"sale":1360,"fee":136,"profit":444},{"id":"csv-20260909-027","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":710,"fee":71,"profit":159},{"id":"csv-20260909-028","date":"2026-09-08","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":710,"fee":71,"profit":159},{"id":"csv-20260909-029","date":"2026-09-09","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":720,"fee":72,"profit":168},{"id":"csv-20260909-030","date":"2026-09-09","name":"ステッカー","purchase":300,"shipping":180,"supplies":0,"sale":800,"fee":40,"profit":280}];
-// 以前のバージョンを含む全保存先から読み込み、消さずに統合する
-const rawSales=[];
-for(const k of [STORAGE_KEY,...ALT_KEYS]){
-  try{
-    const x=JSON.parse(localStorage.getItem(k)||"[]");
-    if(Array.isArray(x)) rawSales.push(...x);
-  }catch(e){}
+try{
+  const x=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+  sales=Array.isArray(x)?x:[];
+}catch(e){
+  sales=[];
 }
-// 復旧CSVは一度だけ追加。今あるSafariデータは上書きしない
-if(localStorage.getItem(RECOVERY_KEY)!=="done"){
-  rawSales.push(...RECOVERY_SALES);
-}
-
-// 同じ記録が複数キーに残っていても重複表示しない
-const seen=new Set();
-sales=rawSales.filter((s,i)=>{
-  const key=s.id!=null ? `id:${s.id}` : `row:${s.date||s.saleDate||s.soldDate||""}|${s.name||s.productName||s.itemName||""}|${s.sale??s.salePrice??s.price??0}|${s.purchase??s.cost??s.purchasePrice??0}|${s.shipping??s.postage??0}`;
-  if(seen.has(key)) return false;
-  seen.add(key);return true;
-});
 
 sales=sales.map((s,i)=>{
   const sale=+(s.sale??s.salePrice??s.price??0);
@@ -295,10 +278,7 @@ sales=sales.map((s,i)=>{
     profit,
     date:normalizeDate(s.date||s.saleDate||s.soldDate)
   };
- });
-
-// 統合後のデータを現在の保存先にもコピー。旧キーは削除しないので復旧余地を残す
-try{localStorage.setItem(STORAGE_KEY,JSON.stringify(sales));localStorage.setItem(RECOVERY_KEY,"done")}catch(e){}
+});
 
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(sales))}
 function totals(arr){
@@ -440,11 +420,8 @@ $("csvFile").onchange=e=>{
       });
 
       if(!confirm(`CSVの${imported.length}件で現在の売上履歴を置き換えます。\nよろしいですか？`))return;
-
       sales=imported;
       save();
-      // 復旧用データが次回起動時に再追加されないようにする
-      try{localStorage.setItem(RECOVERY_KEY,"done")}catch(e){}
       renderAll();
       alert(`CSVから${sales.length}件を読み込みました！`);
     }catch(err){
