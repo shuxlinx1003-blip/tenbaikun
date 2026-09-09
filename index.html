@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>転売君 Ver.4.1</title>
+<title>転売君 Ver.4.2</title>
 <style>
 :root{
   --navy:#0f2a4b;--navy2:#16395f;--blue:#1578f6;--orange:#ff8a00;
@@ -83,7 +83,7 @@ th{background:#f7f9fc}
 <body>
 <header>
   <div class="brand">転売君 📊 <small>利益を見える化、もっと簡単に。</small></div>
-  <div class="ver">Ver.4.1 ⚙️</div>
+  <div class="ver">Ver.4.2 ⚙️</div>
 </header>
 
 <main>
@@ -149,6 +149,8 @@ th{background:#f7f9fc}
       <div class="section-head"><h2>📚 売上履歴</h2></div>
       <div class="history-actions">
         <button class="btn redline" id="deleteAll">🗑 すべて削除</button>
+        <button class="btn blueline" id="csvImportBtn">⬆ CSV読込</button>
+        <input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
         <button class="btn blueline" id="csvBtn">⬇ CSV出力</button>
       </div>
       <div class="tablewrap">
@@ -391,6 +393,69 @@ $("deleteAll").onclick=()=>{
     sales=[];save();renderAll();
   }
 };
+
+function parseCSVLine(line){
+  const out=[];let cur="",quoted=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){
+      if(quoted && line[i+1]==='"'){cur+='"';i++;}
+      else quoted=!quoted;
+    }else if(ch==="," && !quoted){out.push(cur);cur="";}
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out;
+}
+
+$("csvImportBtn").onclick=()=>$("csvFile").click();
+
+$("csvFile").onchange=e=>{
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const content=String(ev.target.result||"").replace(/^\uFEFF/,"");
+      const lines=content.split(/\r?\n/).filter(x=>x.trim()!=="");
+      if(lines.length<2)throw new Error("CSVに売上データがありません");
+      const headers=parseCSVLine(lines[0]).map(x=>x.trim());
+      const need=["日付","商品名","仕入れ価格","送料","備品代","販売価格","手数料","利益"];
+      if(!need.every(h=>headers.includes(h)))throw new Error("転売君のCSV形式ではありません");
+
+      const imported=lines.slice(1).map((line,i)=>{
+        const vals=parseCSVLine(line);
+        const r={};headers.forEach((h,j)=>r[h]=vals[j]??"");
+        return {
+          id:Date.now()+i,
+          date:normalizeDate(r["日付"]),
+          name:r["商品名"]||"商品",
+          purchase:+r["仕入れ価格"]||0,
+          shipping:+r["送料"]||0,
+          supplies:+r["備品代"]||0,
+          sale:+r["販売価格"]||0,
+          fee:+r["手数料"]||0,
+          profit:+r["利益"]||0
+        };
+      });
+
+      if(!confirm(`CSVの${imported.length}件で現在の売上履歴を置き換えます。\nよろしいですか？`))return;
+
+      sales=imported;
+      save();
+      // 復旧用データが次回起動時に再追加されないようにする
+      try{localStorage.setItem(RECOVERY_KEY,"done")}catch(e){}
+      renderAll();
+      alert(`CSVから${sales.length}件を読み込みました！`);
+    }catch(err){
+      alert("CSVを読み込めませんでした。\n"+err.message);
+    }finally{
+      e.target.value="";
+    }
+  };
+  reader.readAsText(file,"UTF-8");
+};
+
 $("csvBtn").onclick=()=>{
   const rows=[["日付","商品名","仕入れ価格","送料","備品代","販売価格","手数料","利益"],...sales.map(s=>[s.date,s.name,s.purchase,s.shipping,s.supplies||0,s.sale,s.fee,s.profit])];
   const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
