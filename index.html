@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>転売君 Ver.4 - 備品代対応</title>
+<title>転売君 Ver.4.1</title>
 <style>
 :root{
   --navy:#0f2a4b;--navy2:#16395f;--blue:#1578f6;--orange:#ff8a00;
@@ -29,7 +29,7 @@ main{max-width:1120px;margin:auto;padding:18px 14px 95px}
 h2{margin:0;font-size:24px}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
-.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 label{display:block;font-weight:900;margin:9px 0 6px}
 input,select{width:100%;padding:13px;border:1.4px solid #cbd5e1;border-radius:11px;font-size:17px;background:#fff}
 .btn{border:0;border-radius:11px;padding:11px 14px;font-weight:900}
@@ -83,7 +83,7 @@ th{background:#f7f9fc}
 <body>
 <header>
   <div class="brand">転売君 📊 <small>利益を見える化、もっと簡単に。</small></div>
-  <div class="ver">Ver.4 ⚙️</div>
+  <div class="ver">Ver.4.1 ⚙️</div>
 </header>
 
 <main>
@@ -247,19 +247,28 @@ function yen(n){return Math.round(Number(n)||0).toLocaleString("ja-JP")+"円"}
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 
 let sales=[];
-try{sales=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){sales=[]}
-if(!Array.isArray(sales)||!sales.length){
-  for(const k of ALT_KEYS){
-    try{
-      const x=JSON.parse(localStorage.getItem(k)||"[]");
-      if(Array.isArray(x)&&x.length){sales=x;break}
-    }catch(e){}
-  }
+// 以前のバージョンを含む全保存先から読み込み、消さずに統合する
+const rawSales=[];
+for(const k of [STORAGE_KEY,...ALT_KEYS]){
+  try{
+    const x=JSON.parse(localStorage.getItem(k)||"[]");
+    if(Array.isArray(x)) rawSales.push(...x);
+  }catch(e){}
 }
+
+// 同じ記録が複数キーに残っていても重複表示しない
+const seen=new Set();
+sales=rawSales.filter((s,i)=>{
+  const key=s.id!=null ? `id:${s.id}` : `row:${s.date||s.saleDate||s.soldDate||""}|${s.name||s.productName||s.itemName||""}|${s.sale??s.salePrice??s.price??0}|${s.purchase??s.cost??s.purchasePrice??0}|${s.shipping??s.postage??0}`;
+  if(seen.has(key)) return false;
+  seen.add(key);return true;
+});
+
 sales=sales.map((s,i)=>{
   const sale=+(s.sale??s.salePrice??s.price??0);
   const purchase=+(s.purchase??s.cost??s.purchasePrice??0);
-  const shipping=+(s.shipping??s.postage??0);\n  const supplies=+(s.supplies??s.supplyCost??s.materialCost??0);
+  const shipping=+(s.shipping??s.postage??0);
+  const supplies=+(s.supplies??s.supplyCost??s.materialCost??0);
   const feeRate=+(s.feeRate??10);
   const feeRaw=s.fee??s.feeAmount;
   const fee=Number.isFinite(Number(feeRaw)) ? Number(feeRaw) : Math.round(sale*feeRate/100);
@@ -277,7 +286,10 @@ sales=sales.map((s,i)=>{
     profit,
     date:normalizeDate(s.date||s.saleDate||s.soldDate)
   };
-});
+ });
+
+// 統合後のデータを現在の保存先にもコピー。旧キーは削除しないので復旧余地を残す
+try{localStorage.setItem(STORAGE_KEY,JSON.stringify(sales))}catch(e){}
 
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(sales))}
 function totals(arr){
