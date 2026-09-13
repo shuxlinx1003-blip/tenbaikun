@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#071a33">
-<title>転売君 Pro</title>
+<title>転売君 Pro LIVE</title>
 <style>
 :root{
  --navy:#071a33;--navy2:#0b2a52;--blue:#1677ff;--cyan:#18b6d9;--green:#16a765;
@@ -59,12 +59,12 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 <main>
 <section class="page active" id="page-home">
  <div class="hero">
-  <h1>今日も、仕入れをもっと効率よく。</h1><p id="todayText"></p>
+  <h1>今日、動く価値がある情報だけ。</h1><p id="todayText"></p>
   <div class="quick"><div class="q"><b id="qNow">0</b><span>今から狙える</span></div><div class="q"><b id="qToday">0</b><span>本日入荷候補</span></div><div class="q"><b id="qRaffle">0</b><span>抽選・予約</span></div><div class="q"><b id="qHot">0</b><span>SNS急上昇候補</span></div></div>
  </div>
 
  <div class="card">
-  <div class="row between"><div><h2>🔥 今日の仕入れ候補 TOP20</h2><div class="sub">今日入手できる可能性・利益・鮮度・距離で優先表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="row between"><div><h2>🔥 今日の仕入れ候補 TOP20</h2><div class="sub">X実データ＋登録済み候補を、鮮度・地域・根拠で優先表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
   <div class="tabs" id="categoryTabs"></div>
   <div id="top20"></div>
  </div>
@@ -98,12 +98,13 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 
 <section class="page" id="page-search">
  <div class="card">
-  <h2>🔎 利益商品サーチ</h2><div class="sub">現時点では候補データ＋手入力。将来X/Instagram/公式情報APIを接続できます。</div>
+  <h2>🔎 X実データ商品サーチ</h2><div class="sub">Xの最新投稿を直接検索。入荷・再販・抽選・予約・販売開始を拾い、地域・鮮度・信頼度で判定します。</div>
   <div class="grid2" style="margin-top:12px">
    <div class="field"><label>キーワード</label><input id="searchKeyword" placeholder="例：ポケモン、一番くじ"></div>
    <div class="field"><label>最低利益</label><input id="searchProfit" type="number" value="200"></div>
   </div>
-  <button class="btn primary" style="width:100%;margin-top:10px" onclick="renderSearch()">検索する</button>
+  <button class="btn primary" style="width:100%;margin-top:10px" onclick="searchLiveFromSearchPage()">Xの最新情報を検索する</button>
+  <div id="liveSearchStatus" class="sub" style="margin-top:10px">商品名や「再販」「抽選」などを入力してください。</div>
   <div id="searchResults"></div>
  </div>
  <div class="card">
@@ -289,12 +290,7 @@ let stores=jload(K.stores,[
  {id:"s3",name:"長崎エリア 本屋",type:"本屋",pref:"長崎県",time:"10:00",memo:"初版・特典・付録付き雑誌を確認。",lat:null,lng:null},
  {id:"s4",name:"長崎エリア 100均",type:"100均",pref:"長崎県",time:"10:00",memo:"コラボ・SNS話題・廃盤候補を確認。",lat:null,lng:null}
 ]);
-let candidates=jload(K.candidates,[
- {id:"c1",name:"トレーディングカード 新商品候補",cat:"トレーディングカード",buy:5400,sell:7980,ship:210,fee:10,avail:5,fresh:5,storeId:"s2",hot:5,today:true},
- {id:"c2",name:"一番くじ 上位賞狙い候補",cat:"一番くじ",buy:790,sell:2200,ship:750,fee:10,avail:4,fresh:5,storeId:"s1",hot:4,today:true},
- {id:"c3",name:"100均 SNS話題グッズ",cat:"100均",buy:110,sell:700,ship:210,fee:10,avail:4,fresh:4,storeId:"s4",hot:5,today:true},
- {id:"c4",name:"コミック 初版・特典候補",cat:"本屋",buy:770,sell:1800,ship:210,fee:10,avail:4,fresh:4,storeId:"s3",hot:4,today:true}
-]);
+let candidates=jload(K.candidates,[]);
 let raffles=jload(K.raffles,[
  {id:"r1",shop:"ポケモンセンターオンライン",name:"ポケモンカード 抽選候補",cat:"トレーディングカード",status:"抽選受付中",deadline:"",notify:1},
  {id:"r2",shop:"GEO",name:"ゲーム機・人気ソフト抽選候補",cat:"ゲーム",status:"抽選受付中",deadline:"",notify:1}
@@ -342,11 +338,12 @@ function renderHome(){
  renderTabs();
  let a=candidates.filter(c=>calcProfit(c)>=200&&(activeCat==="すべて"||c.cat===activeCat));
  a.sort((x,y)=>score(y)-score(x));
- $("top20").innerHTML=a.length?a.slice(0,20).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">条件に合う候補がありません。</div>`;
- $("qNow").textContent=a.filter(c=>verdict(c)[0]==="GO").length;
+ const liveTop=liveSignals.slice().sort((x,y)=>(Number(y.score||0)-Number(x.score||0))).slice(0,20);
+ $("top20").innerHTML=liveTop.length?`<div class="sub" style="margin:8px 0 12px">⚡ X実データから抽出。価格が確認できない情報には利益額を捏造しません。</div>`+liveTop.map(liveSignalCard).join(""):(a.length?a.slice(0,20).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">まだ実データ候補がありません。「X速報を更新」またはサーチから検索してください。</div>`);
+ $("qNow").textContent=liveSignals.length?liveSignals.filter(p=>p.decision==="GO").length:a.filter(c=>verdict(c)[0]==="GO").length;
  $("qToday").textContent=a.filter(c=>c.today).length;
  $("qRaffle").textContent=raffles.filter(r=>/受付|予定/.test(r.status)).length;
- $("qHot").textContent=a.filter(c=>(+c.hot||0)>=4).length;
+ $("qHot").textContent=liveSignals.length?liveSignals.filter(p=>Number(p.score||0)>=70).length:a.filter(c=>(+c.hot||0)>=4).length;
  renderToday();
  renderHomeSell();
 }
@@ -496,62 +493,43 @@ function signalBadgeClass(decision){
   if(decision==="STOP") return "red";
   return "orange";
 }
-
+let liveSignals=[];
+function liveSignalCard(p,i){
+ const author=p.author?.name||p.author?.username||"Xユーザー";
+ const age=Number.isFinite(Number(p.age_minutes))?`${p.age_minutes}分前`:"";
+ const local=p.local_match?`📍 ${(p.matched_locations||[]).join("・")||p.detected_area||"地域一致"}`:"🌐 全国情報";
+ const stores=(p.matched_stores||[]).length?`｜🏪 ${p.matched_stores.join("・")}`:"";
+ const words=(p.matched_words||[]).length?`｜🔎 ${p.matched_words.join("・")}`:"";
+ const decision=p.decision||"WAIT", score=Number(p.score||0), url=esc(p.x_url||"#");
+ return `<div class="item" style="margin-top:10px;border-left:5px solid ${decision==="GO"?'#19a44a':decision==="STOP"?'#ef4444':'#f59e0b'}">
+ <div class="row between"><div><b>${i+1}. ${esc(p.type||"速報")}</b> <span class="badge ${signalBadgeClass(decision)}">${esc(decision)}</span></div><b>${score}点</b></div>
+ <div class="sub" style="margin-top:5px">${esc(local)}${esc(stores)}｜⚡ ${esc(p.freshness||"")}${age?'・'+esc(age):''}${esc(words)}</div>
+ <div style="margin-top:8px;line-height:1.55;font-weight:700">${esc(String(p.text||"").replace(/\s+/g," ").slice(0,260))}</div>
+ <div class="row between" style="margin-top:9px"><span class="sub">${esc(author)}｜信頼度 ${esc(p.confidence||"可能性中")}｜根拠：X実投稿</span><a class="btn soft" href="${url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none">X原文</a></div></div>`;
+}
+async function fetchSignals(product,area,limit=20){
+ const endpoint=TENBAIKUN_API+"/signals?product="+encodeURIComponent(product)+"&area="+encodeURIComponent(area)+"&limit="+limit;
+ const response=await fetch(endpoint,{method:"GET",cache:"no-store"});
+ const data=await response.json();
+ if(!response.ok||!data.ok) throw new Error(data.error||("APIエラー "+response.status));
+ return data;
+}
 async function loadXSignals(){
-  const product=($("xProduct")?.value||"ポケモンカード").trim();
-  const area=($("xArea")?.value||"長崎").trim();
-  const status=$("xSignalStatus");
-  const list=$("xSignalList");
-  if(!product){toast("商品名を入力してください");return}
-
-  status.textContent="Xから最新情報を取得中…";
-  list.innerHTML="";
-
-  try{
-    const endpoint=TENBAIKUN_API+"/signals?product="+encodeURIComponent(product)+"&area="+encodeURIComponent(area)+"&limit=20";
-    const response=await fetch(endpoint,{method:"GET",cache:"no-store"});
-    const data=await response.json();
-
-    if(!response.ok || !data.ok){
-      throw new Error(data.error||("APIエラー "+response.status));
-    }
-
-    const posts=Array.isArray(data.posts)?data.posts:[];
-    const localCount=Number(data.summary?.local||0);
-    status.textContent=`取得 ${posts.length}件｜長崎関連 ${localCount}件｜最終更新 ${new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}`;
-
-    if(!posts.length){
-      list.innerHTML='<div class="empty">現在、条件に合うX速報はありません。時間を置いて再検索してください。</div>';
-      return;
-    }
-
-    list.innerHTML=posts.map((p,i)=>{
-      const author=p.author?.name||p.author?.username||"Xユーザー";
-      const age=Number.isFinite(Number(p.age_minutes))?`${p.age_minutes}分前`:"";
-      const local=p.local_match?`📍 ${esc((p.matched_locations||[]).join("・")||p.detected_area||area)}`:"🌐 全国情報";
-      const stores=(p.matched_stores||[]).length?`｜🏪 ${esc(p.matched_stores.join("・"))}`:"";
-      const words=(p.matched_words||[]).length?`｜${esc(p.matched_words.join("・"))}`:"";
-      const decision=esc(p.decision||"WAIT");
-      const url=esc(p.x_url||"#");
-      const text=esc(String(p.text||"").replace(/\s+/g," ").slice(0,220));
-      return `
-       <div class="item" style="margin-top:10px">
-        <div class="row between">
-         <div><b>${i+1}. ${esc(p.type||"情報")}</b> <span class="badge ${signalBadgeClass(p.decision)}">${decision}</span></div>
-         <b>${Number(p.score||0)}点</b>
-        </div>
-        <div class="sub" style="margin-top:5px">${local}${stores}｜⚡ ${esc(p.freshness||"")}${age?"・"+age:""}${words}</div>
-        <div style="margin-top:8px;line-height:1.55">${text}</div>
-        <div class="row between" style="margin-top:9px">
-         <span class="sub">${esc(author)}｜信頼度 ${esc(p.confidence||"可能性中")}</span>
-         <a class="btn soft" href="${url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Xで確認</a>
-        </div>
-       </div>`;
-    }).join("");
-  }catch(e){
-    status.textContent="取得できませんでした。";
-    list.innerHTML=`<div class="empty">通信エラー：${esc(e.message||String(e))}</div>`;
-  }
+ const product=($('xProduct')?.value||'ポケモンカード').trim(), area=($('xArea')?.value||pref.replace(/[都道府県府]$/,'')).trim();
+ const status=$('xSignalStatus'),list=$('xSignalList'); if(!product)return toast('商品名を入力してください');
+ status.textContent='X実データを取得中…'; list.innerHTML='';
+ try{const data=await fetchSignals(product,area,20); liveSignals=Array.isArray(data.posts)?data.posts:[]; const local=Number(data.summary?.local||0);
+ status.textContent=`X実投稿 ${liveSignals.length}件｜地域一致 ${local}件｜${new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}更新`;
+ list.innerHTML=liveSignals.length?liveSignals.map(liveSignalCard).join(''):'<div class="empty">現在、条件に合うX実投稿はありません。</div>';
+ // Home TOP20 is no longer populated by fabricated examples. Real X signals appear first.
+ renderHome();
+ }catch(e){status.textContent='取得できませんでした。';list.innerHTML=`<div class="empty">通信エラー：${esc(e.message||String(e))}</div>`}
+}
+async function searchLiveFromSearchPage(){
+ const product=($('searchKeyword').value||'').trim(), area=pref.replace(/[都道府県府]$/,''); const status=$('liveSearchStatus'), list=$('searchResults');
+ if(!product)return toast('キーワードを入力してください'); status.textContent='Xから最新情報を検索中…';list.innerHTML='';
+ try{const data=await fetchSignals(product,area,20);const posts=Array.isArray(data.posts)?data.posts:[];status.textContent=`X実投稿 ${posts.length}件｜地域一致 ${Number(data.summary?.local||0)}件`;list.innerHTML=posts.length?posts.map(liveSignalCard).join(''):'<div class="list-empty">該当するX実投稿はありません。</div>'}
+ catch(e){status.textContent='検索失敗';list.innerHTML=`<div class="list-empty">${esc(e.message||String(e))}</div>`}
 }
 
 function showPage(name){
