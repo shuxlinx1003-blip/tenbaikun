@@ -65,7 +65,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・売上連動版</span></div><div class="tag">X API 0回｜過去の売上実績から利益候補を自動生成</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・判定安全版</span></div><div class="tag">X API 0回｜現在候補と過去実績を分離して安全判定</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
@@ -75,7 +75,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
  </div>
 
  <div class="card">
-  <div class="row between"><div><h2>👑 利益候補 TOP100</h2><div class="sub">X APIは使用しません。過去の売上実績と登録データから、利益候補を自動生成して最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="row between"><div><h2>👑 利益候補 TOP100</h2><div class="sub">X APIは使用しません。現在確認済みの候補を優先し、過去実績は「参考」として最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
   <div class="tabs" id="categoryTabs"></div>
   <div class="sub" style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:12px;color:#166534"><b>🌿 無料優先モード</b>：X API 0回・Workerへの自動通信 0回。価格未確認の商品に架空の利益は表示しません。</div><div id="top20"></div>
  </div>
@@ -83,7 +83,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
  <div class="card">
   <div class="row between"><div><h2>🌿 無料データモード</h2><div class="sub">X APIを完全に停止しています。Cloudflare Workerへの自動アクセスも行いません。</div></div><span class="status-go">FREE</span></div>
   <div class="grid2" style="margin-top:12px"><div class="q"><b>0回</b><span>X API呼び出し</span></div><div class="q"><b>0回</b><span>Worker自動通信</span></div></div>
-  <div class="sub" style="margin-top:12px">過去の売上実績から利益が出た商品を自動で候補化します。新しい商品は「候補登録」で追加できます。既存の売上データはそのまま保持します。</div>
+  <div class="sub" style="margin-top:12px">過去の売上実績は「参考」として候補化します。過去実績だけではGO判定にしません。現在価格・在庫を確認して登録した候補だけGO/WAIT/STOP判定します。既存の売上データは保持します。</div>
  </div>
 
  <div class="card">
@@ -318,16 +318,16 @@ function score(c){
  if(gps&&st&&st.lat&&st.lng){const d=distance(gps.lat,gps.lng,+st.lat,+st.lng);distanceBonus=Math.max(0,8-d/3)}
  return Math.max(1,Math.min(99,Math.round(profitScore+av+fr+hot+distanceBonus)));
 }
-function verdict(c){const s=score(c),p=calcProfit(c);if(p<200||s<45)return["STOP","status-stop"];if(s<72)return["WAIT","status-wait"];return["GO","status-go"]}
+function verdict(c){const s=score(c),p=calcProfit(c);if(c.autoFromSales)return["参考","status-wait"];if(p<200||s<45)return["STOP","status-stop"];if(s<72)return["WAIT","status-wait"];return["GO","status-go"]}
 function distance(a,b,c,d){const R=6371,toRad=x=>x*Math.PI/180;const dLat=toRad(c-a),dLon=toRad(d-b);const q=Math.sin(dLat/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
 function storeFor(c){return stores.find(s=>s.id===c.storeId)}
 function candidateCard(c,rank){
  const p=calcProfit(c),s=score(c),st=storeFor(c),[v,vc]=verdict(c);
  return `<div class="product"><div class="product-top"><div class="rank">${rank??"★"}</div><div class="product-info"><div class="row between"><div class="product-title">${esc(c.name)}</div><div class="score">${s}<span style="font-size:11px">点</span></div></div>
- <div class="badges"><span class="badge">${esc(c.cat)}</span><span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span><span class="badge b-orange">${+c.fresh>=5?"速報":+c.fresh>=4?"新鮮":"通常"}</span><span class="${vc}">${v}</span></div>
- <div class="small">${c.autoFromSales?`📊 自分の過去実績 ${c.historyCount||1}件から自動算出`:`📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}`}</div>
+ <div class="badges"><span class="badge">${esc(c.cat)}</span>${c.autoFromSales?`<span class="badge b-purple">過去実績・参考</span><span class="badge b-orange">現在価格 未確認</span>`:`<span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span><span class="badge b-orange">${+c.fresh>=5?"速報":+c.fresh>=4?"新鮮":"通常"}</span>`}<span class="${vc}">${v}</span></div>
+ <div class="small">${c.autoFromSales?`📊 過去の売上実績 ${c.historyCount||1}件から算出した参考値です。現在も同じ価格で仕入れ・販売できるとは限りません。`:`📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}`}</div>
  <div class="money"><div class="m">仕入<b>${yen(c.buy)}</b></div><div class="m">想定販売<b>${yen(c.sell)}</b></div><div class="m profit">想定利益<b>${yen(p)}</b></div></div>
- <div class="actions"><button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button><button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
+ <div class="actions">${c.autoFromSales?`<button class="btn soft" onclick="showPage('search');document.getElementById('searchKeyword').value='${esc(c.name).replace(/'/g,"\\'")}';renderSearch()">🔎 現在価格を確認</button>`:`<button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button>`}<button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
  </div></div></div>`;
 }
 function renderTabs(){
@@ -338,7 +338,7 @@ window.setCat=x=>{activeCat=decodeURIComponent(x);renderHome()}
 function renderHome(){
  renderTabs();
  let a=candidates.filter(c=>calcProfit(c)>=200&&(activeCat==="すべて"||c.cat===activeCat));
- a.sort((x,y)=>score(y)-score(x));
+ a.sort((x,y)=>(Number(x.autoFromSales)-Number(y.autoFromSales)) || score(y)-score(x));
  $("top20").innerHTML=a.length?a.slice(0,100).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">まだ利益候補を作れる売上実績がありません。売上を登録すると、自動でTOP100候補が作られます。</div>`;
  $("qNow").textContent=a.filter(c=>verdict(c)[0]==="GO").length;
  $("qToday").textContent=a.filter(c=>c.today).length;
@@ -434,7 +434,7 @@ function normalizeSale(s,i){
  return {id:s.id||uid("old"),name:s.name||s.productName||"商品",purchase,sale,shipping,supplies,feeRate,fee,profit,date:s.date||new Date().toISOString().slice(0,10),cat:s.cat||"その他"};
 }
 sales=Array.isArray(sales)?sales.map(normalizeSale):[];
-jsave(K.sales,sales);
+// v12安全化：ページを開いただけでは tenbaikun_sales を書き換えない。保存は新規登録・削除時のみ。
 
 // v10: X APIや外部APIを一切使わず、自分の過去売上から利益候補を自動生成。
 // tenbaikun_sales は読み取るだけで、既存データを削除・変更しません。
