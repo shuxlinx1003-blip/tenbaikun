@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#071a33">
+<title>転売君 Pro v11｜TOP100 売上連動修正版</title>
+<style>
+:root{
+ --navy:#071a33;--navy2:#0b2a52;--blue:#1677ff;--cyan:#18b6d9;--green:#16a765;
+ --orange:#f59e0b;--red:#ef4444;--purple:#7c3aed;--pink:#ec4899;
+ --bg:#f3f6fa;--card:#fff;--text:#172033;--muted:#718096;--line:#e4eaf2;
+ --shadow:0 10px 30px rgba(16,35,62,.08)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;padding-bottom:88px}
+button,input,select,textarea{font:inherit}
+header{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,#06162c,#0a2c56);color:#fff;box-shadow:0 3px 14px rgba(0,0,0,.2)}
+.head{max-width:1080px;margin:auto;padding:12px 15px;display:flex;align-items:center;gap:10px}
+.logo{font-size:24px;font-weight:1000}.tag{font-size:12px;opacity:.8;flex:1}.pill{font-size:12px;background:#ffffff18;border:1px solid #ffffff25;border-radius:999px;padding:7px 9px}
+main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{display:block}
+.hero{background:linear-gradient(135deg,#08234a,#0b3b73);color:white;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#20b8ff22;right:-70px;top:-80px}
+.hero h1{font-size:26px;margin:0 0 4px}.hero p{margin:0;opacity:.82;font-size:13px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:15px}
+.q{background:#ffffff14;border:1px solid #ffffff18;border-radius:15px;padding:11px 8px;text-align:center}.q b{display:block;font-size:20px}.q span{font-size:11px;opacity:.85}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:15px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card h2{font-size:20px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:4px}.row{display:flex;gap:9px;align-items:center}.between{justify-content:space-between}
+.tabs{display:flex;gap:7px;overflow:auto;padding:2px 0 9px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;border:1px solid #d8e0ec;background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;font-size:13px;color:#4b5d76}.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:900;cursor:pointer}.primary{background:var(--blue);color:white}.green{background:var(--green);color:white}.soft{background:#eef4ff;color:#1667c9}.danger{background:#fff0f1;color:#d9363e;border:1px solid #ffd1d4}.outline{background:white;border:1px solid #cfd8e6;color:#43536b}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.field label{display:block;font-size:12px;font-weight:900;margin:0 0 6px;color:#42526a}.field input,.field select,.field textarea{width:100%;border:1px solid #cfd8e6;border-radius:12px;padding:12px;background:#fff;outline:none}.field textarea{min-height:80px;resize:vertical}
+.product{border:1px solid var(--line);border-radius:17px;padding:12px;margin-top:10px;background:#fff}
+.rank{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:1000;background:#f3f6fb}
+.product-top{display:flex;gap:10px}.product-info{flex:1;min-width:0}.product-title{font-weight:1000;font-size:16px;line-height:1.25}.badges{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}.badge{font-size:11px;font-weight:900;border-radius:999px;padding:5px 8px;background:#eef4ff;color:#1765bf}.b-green{background:#e9f8ef;color:#13804b}.b-red{background:#fff0f0;color:#dc3535}.b-orange{background:#fff4e5;color:#c67605}.b-purple{background:#f3edff;color:#6b35c9}
+.money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.m{background:#f7f9fc;border-radius:10px;padding:8px;text-align:center;font-size:11px;color:#66758b}.m b{display:block;color:#18263a;font-size:14px;margin-top:3px}.profit b{color:var(--green)}
+.score{font-size:25px;font-weight:1000;color:#173b69}.actions{display:flex;gap:7px;margin-top:9px}.actions .btn{flex:1;padding:10px;font-size:12px}
+.status-go{color:#fff;background:var(--green);border-radius:12px;padding:8px 11px;font-weight:1000}.status-wait{color:#805200;background:#fff2cc;border-radius:12px;padding:8px 11px;font-weight:1000}.status-stop{color:#b42318;background:#fee4e2;border-radius:12px;padding:8px 11px;font-weight:1000}
+.store{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.store:last-child{border-bottom:0}.store-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#eef4ff;font-size:21px}.grow{flex:1}.small{font-size:12px;color:var(--muted)}
+.route-stop{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}.route-n{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#fff;font-weight:1000}
+.kpi{border-radius:15px;padding:12px;background:#f7f9fc}.kpi b{display:block;font-size:20px;margin-top:4px}.kpi.greenish{background:#edf9f2;color:#137a49}
+.list-empty{color:var(--muted);font-size:13px;text-align:center;padding:20px}.warning{background:#fff8e7;border:1px solid #ffe4a8;color:#7d5a10;border-radius:14px;padding:11px;font-size:12px;margin-top:10px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#fffffff4;backdrop-filter:blur(12px);border-top:1px solid var(--line);z-index:50}
+.bottom-in{max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(7,1fr);padding:5px 5px calc(5px + env(safe-area-inset-bottom))}
+.nav{border:0;background:transparent;color:#697a91;border-radius:10px;padding:6px 2px;font-size:10px;font-weight:800}.nav i{font-style:normal;font-size:20px;display:block}.nav.active{color:#116ee8;background:#eef5ff}
+.modal{position:fixed;inset:0;background:#09152588;z-index:80;display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{width:min(720px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h3{margin:0 0 14px}.sheet .close{float:right;border:0;background:#eef1f5;border-radius:50%;width:34px;height:34px}
+.toast{position:fixed;left:50%;bottom:94px;transform:translateX(-50%);background:#10243e;color:#fff;border-radius:999px;padding:11px 15px;font-size:13px;font-weight:900;opacity:0;pointer-events:none;z-index:100;transition:.2s}.toast.show{opacity:1}
+.table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}.table th,.table td{padding:9px;border-bottom:1px solid var(--line);text-align:center}.scroll{overflow:auto}
+@media(max-width:720px){.tag{display:none}.quick{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}.money{grid-template-columns:repeat(3,1fr)}.bottom-in{grid-template-columns:repeat(7,1fr)}.nav{font-size:9px}.nav i{font-size:18px}}
+
+/* === 商品名TOP20 UI v6 === */
+.product-live{background:#fff;border:1px solid #dfe7f2;border-radius:18px;margin:10px 0;padding:12px;box-shadow:0 5px 18px rgba(16,35,62,.06)}
+.live-grid{display:grid;grid-template-columns:46px minmax(0,1fr);gap:10px}.rank-medal{width:42px;height:42px;border-radius:13px;background:#eef4ff;color:#173c70;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:1000}.rank-medal.top{background:#fff3c4;color:#8a5b00}
+.live-title{font-size:17px;font-weight:1000;line-height:1.35}.live-source{font-size:12px;color:#66758b;margin-top:5px;line-height:1.45}.live-alert{font-size:12px;font-weight:900;color:#e33b42;margin-top:5px}.live-money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.live-money>div{background:#f6f8fc;border-radius:11px;padding:8px;text-align:center;font-size:10px;color:#6a788b}.live-money b{display:block;font-size:15px;color:#172033;margin-top:2px}.live-money .profitbox{background:#e9fbef}.live-money .profitbox b{color:#087c35}.decision-row{display:flex;gap:7px;align-items:center;margin-top:9px}.decision-big{border-radius:11px;padding:8px 12px;font-size:17px;font-weight:1000;color:#fff}.decision-big.go{background:#10ad46}.decision-big.wait{background:#f6b900;color:#1d1d1d}.decision-big.stop{background:#e94a50}.evidence{flex:1;background:#fff0f1;color:#e33b42;border-radius:10px;padding:8px;font-size:11px;font-weight:800;text-align:center}.source-count{font-size:11px;color:#5d6c82}.no-price{font-size:11px;color:#6b7789;margin-top:7px;background:#f7f8fb;border-radius:9px;padding:7px}.product-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.product-tags span{background:#eaf3ff;color:#1769c2;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:800}
+@media(min-width:700px){.product-live{padding:14px}.live-grid{grid-template-columns:54px minmax(0,1fr)}.live-title{font-size:18px}}
+
+/* v9 image-target polish */
+@media (min-width:900px){main{max-width:1220px}.hero{padding:22px 26px}.product{box-shadow:none;border:1px solid #e5eaf2}.money{grid-template-columns:repeat(3,1fr)}}
+.card{border:1px solid #e5eaf2;box-shadow:0 8px 24px rgba(7,26,51,.06)}
+.product-title{font-weight:900}.rank{background:#fff7d6;color:#8a5b00}.status-go{background:#16a765;color:#fff}.status-wait{background:#f59e0b;color:#fff}.status-stop{background:#ef4444;color:#fff}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・現在価格確認版</span></div><div class="tag">X API 0回｜現在候補と過去実績を分離して安全判定</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+
+<main>
+<section class="page active" id="page-home">
+ <div class="hero">
+  <h1>今日、動く価値がある情報だけ。</h1><p id="todayText"></p>
+  <div class="quick"><div class="q"><b id="qNow">0</b><span>今から狙える</span></div><div class="q"><b id="qToday">0</b><span>本日入荷候補</span></div><div class="q"><b id="qRaffle">0</b><span>抽選・予約</span></div><div class="q"><b id="qHot">0</b><span>注目度が高い</span></div></div>
+ </div>
+
+ <div class="card">
+  <div class="row between"><div><h2>👑 利益候補 TOP100</h2><div class="sub">X APIは使用しません。現在確認済みの候補を優先し、過去実績は「参考」として最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="tabs" id="categoryTabs"></div>
+  <div class="sub" style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:12px;color:#166534"><b>🌿 無料優先モード</b>：X API 0回・Workerへの自動通信 0回。価格未確認の商品に架空の利益は表示しません。</div><div id="top20"></div>
+ </div>
+
+ <div class="card">
+  <div class="row between"><div><h2>🌿 無料データモード</h2><div class="sub">X APIを完全に停止しています。Cloudflare Workerへの自動アクセスも行いません。</div></div><span class="status-go">FREE</span></div>
+  <div class="grid2" style="margin-top:12px"><div class="q"><b>0回</b><span>X API呼び出し</span></div><div class="q"><b>0回</b><span>Worker自動通信</span></div></div>
+  <div class="sub" style="margin-top:12px">過去の売上実績は「参考」として候補化します。過去実績だけではGO判定にしません。現在価格・在庫を確認して登録した候補だけGO/WAIT/STOP判定します。既存の売上データは保持します。</div>
+ </div>
+
+ <div class="card">
+  <div class="row between"><div><h2>📦 今売るべき所持品</h2><div class="sub">X相場記録・利益・値動きからSELL/HOLD/WATCHを判定</div></div><button class="btn soft" onclick="showPage('holdings')">所持品を見る</button></div>
+  <div id="homeSellList"></div>
+ </div>
+
+ <div class="card">
+  <div class="row between"><div><h2>🚗 今日行く候補</h2><div class="sub">候補を追加すると、近い順＋販売開始時刻を考慮して並べます</div></div><button class="btn green" onclick="buildRoute()">ルート作成</button></div>
+  <div id="todayList"></div>
+ </div>
+</section>
+
+<section class="page" id="page-search">
+ <div class="card">
+  <h2>🔎 登録済み商品サーチ</h2><div class="sub">登録済み候補から商品名・カテゴリで検索します。外部APIへの通信はありません。</div>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>キーワード</label><input id="searchKeyword" placeholder="例：ポケモン、一番くじ"></div>
+   <div class="field"><label>最低利益</label><input id="searchProfit" type="number" value="200"></div>
+  </div>
+  <button class="btn primary" style="width:100%;margin-top:10px" onclick="renderSearch()">登録データを検索する</button>
+  <div id="liveSearchStatus" class="sub" style="margin-top:10px">商品名やカテゴリを入力してください。</div>
+  <div id="searchResults"></div>
+ </div>
+ <div class="card">
+  <div class="row between"><div><h2>＋ 候補商品を追加</h2><div class="sub">SNSや店舗で見つけた情報を自分で登録できます</div></div></div>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>商品名</label><input id="candName"></div>
+   <div class="field"><label>カテゴリー</label><select id="candCat"></select></div>
+   <div class="field"><label>仕入価格</label><input id="candBuy" type="number"></div>
+   <div class="field"><label>想定販売価格</label><input id="candSell" type="number"></div>
+   <div class="field"><label>送料</label><input id="candShip" type="number" value="210"></div>
+   <div class="field"><label>店舗</label><select id="candStore"></select></div>
+   <div class="field"><label>情報鮮度</label><select id="candFresh"><option value="5">速報</option><option value="4">新鮮</option><option value="3">通常</option><option value="2">やや古い</option></select></div>
+   <div class="field"><label>本日入手可能性</label><select id="candAvail"><option value="5">非常に高い</option><option value="4">高い</option><option value="3">中</option><option value="2">低い</option></select></div>
+  </div>
+  <button class="btn green" style="width:100%;margin-top:10px" onclick="addCandidate()">候補商品を登録</button>
+ </div>
+</section>
+
+<section class="page" id="page-raffle">
+ <div class="card">
+  <div class="row between"><div><h2>🎯 抽選・予約監視</h2><div class="sub">GEO・エディオン・ポケセン・ヤマダ・イオン・Amazonなど</div></div><button class="btn primary" onclick="openRaffleModal()">＋追加</button></div>
+  <div class="tabs" id="raffleTabs"></div>
+  <div id="raffleList"></div>
+  <div class="warning">自動監視は外部API/サーバー接続後に有効化できます。今は登録・締切管理・通知対象管理ができます。</div>
+ </div>
+</section>
+
+<section class="page" id="page-stores">
+ <div class="card">
+  <div class="row between"><div><h2>🏪 店舗マスタ</h2><div class="sub">販売開始時間、取扱カテゴリー、店舗メモを自分で登録</div></div><button class="btn primary" onclick="openStoreModal()">＋店舗追加</button></div>
+  <div id="storeList"></div>
+ </div>
+ <div class="card">
+  <h2>🗺️ 現在地・地域設定</h2>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>都道府県</label><select id="prefSelect"></select></div>
+   <div class="field"><label>検索半径</label><select id="radiusSelect"><option value="5">5km</option><option value="10" selected>10km</option><option value="20">20km</option><option value="30">30km</option><option value="50">50km</option></select></div>
+  </div>
+  <button class="btn soft" style="width:100%;margin-top:10px" onclick="requestGPS()">📍 GPSで現在地を取得</button>
+  <div class="sub" id="gpsText" style="margin-top:8px">GPS未取得</div>
+ </div>
+</section>
+
+<section class="page" id="page-route">
+ <div class="card">
+  <div class="row between"><div><h2>🚗 最適仕入れルート</h2><div class="sub">距離・販売開始時刻・期待利益を参考に簡易最適化</div></div><button class="btn green" onclick="buildRoute()">再計算</button></div>
+  <div id="routeSummary" class="grid3" style="margin-top:12px"></div>
+  <div id="routeList"></div>
+  <button id="mapsBtn" class="btn primary" style="width:100%;margin-top:12px;display:none" onclick="openMaps()">地図アプリで開く</button>
+ </div>
+</section>
+
+<section class="page" id="page-holdings">
+ <div class="card">
+  <div class="row between"><div><h2>📦 所持品・売り時判断</h2><div class="sub">Xで見つけた価格情報を蓄積し、相場表と売り時を自動計算</div></div><button class="btn primary" onclick="openHoldingModal()">＋所持品追加</button></div>
+  <div id="holdingSummary" class="grid3" style="margin-top:12px"></div>
+  <div id="holdingList"></div>
+ </div>
+ <div class="card">
+  <h2>📈 相場分析</h2><div class="sub">所持品を選ぶと、7日・30日・90日の価格推移を確認できます。</div>
+  <div class="field" style="margin-top:12px"><label>分析する所持品</label><select id="marketHoldingSelect" onchange="renderMarketAnalysis()"></select></div>
+  <div id="marketKpis" class="grid3" style="margin-top:12px"></div>
+  <canvas id="marketCanvas" height="220" style="width:100%;background:#fff;border:1px solid var(--line);border-radius:16px;margin-top:12px"></canvas>
+  <div id="marketBreakdown" style="margin-top:10px"></div>
+  <button class="btn soft" style="width:100%;margin-top:10px" onclick="openMarketModal()">＋ X相場情報を記録</button>
+  <div class="warning">Xの完全自動収集にはX APIとサーバー接続が必要です。この画面はその接続先になるデータ構造まで実装済みです。</div>
+ </div>
+</section>
+
+<section class="page" id="page-sales">
+ <div class="card">
+  <h2>💰 仕入れ・売上・利益管理</h2><div class="sub">旧転売君の保存キーを維持して、既存データを引き継ぎます</div>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>商品名</label><input id="saleName"></div>
+   <div class="field"><label>カテゴリー</label><select id="saleCat"></select></div>
+   <div class="field"><label>仕入れ価格</label><input id="saleBuy" type="number"></div>
+   <div class="field"><label>販売価格</label><input id="saleSell" type="number"></div>
+   <div class="field"><label>送料</label><input id="saleShip" type="number" value="210"></div>
+   <div class="field"><label>備品代</label><input id="saleSupplies" type="number" value="0"></div>
+   <div class="field"><label>手数料%</label><input id="saleFee" type="number" value="10"></div>
+   <div class="field"><label>販売日</label><input id="saleDate" type="date"></div>
+  </div>
+  <div class="grid3" id="salePreview" style="margin-top:10px"></div>
+  <button class="btn green" style="width:100%;margin-top:10px" onclick="saveSale()">売上として記録</button>
+ </div>
+ <div class="card">
+  <div class="row between"><div><h2>📊 今月の実績</h2></div><button class="btn soft" onclick="exportCSV()">CSV出力</button></div>
+  <div class="grid3" id="monthKpis" style="margin-top:12px"></div>
+ </div>
+ <div class="card">
+  <h2>📚 売上履歴</h2>
+  <div class="scroll"><table class="table"><thead><tr><th>日付</th><th>商品</th><th>仕入</th><th>送料</th><th>備品</th><th>販売</th><th>利益</th><th></th></tr></thead><tbody id="salesBody"></tbody></table></div>
+ </div>
+</section>
+</main>
+
+<nav class="bottom"><div class="bottom-in">
+ <button class="nav active" data-page="home"><i>🏠</i>ホーム</button>
+ <button class="nav" data-page="search"><i>🔎</i>サーチ</button>
+ <button class="nav" data-page="raffle"><i>🎯</i>抽選</button>
+ <button class="nav" data-page="stores"><i>🏪</i>店舗</button>
+ <button class="nav" data-page="route"><i>🚗</i>ルート</button>
+ <button class="nav" data-page="holdings"><i>📦</i>所持品</button>
+ <button class="nav" data-page="sales"><i>📊</i>売上</button>
+</div></nav>
+
+<div class="modal" id="storeModal"><div class="sheet"><button class="close" onclick="closeModal('storeModal')">×</button><h3>店舗を追加</h3>
+ <div class="grid2">
+  <div class="field"><label>店舗名</label><input id="storeName" placeholder="例：ファミリーマート ○○店"></div>
+  <div class="field"><label>種別</label><select id="storeType"><option>コンビニ</option><option>GEO</option><option>家電量販店</option><option>本屋</option><option>100均</option><option>トレカ</option><option>ショッピングモール</option><option>その他</option></select></div>
+  <div class="field"><label>販売開始時間</label><input id="storeTime" type="time" value="10:00"></div>
+  <div class="field"><label>都道府県</label><select id="storePref"></select></div>
+  <div class="field"><label>緯度（任意）</label><input id="storeLat" inputmode="decimal" placeholder="32.xxxx"></div>
+  <div class="field"><label>経度（任意）</label><input id="storeLng" inputmode="decimal" placeholder="129.xxxx"></div>
+  <div class="field" style="grid-column:1/-1"><label>メモ</label><textarea id="storeMemo" placeholder="例：一番くじは基本10時開始。トレカは入荷曜日要確認。"></textarea></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addStore()">保存</button>
+</div></div>
+
+<div class="modal" id="raffleModal"><div class="sheet"><button class="close" onclick="closeModal('raffleModal')">×</button><h3>抽選・予約を追加</h3>
+ <div class="grid2">
+  <div class="field"><label>ショップ</label><select id="raffleShop"><option>GEO</option><option>エディオン</option><option>ポケモンセンターオンライン</option><option>ヤマダデンキ</option><option>イオン</option><option>Amazon</option><option>プレミアムバンダイ</option><option>その他</option></select></div>
+  <div class="field"><label>カテゴリー</label><select id="raffleCat"></select></div>
+  <div class="field"><label>商品名</label><input id="raffleName"></div>
+  <div class="field"><label>状態</label><select id="raffleStatus"><option>抽選受付中</option><option>予約受付中</option><option>再販予定</option><option>結果発表待ち</option></select></div>
+  <div class="field"><label>締切日</label><input id="raffleDeadline" type="datetime-local"></div>
+  <div class="field"><label>通知</label><select id="raffleNotify"><option value="1">ON</option><option value="0">OFF</option></select></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addRaffle()">保存</button>
+</div></div>
+
+<div class="modal" id="categoryModal"><div class="sheet"><button class="close" onclick="closeModal('categoryModal')">×</button><h3>カテゴリーを追加</h3>
+ <div class="field"><label>カテゴリー名</label><input id="newCat" placeholder="例：LEGO、食品限定、ホビー"></div>
+ <button class="btn green" style="width:100%;margin-top:10px" onclick="addCategory()">追加</button>
+</div></div>
+
+<div class="modal" id="holdingModal"><div class="sheet"><button class="close" onclick="closeModal('holdingModal')">×</button><h3>所持品を追加</h3>
+ <div class="grid2">
+  <div class="field"><label>商品名</label><input id="holdingName" placeholder="例：ポケモンカード ○○BOX"></div>
+  <div class="field"><label>カテゴリー</label><select id="holdingCat"></select></div>
+  <div class="field"><label>仕入価格</label><input id="holdingBuy" type="number"></div>
+  <div class="field"><label>目標売価</label><input id="holdingTarget" type="number"></div>
+  <div class="field"><label>保有数</label><input id="holdingQty" type="number" value="1" min="1"></div>
+  <div class="field"><label>購入日</label><input id="holdingDate" type="date"></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addHolding()">保存</button>
+</div></div>
+
+<div class="modal" id="marketModal"><div class="sheet"><button class="close" onclick="closeModal('marketModal')">×</button><h3>X相場情報を記録</h3>
+ <div class="grid2">
+  <div class="field"><label>所持品</label><select id="marketHolding"></select></div>
+  <div class="field"><label>価格タイプ</label><select id="marketType"><option value="buyback">買取価格</option><option value="asking">出品希望価格</option><option value="sold">成約報告価格</option></select></div>
+  <div class="field"><label>価格</label><input id="marketPrice" type="number"></div>
+  <div class="field"><label>情報日時</label><input id="marketDate" type="datetime-local"></div>
+  <div class="field"><label>信頼度</label><select id="marketTrust"><option value="5">5：店舗公式/明確な成約</option><option value="4">4：信頼性高め</option><option value="3" selected>3：通常</option><option value="2">2：未確認</option><option value="1">1：予想・噂</option></select></div>
+  <div class="field"><label>再販/供給情報</label><select id="marketSupply"><option value="0">通常</option><option value="1">再販・供給増加</option><option value="-1">品薄・供給減少</option></select></div>
+  <div class="field" style="grid-column:1/-1"><label>メモ</label><textarea id="marketMemo" placeholder="例：Xの店舗公式買取表、売れた報告など"></textarea></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addMarketPoint()">相場に追加</button>
+</div></div>
+
+
+<div class="modal" id="verifyModal"><div class="sheet"><button class="close" onclick="closeModal('verifyModal')">×</button><h3>🔎 現在価格を確認</h3>
+ <div class="sub" id="verifyGuide">店頭・公式通販・実際の販売相場を確認して入力してください。入力した価格だけで再判定します。</div>
+ <input type="hidden" id="verifyId">
+ <div class="grid2" style="margin-top:12px">
+  <div class="field" style="grid-column:1/-1"><label>商品名</label><input id="verifyName" readonly></div>
+  <div class="field"><label>現在の仕入価格</label><input id="verifyBuy" type="number" inputmode="numeric"></div>
+  <div class="field"><label>現在の販売相場</label><input id="verifySell" type="number" inputmode="numeric"></div>
+  <div class="field"><label>送料</label><input id="verifyShip" type="number" inputmode="numeric" value="210"></div>
+  <div class="field"><label>手数料%</label><input id="verifyFee" type="number" inputmode="decimal" value="10"></div>
+  <div class="field"><label>入手可能性</label><select id="verifyAvail"><option value="5">非常に高い</option><option value="4">高い</option><option value="3" selected>中</option><option value="2">低い</option></select></div>
+  <div class="field"><label>確認先</label><select id="verifySource"><option>実店舗</option><option>公式通販</option><option>フリマ成約相場</option><option>買取店</option><option>その他</option></select></div>
+  <div class="field" style="grid-column:1/-1"><label>確認メモ（任意）</label><input id="verifyMemo" placeholder="例：長崎市内の店舗で在庫確認、販売相場は直近成約"></div>
+ </div>
+ <div id="verifyPreview" class="grid3" style="margin-top:12px"></div>
+ <div class="warning">価格を確認した時点の情報です。在庫や相場は変動します。確認済みにすると過去実績ではなく現在価格でGO / WAIT / STOPを判定します。</div>
+ <button class="btn green" style="width:100%;margin-top:10px" onclick="confirmCurrentPrice()">この現在価格で判定する</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const K={
+ sales:"tenbaikun_sales",
+ cats:"tenbaikun_pro_categories",
+ stores:"tenbaikun_pro_stores",
+ candidates:"tenbaikun_pro_candidates",
+ raffles:"tenbaikun_pro_raffles",
+ today:"tenbaikun_pro_today",
+ pref:"tenbaikun_pro_pref",
+ gps:"tenbaikun_pro_gps",
+ holdings:"tenbaikun_pro_holdings",
+ market:"tenbaikun_pro_market"
+};
+const defaultCats=["すべて","一番くじ","ガチャガチャ","トレーディングカード","100均","本屋","ゲーム","フィギュア","プラモデル","アニメグッズ","アパレル","限定コラボ","ご当地・イベント","抽選・予約","その他"];
+const prefs=["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+const jload=(k,d)=>{try{const x=JSON.parse(localStorage.getItem(k));return x??d}catch(e){return d}};
+const jsave=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+let categories=jload(K.cats,defaultCats);
+if(!categories.includes("すべて"))categories.unshift("すべて");
+let stores=jload(K.stores,[
+ {id:"s1",name:"ファミリーマート 上戸町周辺店",type:"コンビニ",pref:"長崎県",time:"10:00",memo:"一番くじ販売開始時間は店舗確認。",lat:null,lng:null},
+ {id:"s2",name:"GEO 長崎エリア店舗",type:"GEO",pref:"長崎県",time:"10:00",memo:"ゲーム・トレカ・抽選情報を確認。",lat:null,lng:null},
+ {id:"s3",name:"長崎エリア 本屋",type:"本屋",pref:"長崎県",time:"10:00",memo:"初版・特典・付録付き雑誌を確認。",lat:null,lng:null},
+ {id:"s4",name:"長崎エリア 100均",type:"100均",pref:"長崎県",time:"10:00",memo:"コラボ・SNS話題・廃盤候補を確認。",lat:null,lng:null}
+]);
+let candidates=jload(K.candidates,[]);
+let raffles=jload(K.raffles,[
+ {id:"r1",shop:"ポケモンセンターオンライン",name:"ポケモンカード 抽選候補",cat:"トレーディングカード",status:"抽選受付中",deadline:"",notify:1},
+ {id:"r2",shop:"GEO",name:"ゲーム機・人気ソフト抽選候補",cat:"ゲーム",status:"抽選受付中",deadline:"",notify:1}
+]);
+let todayIds=jload(K.today,[]);
+let sales=jload(K.sales,[]);
+let pref=localStorage.getItem(K.pref)||"長崎県";
+let gps=jload(K.gps,null);
+let holdings=jload(K.holdings,[]);
+let marketData=jload(K.market,[]);
+let activeCat="すべて",activeRaffle="すべて",currentRoute=[];
+
+function yen(n){return Math.round(Number(n)||0).toLocaleString("ja-JP")+"円"}
+function uid(p){return p+"-"+Date.now()+"-"+Math.random().toString(16).slice(2)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function toast(s){$("toast").textContent=s;$("toast").classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),1900)}
+function calcProfit(c){const fee=Math.round((+c.sell||0)*(+c.fee||10)/100);return (+c.sell||0)-(+c.buy||0)-(+c.ship||0)-fee}
+function score(c){
+ const p=calcProfit(c);
+ const profitScore=Math.min(35,Math.max(0,p/50));
+ const av=(+c.avail||1)*7,fr=(+c.fresh||1)*4,hot=(+c.hot||3)*3;
+ let distanceBonus=5;
+ const st=stores.find(s=>s.id===c.storeId);
+ if(gps&&st&&st.lat&&st.lng){const d=distance(gps.lat,gps.lng,+st.lat,+st.lng);distanceBonus=Math.max(0,8-d/3)}
+ return Math.max(1,Math.min(99,Math.round(profitScore+av+fr+hot+distanceBonus)));
+}
+function verdict(c){const s=score(c),p=calcProfit(c);if(c.autoFromSales&&!c.currentVerified)return["参考","status-wait"];if(p<200||s<45)return["STOP","status-stop"];if(s<72)return["WAIT","status-wait"];return["GO","status-go"]}
+function distance(a,b,c,d){const R=6371,toRad=x=>x*Math.PI/180;const dLat=toRad(c-a),dLon=toRad(d-b);const q=Math.sin(dLat/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
+function storeFor(c){return stores.find(s=>s.id===c.storeId)}
+function candidateCard(c,rank){
+ const p=calcProfit(c),s=score(c),st=storeFor(c),[v,vc]=verdict(c),isRef=c.autoFromSales&&!c.currentVerified;
+ const checked=c.currentVerifiedAt?new Date(c.currentVerifiedAt).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+ return `<div class="product"><div class="product-top"><div class="rank">${rank??"★"}</div><div class="product-info"><div class="row between"><div class="product-title">${esc(c.name)}</div><div class="score">${s}<span style="font-size:11px">点</span></div></div>
+ <div class="badges"><span class="badge">${esc(c.cat)}</span>${isRef?`<span class="badge b-purple">過去実績・参考</span><span class="badge b-orange">現在価格 未確認</span>`:`<span class="badge b-green">${c.currentVerified?'現在価格 確認済み':'登録候補'}</span><span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span>`}<span class="${vc}">${v}</span></div>
+ <div class="small">${isRef?`📊 過去の売上実績 ${c.historyCount||1}件から算出した参考値です。現在も同じ価格で仕入れ・販売できるとは限りません。`:c.currentVerified?`✅ ${esc(c.verifySource||'現在価格')}で確認 ${checked}${c.verifyMemo?'｜'+esc(c.verifyMemo):''}`:`📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}`}</div>
+ <div class="money"><div class="m">${isRef?'過去仕入':'現在仕入'}<b>${yen(c.buy)}</b></div><div class="m">${isRef?'過去販売':'現在相場'}<b>${yen(c.sell)}</b></div><div class="m profit">${isRef?'過去利益':'予想利益'}<b>${yen(p)}</b></div></div>
+ <div class="actions">${isRef?`<button class="btn soft" onclick="openVerifyModal('${c.id}')">🔎 現在価格を確認</button>`:`<button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button>`}<button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
+ </div></div></div>`;
+}
+function openVerifyModal(id){
+ const c=candidates.find(x=>x.id===id);if(!c)return;
+ $("verifyId").value=id;$("verifyName").value=c.name;$("verifyBuy").value=c.buy||"";$("verifySell").value=c.sell||"";$("verifyShip").value=c.ship??210;$("verifyFee").value=c.fee??10;$("verifyAvail").value=c.avail||3;$("verifySource").value=c.verifySource||"実店舗";$("verifyMemo").value=c.verifyMemo||"";updateVerifyPreview();openModal("verifyModal");
+}
+function updateVerifyPreview(){
+ const b=+$("verifyBuy").value||0,s=+$("verifySell").value||0,sh=+$("verifyShip").value||0,r=+$("verifyFee").value||0,fee=Math.round(s*r/100),p=s-b-sh-fee;
+ $("verifyPreview").innerHTML=`<div class="kpi">手数料<b>${yen(fee)}</b></div><div class="kpi greenish">現在の予想利益<b>${yen(p)}</b></div><div class="kpi">利益率<b>${b?((p/b)*100).toFixed(1):0}%</b></div>`;
+}
+function confirmCurrentPrice(){
+ const id=$("verifyId").value,c=candidates.find(x=>x.id===id);if(!c)return;
+ const buy=+$("verifyBuy").value||0,sell=+$("verifySell").value||0;
+ if(!buy||!sell){toast("現在の仕入価格と販売相場を入力してください");return}
+ c.buy=buy;c.sell=sell;c.ship=+$("verifyShip").value||0;c.fee=+$("verifyFee").value||0;c.avail=+$("verifyAvail").value||3;c.fresh=5;c.currentVerified=true;c.autoFromSales=false;c.currentVerifiedAt=Date.now();c.verifySource=$("verifySource").value;c.verifyMemo=$("verifyMemo").value.trim();c.hot=Math.max(3,+c.hot||3);
+ jsave(K.candidates,candidates);closeModal("verifyModal");renderHome();renderSearch();toast("現在価格で再判定しました");
+}
+function renderTabs(){
+ $("categoryTabs").innerHTML=categories.map(c=>`<button class="tab ${c===activeCat?"active":""}" onclick="setCat('${encodeURIComponent(c)}')">${esc(c)}</button>`).join("")+`<button class="tab" onclick="openModal('categoryModal')">＋追加</button>`;
+ ["candCat","saleCat","raffleCat","holdingCat"].forEach(id=>$(id).innerHTML=categories.filter(c=>c!=="すべて").map(c=>`<option>${esc(c)}</option>`).join(""));
+}
+window.setCat=x=>{activeCat=decodeURIComponent(x);renderHome()}
+function renderHome(){
+ renderTabs();
+ let a=candidates.filter(c=>calcProfit(c)>=200&&(activeCat==="すべて"||c.cat===activeCat));
+ a.sort((x,y)=>(Number(x.autoFromSales)-Number(y.autoFromSales)) || score(y)-score(x));
+ $("top20").innerHTML=a.length?a.slice(0,100).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">まだ利益候補を作れる売上実績がありません。売上を登録すると、自動でTOP100候補が作られます。</div>`;
+ $("qNow").textContent=a.filter(c=>verdict(c)[0]==="GO").length;
+ $("qToday").textContent=a.filter(c=>c.today).length;
+ $("qRaffle").textContent=raffles.filter(r=>/受付|予定/.test(r.status)).length;
+ $("qHot").textContent=a.filter(c=>(+c.hot||0)>=4).length;
+ renderToday();
+ renderHomeSell();
+}
+function addToday(id){if(!todayIds.includes(id))todayIds.push(id);else todayIds=todayIds.filter(x=>x!==id);jsave(K.today,todayIds);renderHome();toast("今日行く候補を更新しました")}
+function renderToday(){
+ const list=todayIds.map(id=>candidates.find(c=>c.id===id)).filter(Boolean);
+ $("todayList").innerHTML=list.length?list.map(c=>{const st=storeFor(c);return `<div class="store"><div class="store-icon">⭐</div><div class="grow"><b>${esc(c.name)}</b><div class="small">${esc(st?.name||"店舗未設定")}・想定利益 ${yen(calcProfit(c))}</div></div><button class="btn danger" onclick="addToday('${c.id}')">外す</button></div>`}).join(""):`<div class="list-empty">TOP100から「今日行く」を押してください。</div>`;
+}
+function renderSearch(){
+ const kw=$("searchKeyword").value.trim().toLowerCase(),min=+$("searchProfit").value||0;
+ const a=candidates.filter(c=>(!kw||c.name.toLowerCase().includes(kw)||c.cat.toLowerCase().includes(kw))&&calcProfit(c)>=min).sort((x,y)=>score(y)-score(x));
+ $("searchResults").innerHTML=a.length?a.map(c=>candidateCard(c)).join(""):`<div class="list-empty">該当なし</div>`;
+}
+function fillStores(){
+ $("candStore").innerHTML=stores.filter(s=>s.pref===pref).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("")||stores.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+}
+function addCandidate(){
+ const name=$("candName").value.trim(),buy=+$("candBuy").value,sell=+$("candSell").value,ship=+$("candShip").value;
+ if(!name||!sell){toast("商品名と想定販売価格を入力してください");return}
+ candidates.push({id:uid("c"),name,cat:$("candCat").value,buy,sell,ship,fee:10,avail:+$("candAvail").value,fresh:+$("candFresh").value,storeId:$("candStore").value,hot:3,today:true});
+ jsave(K.candidates,candidates);$("candName").value="";renderHome();renderSearch();toast("候補商品を追加しました");
+}
+function renderStores(){
+ $("storeList").innerHTML=stores.filter(s=>s.pref===pref).map(s=>`<div class="store"><div class="store-icon">${s.type==="本屋"?"📚":s.type==="100均"?"💯":s.type==="GEO"?"🎮":"🏪"}</div><div class="grow"><b>${esc(s.name)}</b><div class="small">${esc(s.type)}・${esc(s.time||"時間未設定")}〜</div><div class="small">${esc(s.memo||"")}</div></div><button class="btn danger" onclick="deleteStore('${s.id}')">削除</button></div>`).join("")||`<div class="list-empty">この地域の店舗がありません。</div>`;
+}
+function addStore(){
+ const name=$("storeName").value.trim();if(!name){toast("店舗名を入力してください");return}
+ stores.push({id:uid("s"),name,type:$("storeType").value,pref:$("storePref").value,time:$("storeTime").value,memo:$("storeMemo").value.trim(),lat:parseFloat($("storeLat").value)||null,lng:parseFloat($("storeLng").value)||null});
+ jsave(K.stores,stores);closeModal("storeModal");renderStores();fillStores();toast("店舗を保存しました");
+}
+function deleteStore(id){if(!confirm("この店舗を削除しますか？"))return;stores=stores.filter(s=>s.id!==id);jsave(K.stores,stores);renderStores();fillStores()}
+function renderRaffles(){
+ const cats=["すべて",...categories.filter(c=>c!=="すべて")];
+ $("raffleTabs").innerHTML=cats.map(c=>`<button class="tab ${c===activeRaffle?"active":""}" onclick="setRaffleCat('${encodeURIComponent(c)}')">${esc(c)}</button>`).join("");
+ const a=raffles.filter(r=>activeRaffle==="すべて"||r.cat===activeRaffle);
+ $("raffleList").innerHTML=a.length?a.map(r=>`<div class="store"><div class="store-icon">🎯</div><div class="grow"><b>${esc(r.shop)}｜${esc(r.name)}</b><div class="badges"><span class="badge b-green">${esc(r.status)}</span><span class="badge">${esc(r.cat)}</span></div><div class="small">${r.deadline?"締切 "+new Date(r.deadline).toLocaleString("ja-JP"):"締切未登録"}・通知 ${r.notify?"ON":"OFF"}</div></div><button class="btn danger" onclick="deleteRaffle('${r.id}')">削除</button></div>`).join(""):`<div class="list-empty">登録なし</div>`;
+}
+window.setRaffleCat=x=>{activeRaffle=decodeURIComponent(x);renderRaffles()}
+function addRaffle(){
+ const name=$("raffleName").value.trim();if(!name){toast("商品名を入力してください");return}
+ raffles.push({id:uid("r"),shop:$("raffleShop").value,name,cat:$("raffleCat").value,status:$("raffleStatus").value,deadline:$("raffleDeadline").value,notify:+$("raffleNotify").value});
+ jsave(K.raffles,raffles);closeModal("raffleModal");renderRaffles();renderHome();toast("抽選・予約を追加しました");
+}
+function deleteRaffle(id){raffles=raffles.filter(r=>r.id!==id);jsave(K.raffles,raffles);renderRaffles();renderHome()}
+function addCategory(){
+ const c=$("newCat").value.trim();if(!c||categories.includes(c)){toast("別のカテゴリー名を入力してください");return}
+ categories.push(c);jsave(K.cats,categories);$("newCat").value="";closeModal("categoryModal");renderTabs();renderRaffles();toast("カテゴリーを追加しました");
+}
+function buildRoute(){
+ let list=todayIds.map(id=>candidates.find(c=>c.id===id)).filter(Boolean).map(c=>({c,st:storeFor(c)})).filter(x=>x.st);
+ if(!list.length){toast("今日行く候補を追加してください");return}
+ let route=[],remaining=[...list],cur=gps;
+ if(cur){
+  while(remaining.length){
+   remaining.sort((a,b)=>{
+    const da=a.st.lat&&a.st.lng?distance(cur.lat,cur.lng,+a.st.lat,+a.st.lng):999;
+    const db=b.st.lat&&b.st.lng?distance(cur.lat,cur.lng,+b.st.lat,+b.st.lng):999;
+    const ta=(a.st.time||"23:59"),tb=(b.st.time||"23:59");
+    return da-db || ta.localeCompare(tb) || score(b.c)-score(a.c);
+   });
+   const n=remaining.shift();route.push(n);
+   if(n.st.lat&&n.st.lng)cur={lat:+n.st.lat,lng:+n.st.lng};
+  }
+ }else route=list.sort((a,b)=>(a.st.time||"23:59").localeCompare(b.st.time||"23:59")||score(b.c)-score(a.c));
+ currentRoute=route;renderRoute();showPage("route");
+}
+function renderRoute(){
+ let km=0,prev=gps;
+ if(gps)currentRoute.forEach(x=>{if(x.st.lat&&x.st.lng){km+=distance(prev.lat,prev.lng,+x.st.lat,+x.st.lng);prev={lat:+x.st.lat,lng:+x.st.lng}}});
+ const profit=currentRoute.reduce((a,x)=>a+calcProfit(x.c),0),gas=Math.round(km/15*180),net=profit-gas;
+ $("routeSummary").innerHTML=`<div class="kpi">走行距離<b>${km?km.toFixed(1):"未計算"}${km?"km":""}</b></div><div class="kpi">推定移動費<b>${km?yen(gas):"GPS/座標必要"}</b></div><div class="kpi greenish">実質期待利益<b>${yen(net)}</b></div>`;
+ $("routeList").innerHTML=currentRoute.length?currentRoute.map((x,i)=>`<div class="route-stop"><div class="route-n">${i+1}</div><div class="grow"><b>${esc(x.st.name)}</b><div class="small">${esc(x.st.time||"時間未設定")}〜 ｜ ${esc(x.c.name)} ｜ ${yen(calcProfit(x.c))}</div></div></div>`).join(""):`<div class="list-empty">ルート未作成</div>`;
+ $("mapsBtn").style.display=currentRoute.length?"block":"none";
+}
+function openMaps(){
+ const dest=currentRoute.find(x=>x.st.lat&&x.st.lng)?.st;
+ if(!dest){toast("店舗の緯度・経度を登録してください");return}
+ location.href=`https://maps.apple.com/?daddr=${dest.lat},${dest.lng}&dirflg=d`;
+}
+function requestGPS(){
+ if(!navigator.geolocation){toast("この端末ではGPSを利用できません");return}
+ navigator.geolocation.getCurrentPosition(p=>{gps={lat:p.coords.latitude,lng:p.coords.longitude,at:Date.now()};jsave(K.gps,gps);$("gpsText").textContent=`GPS取得済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;toast("現在地を取得しました");renderHome()},e=>toast("GPSを取得できませんでした"),{enableHighAccuracy:true,timeout:10000});
+}
+function normalizeSale(s,i){
+ const sale=+(s.sale??s.salePrice??s.price??0),purchase=+(s.purchase??s.cost??s.purchasePrice??0),shipping=+(s.shipping??s.postage??0),supplies=+(s.supplies??s.supplyCost??s.materialCost??0),feeRate=+(s.feeRate??10);
+ const fee=Number.isFinite(Number(s.fee))?+s.fee:Math.round(sale*feeRate/100);
+ const profit=Number.isFinite(Number(s.profit))?+s.profit:sale-purchase-shipping-supplies-fee;
+ return {id:s.id||uid("old"),name:s.name||s.productName||"商品",purchase,sale,shipping,supplies,feeRate,fee,profit,date:s.date||new Date().toISOString().slice(0,10),cat:s.cat||"その他"};
+}
+sales=Array.isArray(sales)?sales.map(normalizeSale):[];
+// v12安全化：ページを開いただけでは tenbaikun_sales を書き換えない。保存は新規登録・削除時のみ。
+
+// v10: X APIや外部APIを一切使わず、自分の過去売上から利益候補を自動生成。
+// tenbaikun_sales は読み取るだけで、既存データを削除・変更しません。
+function autoCandidatesFromSales(){
+ // 売上実績を商品名ごとに集計し、利益200円以上の実績がある商品をTOP100候補へ反映。
+ // 以前のバージョンで同名の「価格0円候補」が残っていても、売上実績で安全に更新する。
+ const groups=new Map();
+ for(const x of sales){
+  const name=String(x.name||'').trim();
+  const sale=+x.sale||0;
+  const profit=+x.profit||0;
+  if(!name||sale<=0)continue;
+  const key=normalizeProductName(name)||name.toLowerCase().replace(/\s+/g,' ');
+  if(!groups.has(key))groups.set(key,{key,name,cat:x.cat||'その他',rows:[]});
+  groups.get(key).rows.push(x);
+ }
+ let changed=0;
+ for(const g of groups.values()){
+  const profitable=g.rows.filter(x=>(+x.profit||0)>=200 && (+x.sale||0)>0);
+  if(!profitable.length)continue;
+  const avg=fn=>Math.round(profitable.reduce((a,x)=>a+fn(x),0)/profitable.length);
+  const buy=avg(x=>+x.purchase||0);
+  const sell=avg(x=>+x.sale||0);
+  // 候補側には備品代欄がないため、送料に備品代を合算して利益を過大表示しない。
+  const ship=avg(x=>(+x.shipping||0)+(+x.supplies||0));
+  const actualFee=avg(x=>Number.isFinite(+x.fee)?(+x.fee||0):Math.round((+x.sale||0)*.10));
+  const feeRate=sell>0?Math.max(0,Math.min(30,actualFee/sell*100)):10;
+  const expectedProfit=Math.round(sell-buy-ship-sell*feeRate/100);
+  if(expectedProfit<200)continue;
+
+  const idx=candidates.findIndex(c=>{
+   const ck=normalizeProductName(c.name)||String(c.name||'').toLowerCase().replace(/\s+/g,' ');
+   return ck===g.key;
+  });
+  const base={name:g.name,cat:g.cat||'その他',buy,sell,ship,fee:feeRate,avail:3,fresh:2,storeId:'',hot:Math.min(5,2+profitable.length),today:false,autoFromSales:true,historyCount:profitable.length,lastAutoAt:Date.now()};
+  if(idx>=0){
+   // 手動で価格が入っている候補は尊重。0円/旧自動候補だけ売上実績で更新。
+   const old=candidates[idx];
+   const stale=!old.buy||!old.sell||old.autoFromSales;
+   if(stale){candidates[idx]={...old,...base,id:old.id||uid('auto')};changed++;}
+  }else{
+   candidates.push({id:uid('auto'),...base});changed++;
+  }
+ }
+ if(changed)jsave(K.candidates,candidates);
+ return changed;
+}
+const autoAdded=autoCandidatesFromSales();
+function updateSalePreview(){
+ const b=+$("saleBuy").value||0,s=+$("saleSell").value||0,sh=+$("saleShip").value||0,su=+$("saleSupplies").value||0,rate=+$("saleFee").value||0,fee=Math.round(s*rate/100),p=s-b-sh-su-fee;
+ $("salePreview").innerHTML=`<div class="kpi">手数料<b>${yen(fee)}</b></div><div class="kpi greenish">利益<b>${yen(p)}</b></div><div class="kpi">利益率<b>${b?((p/b)*100).toFixed(1):0}%</b></div>`;
+}
+function saveSale(){
+ const name=$("saleName").value.trim();if(!name){toast("商品名を入力してください");return}
+ const purchase=+$("saleBuy").value||0,sale=+$("saleSell").value||0,shipping=+$("saleShip").value||0,supplies=+$("saleSupplies").value||0,feeRate=+$("saleFee").value||0,fee=Math.round(sale*feeRate/100),profit=sale-purchase-shipping-supplies-fee;
+ sales.push({id:uid("sale"),name,cat:$("saleCat").value,purchase,sale,shipping,supplies,feeRate,fee,profit,date:$("saleDate").value||new Date().toISOString().slice(0,10)});
+ jsave(K.sales,sales);renderSales();["saleName","saleBuy","saleSell"].forEach(id=>$(id).value="");updateSalePreview();toast("売上を記録しました");
+}
+function duplicateToSale(id){
+ const c=candidates.find(x=>x.id===id);if(!c)return;showPage("sales");$("saleName").value=c.name;$("saleCat").value=c.cat;$("saleBuy").value=c.buy;$("saleSell").value=c.sell;$("saleShip").value=c.ship;updateSalePreview();
+}
+function renderSales(){
+ const d=new Date(),key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),m=sales.filter(x=>String(x.date).startsWith(key));
+ const total=m.reduce((a,x)=>({sale:a.sale+x.sale,buy:a.buy+x.purchase,profit:a.profit+x.profit}),{sale:0,buy:0,profit:0});
+ $("monthKpis").innerHTML=`<div class="kpi">売上<b>${yen(total.sale)}</b></div><div class="kpi">仕入れ<b>${yen(total.buy)}</b></div><div class="kpi greenish">利益<b>${yen(total.profit)}</b></div>`;
+ $("salesBody").innerHTML=[...sales].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.name)}</td><td>${yen(x.purchase)}</td><td>${yen(x.shipping)}</td><td>${yen(x.supplies||0)}</td><td>${yen(x.sale)}</td><td><b>${yen(x.profit)}</b></td><td><button class="btn danger" onclick="deleteSale('${x.id}')">削除</button></td></tr>`).join("")||`<tr><td colspan="8">売上記録なし</td></tr>`;
+}
+function deleteSale(id){if(!confirm("削除しますか？"))return;sales=sales.filter(x=>String(x.id)!==String(id));jsave(K.sales,sales);renderSales()}
+function exportCSV(){
+ if(!sales.length){toast("売上履歴がありません");return}
+ const head=["日付","商品名","カテゴリー","仕入れ価格","送料","備品代","販売価格","手数料","利益"];
+ const rows=sales.map(x=>[x.date,x.name,x.cat||"",x.purchase,x.shipping,x.supplies||0,x.sale,x.fee,x.profit]);
+ const csv="\uFEFF"+[head,...rows].map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="tenbaikun_sales.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+function avg(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0}
+function pointsFor(id,days=9999){const cutoff=Date.now()-days*86400000;return marketData.filter(x=>x.holdingId===id&&new Date(x.date).getTime()>=cutoff).sort((a,b)=>new Date(a.date)-new Date(b.date))}
+function weightedPrice(points,type){const a=points.filter(x=>!type||x.type===type);if(!a.length)return 0;let n=0,d=0;a.forEach(x=>{const w=+x.trust||1;n+=(+x.price||0)*w;d+=w});return d?n/d:0}
+function currentMarket(h){const p=pointsFor(h.id,30);const sold=weightedPrice(p,'sold'),ask=weightedPrice(p,'asking'),buy=weightedPrice(p,'buyback');return sold||ask||buy||0}
+function trendPct(h,days=7){const p=pointsFor(h.id,days);if(p.length<2)return 0;const half=Math.max(1,Math.floor(p.length/2));const a=avg(p.slice(0,half).map(x=>+x.price||0)),b=avg(p.slice(half).map(x=>+x.price||0));return a?((b-a)/a*100):0}
+function holdingSignal(h){const cur=currentMarket(h),t7=trendPct(h,7),p30=pointsFor(h.id,30);const supply=p30.slice(-5).reduce((a,x)=>a+(+x.supply||0),0);const fee=Math.round(cur*.10),profit=cur-(+h.buy||0)-fee-210;let signal='WAIT',cls='status-wait',reason='相場データを蓄積中';if(cur>0){if((h.target&&cur>=h.target)||profit>=Math.max(1000,(+h.buy||0)*.25)){signal='SELL';cls='status-go';reason='利益目標に到達'}if(t7>8&&supply<=0){signal='HOLD';cls='status-wait';reason='7日相場が上昇中'}if(supply>=2||t7<-8){signal='WATCH';cls='status-stop';reason='再販・価格下落に注意'}if((h.target&&cur>=h.target)&&t7<=3){signal='SELL';cls='status-go';reason='目標価格到達・上昇鈍化'}}return{signal,cls,reason,cur,t7,profit}}
+function renderHomeSell(){const a=holdings.map(h=>({h,...holdingSignal(h)})).filter(x=>x.signal==='SELL'||x.signal==='WATCH').sort((a,b)=>b.profit-a.profit).slice(0,5);$('homeSellList').innerHTML=a.length?a.map(x=>`<div class="store"><div class="store-icon">${x.signal==='SELL'?'🔥':'⚠️'}</div><div class="grow"><b>${esc(x.h.name)}</b><div class="small">現在参考相場 ${yen(x.cur)}・想定利益 ${yen(x.profit)}・7日 ${x.t7>=0?'+':''}${x.t7.toFixed(1)}%</div><div class="small">${esc(x.reason)}</div></div><span class="${x.cls}">${x.signal}</span></div>`).join(''):`<div class="list-empty">所持品と相場を登録すると売り時候補を表示します。</div>`}
+function openHoldingModal(){openModal('holdingModal')}
+function openMarketModal(){if(!holdings.length){toast('先に所持品を登録してください');return}fillHoldingSelects();openModal('marketModal')}
+function fillHoldingSelects(){const opts=holdings.map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join('');$('marketHolding').innerHTML=opts;$('marketHoldingSelect').innerHTML=opts}
+function addHolding(){const name=$('holdingName').value.trim();if(!name){toast('商品名を入力してください');return}holdings.push({id:uid('h'),name,cat:$('holdingCat').value,buy:+$('holdingBuy').value||0,target:+$('holdingTarget').value||0,qty:+$('holdingQty').value||1,date:$('holdingDate').value||new Date().toISOString().slice(0,10)});jsave(K.holdings,holdings);closeModal('holdingModal');$('holdingName').value='';renderHoldings();renderHome();toast('所持品を追加しました')}
+function deleteHolding(id){if(!confirm('この所持品と相場履歴を削除しますか？'))return;holdings=holdings.filter(h=>h.id!==id);marketData=marketData.filter(x=>x.holdingId!==id);jsave(K.holdings,holdings);jsave(K.market,marketData);renderHoldings();renderHome()}
+function addMarketPoint(){const holdingId=$('marketHolding').value,price=+$('marketPrice').value;if(!holdingId||!price){toast('所持品と価格を入力してください');return}marketData.push({id:uid('m'),holdingId,type:$('marketType').value,price,date:$('marketDate').value||new Date().toISOString(),trust:+$('marketTrust').value||3,supply:+$('marketSupply').value||0,memo:$('marketMemo').value.trim()});jsave(K.market,marketData);closeModal('marketModal');$('marketPrice').value='';renderHoldings();renderMarketAnalysis();renderHome();toast('X相場情報を追加しました')}
+function renderHoldings(){fillHoldingSelects();const rows=holdings.map(h=>({h,...holdingSignal(h)}));$('holdingSummary').innerHTML=`<div class="kpi">所持品<b>${holdings.reduce((a,h)=>a+(+h.qty||1),0)}点</b></div><div class="kpi greenish">SELL候補<b>${rows.filter(x=>x.signal==='SELL').length}件</b></div><div class="kpi">WATCH<b>${rows.filter(x=>x.signal==='WATCH').length}件</b></div>`;$('holdingList').innerHTML=rows.length?rows.map(x=>{const p=pointsFor(x.h.id,30);return `<div class="product"><div class="product-top"><div class="rank">📦</div><div class="product-info"><div class="row between"><div class="product-title">${esc(x.h.name)}</div><span class="${x.cls}">${x.signal}</span></div><div class="badges"><span class="badge">${esc(x.h.cat)}</span><span class="badge b-green">X相場 ${p.length}件</span><span class="badge ${p.length>=10?'b-green':p.length>=4?'b-orange':'b-red'}">信頼度 ${p.length>=10?'高':p.length>=4?'中':'低'}</span></div><div class="money"><div class="m">仕入<b>${yen(x.h.buy)}</b></div><div class="m">参考相場<b>${yen(x.cur)}</b></div><div class="m profit">想定利益<b>${yen(x.profit)}</b></div></div><div class="small" style="margin-top:8px">7日変動 ${x.t7>=0?'+':''}${x.t7.toFixed(1)}% ｜ ${esc(x.reason)}</div><div class="actions"><button class="btn soft" onclick="selectHoldingAnalysis('${x.h.id}')">相場を見る</button><button class="btn outline" onclick="quickMarket('${x.h.id}')">相場追加</button><button class="btn danger" onclick="deleteHolding('${x.h.id}')">削除</button></div></div></div></div>`}).join(''):`<div class="list-empty">所持品を登録してください。</div>`;renderMarketAnalysis()}
+function selectHoldingAnalysis(id){$('marketHoldingSelect').value=id;renderMarketAnalysis();showPage('holdings')}
+function quickMarket(id){fillHoldingSelects();$('marketHolding').value=id;openModal('marketModal')}
+function renderMarketAnalysis(){if(!holdings.length){$('marketKpis').innerHTML='';$('marketBreakdown').innerHTML='<div class="list-empty">所持品を登録してください。</div>';drawMarket([]);return}const id=$('marketHoldingSelect').value||holdings[0].id,h=holdings.find(x=>x.id===id)||holdings[0];$('marketHoldingSelect').value=h.id;const p30=pointsFor(h.id,30),p7=pointsFor(h.id,7),sig=holdingSignal(h);const buy=weightedPrice(p30,'buyback'),ask=weightedPrice(p30,'asking'),sold=weightedPrice(p30,'sold');$('marketKpis').innerHTML=`<div class="kpi">現在参考相場<b>${yen(sig.cur)}</b></div><div class="kpi">7日変動<b>${sig.t7>=0?'+':''}${sig.t7.toFixed(1)}%</b></div><div class="kpi greenish">判定<b>${sig.signal}</b></div>`;$('marketBreakdown').innerHTML=`<div class="grid3"><div class="kpi">買取平均<b>${yen(buy)}</b></div><div class="kpi">出品希望平均<b>${yen(ask)}</b></div><div class="kpi">成約報告平均<b>${yen(sold)}</b></div></div><div class="small" style="margin-top:10px">30日データ ${p30.length}件｜${esc(sig.reason)}</div>`;drawMarket(pointsFor(h.id,90))}
+function drawMarket(points){const c=$('marketCanvas'),ctx=c.getContext('2d'),w=c.clientWidth||320,h=220,dpr=window.devicePixelRatio||1;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);ctx.strokeStyle='#e4eaf2';ctx.lineWidth=1;for(let i=0;i<5;i++){let y=20+i*(h-40)/4;ctx.beginPath();ctx.moveTo(35,y);ctx.lineTo(w-12,y);ctx.stroke()}if(!points.length){ctx.fillStyle='#718096';ctx.font='13px sans-serif';ctx.fillText('相場データを追加するとグラフを表示します',45,h/2);return}const vals=points.map(x=>+x.price||0),min=Math.min(...vals)*.95,max=Math.max(...vals)*1.05||1;ctx.strokeStyle='#1677ff';ctx.lineWidth=3;ctx.beginPath();points.forEach((p,i)=>{const x=35+(w-50)*(points.length===1?.5:i/(points.length-1)),y=20+(h-40)*(1-((p.price-min)/(max-min||1)));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();ctx.fillStyle='#172033';ctx.font='11px sans-serif';ctx.fillText(yen(max),4,24);ctx.fillText(yen(min),4,h-16)}
+
+
+// ============================================================
+// X LIVE SIGNALS - Cloudflare Worker Version 5.0
+// 既存の tenbaikun_sales 等のlocalStorageは変更しません。
+// ============================================================
+const TENBAIKUN_API="https://tenbaikun-api.shuxlinx1003.workers.dev";
+
+function signalBadgeClass(decision){
+  if(decision==="GO") return "green";
+  if(decision==="STOP") return "red";
+  return "orange";
+}
+let liveSignals=[];
+
+// 長崎優先ランキング: X実投稿を「今日動ける順」に並べる（価格は推測しない）
+function localRankSignal(p){
+ const text=String(p.text||'');
+ const age=Number(p.age_minutes||99999);
+ let sc=Number(p.score||0);
+ const reasons=[];
+ const localWords=['長崎','長崎市','茂里町','浦上','浜口','住吉','時津','長与','諫早','大村'];
+ const actionWords=['入荷','再販','販売開始','発売','在庫','本日','今日','ただいま販売','購入可能','予約開始','抽選開始'];
+ const onlineWords=['オンライン','通販','公式サイト','EC','ネット販売','Amazon'];
+ const distantWords=['池袋','新宿','渋谷','秋葉原','大阪','梅田','名古屋','札幌','仙台','横浜','千葉','埼玉','福岡'];
+ const localHits=localWords.filter(w=>text.includes(w)||(p.matched_locations||[]).some(x=>String(x).includes(w)));
+ const actionHits=actionWords.filter(w=>text.includes(w)||(p.matched_words||[]).includes(w));
+ const online=onlineWords.some(w=>text.includes(w));
+ const distant=distantWords.some(w=>text.includes(w));
+ if(p.local_match||localHits.length){sc+=35;reasons.push('長崎・近隣');}
+ else if(online){sc+=15;reasons.push('全国通販');}
+ else if(distant){sc-=30;reasons.push('県外店頭');}
+ if(actionHits.length){sc+=Math.min(18,actionHits.length*4);reasons.push(actionHits.slice(0,2).join('・'));}
+ if(age<=60){sc+=15;reasons.push('1時間以内');}
+ else if(age<=360){sc+=9;reasons.push('6時間以内');}
+ else if(age<=1440){sc+=4;reasons.push('24時間以内');}
+ else if(age>2880){sc-=12;reasons.push('情報古め');}
+ sc=Math.max(0,Math.min(99,Math.round(sc)));
+ let priority=p.local_match||localHits.length?'LOCAL':online?'ONLINE':distant?'DISTANT':'NATIONAL';
+ return {...p,local_rank_score:sc,local_rank_reason:reasons.join(' / '),local_priority:priority};
+}
+function rankLiveSignals(posts){return posts.map(localRankSignal).sort((a,b)=>b.local_rank_score-a.local_rank_score);}
+function cleanSignalText(t){return String(t||'').replace(/https?:\/\/\S+/g,' ').replace(/[🔥⭐✨‼️❗📣🎉🎯💥🚨📢]/g,' ').replace(/\s+/g,' ').trim()}
+function extractProductName(p){
+ const raw=cleanSignalText(p.text); if(!raw)return String(p.type||'商品情報');
+ const bracket=[...raw.matchAll(/[『「【\[]([^』」】\]]{3,55})[』」】\]]/g)].map(m=>m[1].trim()).filter(x=>!/(お知らせ|入荷|販売|予約|抽選|買取)/.test(x));
+ if(bracket.length)return bracket[0].slice(0,55);
+ const patterns=[
+  /(ポケモンカード(?:ゲーム)?\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー×Xx ]{2,45}?(?:BOX|パック|セット|デッキ|ex))/i,
+  /(ワンピースカード(?:ゲーム)?\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー× ]{2,45}?(?:BOX|パック|セット|カード))/i,
+  /((?:遊戯王|デュエル・マスターズ|デュエマ|ドラゴンボール|ヴァイスシュヴァルツ)[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー× ]{2,45}?(?:BOX|パック|デッキ|セット))/i,
+  /(一番くじ\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー～〜× ]{2,50})/i,
+  /((?:Nintendo Switch|Switch|PS5|PlayStation 5)\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー× ]{2,45})/i,
+  /([ぁ-んァ-ヶ一-龠A-Za-z0-9・ー]+\s*\d+巻(?:\s*\([^)]*\))?)/,
+  /([A-Za-z0-9ぁ-んァ-ヶ一-龠・ー× ]{3,45}(?:フィギュア|Tシャツ|ぬいぐるみ|アクスタ|アクリルスタンド|ガチャ|カプセルトイ))/i
+ ];
+ for(const re of patterns){const m=raw.match(re);if(m)return m[1].trim().replace(/(?:入荷|再販|販売開始|予約開始).*$/,'').slice(0,58)}
+ let x=raw.replace(/^(?:入荷|在庫|予約|抽選|再販|販売開始|発売|買取)[\s:：・-]*/,'');
+ x=x.split(/(?:入荷しました|入荷情報|販売中|販売開始|予約開始|抽選開始|在庫あり|お申し込み|お問い合わせ|です‼|です!!)/)[0].trim();
+ return (x.length>=4?x:raw).slice(0,58);
+}
+function normalizeProductName(s){return String(s||'').toLowerCase().replace(/[\s　・･~〜～!！?？「」『』【】()（）\-_:：]/g,'').slice(0,38)}
+function priceForSignal(title){
+ const n=normalizeProductName(title); if(!n)return null;
+ const hits=candidates.filter(c=>{const cn=normalizeProductName(c.name);return cn&&(n.includes(cn)||cn.includes(n))});
+ if(!hits.length)return null; const c=hits.sort((a,b)=>score(b)-score(a))[0];return {buy:+c.buy||0,sell:+c.sell||0,profit:calcProfit(c),candidate:c};
+}
+function isSpecificProductName(title,p){
+ const t=String(title||'').trim(); if(t.length<4)return false;
+ const generic=/^(入荷|在庫|予約|抽選|再販|販売|買取|お知らせ|商品情報|本日|更新|速報|情報|全国情報)/;
+ if(generic.test(t))return false;
+ if(/(買取表|本日有効|更新いたしました|お問い合わせ|お申し込み|大変増えております)/.test(t)&&!/(BOX|デッキ|フィギュア|一番くじ|ガチャ|巻|Switch|PS5|Tシャツ|ぬいぐるみ|アクスタ|プラモデル)/i.test(t))return false;
+ return true;
+}
+function productGroupSignals(posts){
+ const map=new Map(); posts.forEach(p=>{const title=extractProductName(p); if(!isSpecificProductName(title,p))return; const key=normalizeProductName(title)||('signal'+map.size);if(!map.has(key))map.set(key,{title,posts:[]});map.get(key).posts.push(p)});
+ return [...map.values()].map(g=>{g.posts.sort((a,b)=>Number(b.local_rank_score||b.score||0)-Number(a.local_rank_score||a.score||0));g.best=g.posts[0];g.price=priceForSignal(g.title);g.groupScore=Math.min(99,Number(g.best.local_rank_score||g.best.score||0)+Math.min(10,(g.posts.length-1)*2));return g}).sort((a,b)=>b.groupScore-a.groupScore).slice(0,20);
+}
+function productLiveCard(g,i){
+ const p=g.best, price=g.price, author=p.author?.name||p.author?.username||'Xユーザー';
+ const local=p.local_match?((p.matched_locations||[]).join('・')||p.detected_area||pref):p.local_priority==='ONLINE'?'全国通販':'全国情報';
+ const store=(p.matched_stores||[])[0]||author; const age=Number.isFinite(Number(p.age_minutes))?`${p.age_minutes}分前`:'時刻未取得';
+ let decision='WAIT'; if(price){if(price.profit>=500&&g.groupScore>=65)decision='GO';else if(price.profit<200)decision='STOP'}
+ const dc=decision==='GO'?'go':decision==='STOP'?'stop':'wait';
+ const reason=decision==='GO'?'利益・鮮度・入手情報を確認':decision==='STOP'?'利益基準200円未満':'販売相場または仕入価格を確認中';
+ const tags=[p.type||'商品',...(p.matched_words||[]).slice(0,2)].filter(Boolean);
+ return `<div class="product-live"><div class="live-grid"><div class="rank-medal ${i<3?'top':''}">${i+1}</div><div><div class="live-title">${esc(g.title)}</div><div class="product-tags">${tags.map(x=>`<span>${esc(x)}</span>`).join('')}</div><div class="live-alert">${p.local_match?'本日候補（長崎・近隣）':p.local_priority==='ONLINE'?'全国通販候補':'情報確認候補'}</div><div class="live-source">📍 ${esc(store)}｜${esc(local)}<br>🕒 ${esc(age)}（X投稿 ${g.posts.length}件）</div>${price?`<div class="live-money"><div>仕入価格<b>${yen(price.buy)}</b></div><div>販売相場<b>${yen(price.sell)}</b></div><div class="profitbox">予想利益<b>${yen(price.profit)}</b></div></div>`:`<div class="no-price">価格未確認：商品名はX実投稿から抽出。仕入価格・販売相場が確認できるまで利益額は表示しません。</div>`}<div class="decision-row"><div class="decision-big ${dc}">${decision}</div><div class="evidence">${esc(reason)}<br><span class="source-count">スコア ${g.groupScore}点</span></div><a class="btn soft" href="${esc(p.x_url||'#')}" target="_blank" rel="noopener noreferrer" style="text-decoration:none">X原文</a></div></div></div></div>`;
+}
+function liveSignalCard(p,i){return productLiveCard({title:extractProductName(p),posts:[p],best:p,price:priceForSignal(extractProductName(p)),groupScore:Number(p.local_rank_score||p.score||0)},i||0)}
+
+async function fetchSignals(){ throw new Error("無料優先モードではX API・外部API通信を使用しません");
+}
+const GENRE_QUERIES=[
+ {cat:"トレカ",q:"トレーディングカード"},{cat:"一番くじ",q:"一番くじ"},{cat:"ガチャ",q:"ガチャ"},{cat:"フィギュア",q:"フィギュア"},{cat:"プラモデル",q:"プラモデル"},{cat:"漫画・本",q:"漫画 特典"},{cat:"ゲーム",q:"ゲーム 再販"},{cat:"限定コラボ",q:"限定 コラボ"},{cat:"100均",q:"100均"},{cat:"アニメグッズ",q:"アニメグッズ"}
+];
+function signalIdentity(p){return String(p.id||p.tweet_id||p.x_url||p.text||'').slice(0,300)}
+async function loadAllGenres(){ toast("無料優先モード：X APIは使用しません"); renderHome();
+}
+async function loadXSignals(){ toast("X APIは完全停止中です");
+}
+async function searchLiveFromSearchPage(){ renderSearch();
+}
+
+function showPage(name){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("page-"+name).classList.add("active");
+ document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===name));
+ if(name==="route")renderRoute();if(name==="holdings"){renderHoldings();renderMarketAnalysis()}window.scrollTo({top:0,behavior:"smooth"});
+}
+function openModal(id){$(id).classList.add("show")}function closeModal(id){$(id).classList.remove("show")}
+function openStoreModal(){openModal("storeModal")}function openRaffleModal(){openModal("raffleModal")}
+document.querySelectorAll(".nav").forEach(n=>n.onclick=()=>showPage(n.dataset.page));
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
+["saleBuy","saleSell","saleShip","saleSupplies","saleFee"].forEach(id=>$(id).addEventListener("input",updateSalePreview));
+["verifyBuy","verifySell","verifyShip","verifyFee"].forEach(id=>$(id).addEventListener("input",updateVerifyPreview));
+prefs.forEach(p=>{$("prefSelect").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`);$("storePref").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`)});
+$("prefSelect").onchange=e=>{pref=e.target.value;localStorage.setItem(K.pref,pref);$("regionPill").textContent="📍 "+pref;$("storePref").value=pref;renderStores();fillStores();renderHome();toast(pref+"に切り替えました")};
+$("regionPill").textContent="📍 "+pref;$("saleDate").value=new Date().toISOString().slice(0,10);$("holdingDate").value=new Date().toISOString().slice(0,10);$("marketDate").value=new Date().toISOString().slice(0,16);
+$("todayText").textContent=new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"})+"｜"+pref+"の仕入れ候補";
+if(gps)$("gpsText").textContent=`GPS保存済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;
+renderTabs();fillStores();renderHome();renderSearch();renderRaffles();renderStores();renderSales();renderRoute();renderHoldings();renderMarketAnalysis();updateSalePreview();
+// v11 完全無料・売上連動: X API 0回、Worker自動通信0回。候補は端末内の売上実績・登録データから生成。
+</script>
+</body>
+</html>
