@@ -65,7 +65,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・判定安全版</span></div><div class="tag">X API 0回｜現在候補と過去実績を分離して安全判定</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・現在価格確認版</span></div><div class="tag">X API 0回｜現在候補と過去実績を分離して安全判定</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
@@ -263,6 +263,25 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
  </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addMarketPoint()">相場に追加</button>
 </div></div>
 
+
+<div class="modal" id="verifyModal"><div class="sheet"><button class="close" onclick="closeModal('verifyModal')">×</button><h3>🔎 現在価格を確認</h3>
+ <div class="sub" id="verifyGuide">店頭・公式通販・実際の販売相場を確認して入力してください。入力した価格だけで再判定します。</div>
+ <input type="hidden" id="verifyId">
+ <div class="grid2" style="margin-top:12px">
+  <div class="field" style="grid-column:1/-1"><label>商品名</label><input id="verifyName" readonly></div>
+  <div class="field"><label>現在の仕入価格</label><input id="verifyBuy" type="number" inputmode="numeric"></div>
+  <div class="field"><label>現在の販売相場</label><input id="verifySell" type="number" inputmode="numeric"></div>
+  <div class="field"><label>送料</label><input id="verifyShip" type="number" inputmode="numeric" value="210"></div>
+  <div class="field"><label>手数料%</label><input id="verifyFee" type="number" inputmode="decimal" value="10"></div>
+  <div class="field"><label>入手可能性</label><select id="verifyAvail"><option value="5">非常に高い</option><option value="4">高い</option><option value="3" selected>中</option><option value="2">低い</option></select></div>
+  <div class="field"><label>確認先</label><select id="verifySource"><option>実店舗</option><option>公式通販</option><option>フリマ成約相場</option><option>買取店</option><option>その他</option></select></div>
+  <div class="field" style="grid-column:1/-1"><label>確認メモ（任意）</label><input id="verifyMemo" placeholder="例：長崎市内の店舗で在庫確認、販売相場は直近成約"></div>
+ </div>
+ <div id="verifyPreview" class="grid3" style="margin-top:12px"></div>
+ <div class="warning">価格を確認した時点の情報です。在庫や相場は変動します。確認済みにすると過去実績ではなく現在価格でGO / WAIT / STOPを判定します。</div>
+ <button class="btn green" style="width:100%;margin-top:10px" onclick="confirmCurrentPrice()">この現在価格で判定する</button>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -318,17 +337,33 @@ function score(c){
  if(gps&&st&&st.lat&&st.lng){const d=distance(gps.lat,gps.lng,+st.lat,+st.lng);distanceBonus=Math.max(0,8-d/3)}
  return Math.max(1,Math.min(99,Math.round(profitScore+av+fr+hot+distanceBonus)));
 }
-function verdict(c){const s=score(c),p=calcProfit(c);if(c.autoFromSales)return["参考","status-wait"];if(p<200||s<45)return["STOP","status-stop"];if(s<72)return["WAIT","status-wait"];return["GO","status-go"]}
+function verdict(c){const s=score(c),p=calcProfit(c);if(c.autoFromSales&&!c.currentVerified)return["参考","status-wait"];if(p<200||s<45)return["STOP","status-stop"];if(s<72)return["WAIT","status-wait"];return["GO","status-go"]}
 function distance(a,b,c,d){const R=6371,toRad=x=>x*Math.PI/180;const dLat=toRad(c-a),dLon=toRad(d-b);const q=Math.sin(dLat/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
 function storeFor(c){return stores.find(s=>s.id===c.storeId)}
 function candidateCard(c,rank){
- const p=calcProfit(c),s=score(c),st=storeFor(c),[v,vc]=verdict(c);
+ const p=calcProfit(c),s=score(c),st=storeFor(c),[v,vc]=verdict(c),isRef=c.autoFromSales&&!c.currentVerified;
+ const checked=c.currentVerifiedAt?new Date(c.currentVerifiedAt).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
  return `<div class="product"><div class="product-top"><div class="rank">${rank??"★"}</div><div class="product-info"><div class="row between"><div class="product-title">${esc(c.name)}</div><div class="score">${s}<span style="font-size:11px">点</span></div></div>
- <div class="badges"><span class="badge">${esc(c.cat)}</span>${c.autoFromSales?`<span class="badge b-purple">過去実績・参考</span><span class="badge b-orange">現在価格 未確認</span>`:`<span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span><span class="badge b-orange">${+c.fresh>=5?"速報":+c.fresh>=4?"新鮮":"通常"}</span>`}<span class="${vc}">${v}</span></div>
- <div class="small">${c.autoFromSales?`📊 過去の売上実績 ${c.historyCount||1}件から算出した参考値です。現在も同じ価格で仕入れ・販売できるとは限りません。`:`📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}`}</div>
- <div class="money"><div class="m">仕入<b>${yen(c.buy)}</b></div><div class="m">想定販売<b>${yen(c.sell)}</b></div><div class="m profit">想定利益<b>${yen(p)}</b></div></div>
- <div class="actions">${c.autoFromSales?`<button class="btn soft" onclick="showPage('search');document.getElementById('searchKeyword').value='${esc(c.name).replace(/'/g,"\\'")}';renderSearch()">🔎 現在価格を確認</button>`:`<button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button>`}<button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
+ <div class="badges"><span class="badge">${esc(c.cat)}</span>${isRef?`<span class="badge b-purple">過去実績・参考</span><span class="badge b-orange">現在価格 未確認</span>`:`<span class="badge b-green">${c.currentVerified?'現在価格 確認済み':'登録候補'}</span><span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span>`}<span class="${vc}">${v}</span></div>
+ <div class="small">${isRef?`📊 過去の売上実績 ${c.historyCount||1}件から算出した参考値です。現在も同じ価格で仕入れ・販売できるとは限りません。`:c.currentVerified?`✅ ${esc(c.verifySource||'現在価格')}で確認 ${checked}${c.verifyMemo?'｜'+esc(c.verifyMemo):''}`:`📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}`}</div>
+ <div class="money"><div class="m">${isRef?'過去仕入':'現在仕入'}<b>${yen(c.buy)}</b></div><div class="m">${isRef?'過去販売':'現在相場'}<b>${yen(c.sell)}</b></div><div class="m profit">${isRef?'過去利益':'予想利益'}<b>${yen(p)}</b></div></div>
+ <div class="actions">${isRef?`<button class="btn soft" onclick="openVerifyModal('${c.id}')">🔎 現在価格を確認</button>`:`<button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button>`}<button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
  </div></div></div>`;
+}
+function openVerifyModal(id){
+ const c=candidates.find(x=>x.id===id);if(!c)return;
+ $("verifyId").value=id;$("verifyName").value=c.name;$("verifyBuy").value=c.buy||"";$("verifySell").value=c.sell||"";$("verifyShip").value=c.ship??210;$("verifyFee").value=c.fee??10;$("verifyAvail").value=c.avail||3;$("verifySource").value=c.verifySource||"実店舗";$("verifyMemo").value=c.verifyMemo||"";updateVerifyPreview();openModal("verifyModal");
+}
+function updateVerifyPreview(){
+ const b=+$("verifyBuy").value||0,s=+$("verifySell").value||0,sh=+$("verifyShip").value||0,r=+$("verifyFee").value||0,fee=Math.round(s*r/100),p=s-b-sh-fee;
+ $("verifyPreview").innerHTML=`<div class="kpi">手数料<b>${yen(fee)}</b></div><div class="kpi greenish">現在の予想利益<b>${yen(p)}</b></div><div class="kpi">利益率<b>${b?((p/b)*100).toFixed(1):0}%</b></div>`;
+}
+function confirmCurrentPrice(){
+ const id=$("verifyId").value,c=candidates.find(x=>x.id===id);if(!c)return;
+ const buy=+$("verifyBuy").value||0,sell=+$("verifySell").value||0;
+ if(!buy||!sell){toast("現在の仕入価格と販売相場を入力してください");return}
+ c.buy=buy;c.sell=sell;c.ship=+$("verifyShip").value||0;c.fee=+$("verifyFee").value||0;c.avail=+$("verifyAvail").value||3;c.fresh=5;c.currentVerified=true;c.autoFromSales=false;c.currentVerifiedAt=Date.now();c.verifySource=$("verifySource").value;c.verifyMemo=$("verifyMemo").value.trim();c.hot=Math.max(3,+c.hot||3);
+ jsave(K.candidates,candidates);closeModal("verifyModal");renderHome();renderSearch();toast("現在価格で再判定しました");
 }
 function renderTabs(){
  $("categoryTabs").innerHTML=categories.map(c=>`<button class="tab ${c===activeCat?"active":""}" onclick="setCat('${encodeURIComponent(c)}')">${esc(c)}</button>`).join("")+`<button class="tab" onclick="openModal('categoryModal')">＋追加</button>`;
@@ -641,6 +676,7 @@ function openStoreModal(){openModal("storeModal")}function openRaffleModal(){ope
 document.querySelectorAll(".nav").forEach(n=>n.onclick=()=>showPage(n.dataset.page));
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
 ["saleBuy","saleSell","saleShip","saleSupplies","saleFee"].forEach(id=>$(id).addEventListener("input",updateSalePreview));
+["verifyBuy","verifySell","verifyShip","verifyFee"].forEach(id=>$(id).addEventListener("input",updateVerifyPreview));
 prefs.forEach(p=>{$("prefSelect").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`);$("storePref").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`)});
 $("prefSelect").onchange=e=>{pref=e.target.value;localStorage.setItem(K.pref,pref);$("regionPill").textContent="📍 "+pref;$("storePref").value=pref;renderStores();fillStores();renderHome();toast(pref+"に切り替えました")};
 $("regionPill").textContent="📍 "+pref;$("saleDate").value=new Date().toISOString().slice(0,10);$("holdingDate").value=new Date().toISOString().slice(0,10);$("marketDate").value=new Date().toISOString().slice(0,16);
