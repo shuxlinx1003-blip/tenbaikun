@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#071a33">
-<title>転売君 Pro v9｜TOP100 無料優先版</title>
+<title>転売君 Pro v10｜TOP100 無料自動版</title>
 <style>
 :root{
  --navy:#071a33;--navy2:#0b2a52;--blue:#1677ff;--cyan:#18b6d9;--green:#16a765;
@@ -65,7 +65,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料優先版</span></div><div class="tag">X API 不使用｜登録データ・売上データで利益候補を管理</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・自動候補版</span></div><div class="tag">X API 0回｜過去の売上実績から利益候補を自動生成</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
@@ -75,7 +75,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
  </div>
 
  <div class="card">
-  <div class="row between"><div><h2>👑 利益候補 TOP100</h2><div class="sub">X APIは使用しません。登録した価格・店舗情報と売上データから、利益候補を最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="row between"><div><h2>👑 利益候補 TOP100</h2><div class="sub">X APIは使用しません。過去の売上実績と登録データから、利益候補を自動生成して最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
   <div class="tabs" id="categoryTabs"></div>
   <div class="sub" style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:12px;color:#166534"><b>🌿 無料優先モード</b>：X API 0回・Workerへの自動通信 0回。価格未確認の商品に架空の利益は表示しません。</div><div id="top20"></div>
  </div>
@@ -83,7 +83,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
  <div class="card">
   <div class="row between"><div><h2>🌿 無料データモード</h2><div class="sub">X APIを完全に停止しています。Cloudflare Workerへの自動アクセスも行いません。</div></div><span class="status-go">FREE</span></div>
   <div class="grid2" style="margin-top:12px"><div class="q"><b>0回</b><span>X API呼び出し</span></div><div class="q"><b>0回</b><span>Worker自動通信</span></div></div>
-  <div class="sub" style="margin-top:12px">利益候補は「候補登録」で仕入価格・販売相場・店舗を登録するとTOP100に反映されます。既存の売上データはそのまま保持します。</div>
+  <div class="sub" style="margin-top:12px">過去の売上実績から利益が出た商品を自動で候補化します。新しい商品は「候補登録」で追加できます。既存の売上データはそのまま保持します。</div>
  </div>
 
  <div class="card">
@@ -325,7 +325,7 @@ function candidateCard(c,rank){
  const p=calcProfit(c),s=score(c),st=storeFor(c),[v,vc]=verdict(c);
  return `<div class="product"><div class="product-top"><div class="rank">${rank??"★"}</div><div class="product-info"><div class="row between"><div class="product-title">${esc(c.name)}</div><div class="score">${s}<span style="font-size:11px">点</span></div></div>
  <div class="badges"><span class="badge">${esc(c.cat)}</span><span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span><span class="badge b-orange">${+c.fresh>=5?"速報":+c.fresh>=4?"新鮮":"通常"}</span><span class="${vc}">${v}</span></div>
- <div class="small">📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}</div>
+ <div class="small">${c.autoFromSales?`📊 自分の過去実績 ${c.historyCount||1}件から自動算出`:`📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}`}</div>
  <div class="money"><div class="m">仕入<b>${yen(c.buy)}</b></div><div class="m">想定販売<b>${yen(c.sell)}</b></div><div class="m profit">想定利益<b>${yen(p)}</b></div></div>
  <div class="actions"><button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button><button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
  </div></div></div>`;
@@ -339,7 +339,7 @@ function renderHome(){
  renderTabs();
  let a=candidates.filter(c=>calcProfit(c)>=200&&(activeCat==="すべて"||c.cat===activeCat));
  a.sort((x,y)=>score(y)-score(x));
- $("top20").innerHTML=a.length?a.slice(0,100).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">利益候補はまだありません。候補を登録すると、ここに最大100件表示されます。</div>`;
+ $("top20").innerHTML=a.length?a.slice(0,100).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">まだ利益候補を作れる売上実績がありません。売上を登録すると、自動でTOP100候補が作られます。</div>`;
  $("qNow").textContent=a.filter(c=>verdict(c)[0]==="GO").length;
  $("qToday").textContent=a.filter(c=>c.today).length;
  $("qRaffle").textContent=raffles.filter(r=>/受付|予定/.test(r.status)).length;
@@ -435,6 +435,36 @@ function normalizeSale(s,i){
 }
 sales=Array.isArray(sales)?sales.map(normalizeSale):[];
 jsave(K.sales,sales);
+
+// v10: X APIや外部APIを一切使わず、自分の過去売上から利益候補を自動生成。
+// tenbaikun_sales は読み取るだけで、既存データを削除・変更しません。
+function autoCandidatesFromSales(){
+ const groups=new Map();
+ for(const x of sales){
+  const name=String(x.name||'').trim();
+  if(!name||(+x.sale||0)<=0)continue;
+  const key=name.toLowerCase().replace(/\s+/g,' ');
+  if(!groups.has(key))groups.set(key,{name,cat:x.cat||'その他',rows:[]});
+  groups.get(key).rows.push(x);
+ }
+ const existing=new Set(candidates.map(c=>String(c.name||'').toLowerCase().replace(/\s+/g,' ')));
+ let added=0;
+ for(const g of groups.values()){
+  if(existing.has(g.name.toLowerCase().replace(/\s+/g,' ')))continue;
+  const profitable=g.rows.filter(x=>(+x.profit||0)>=200);
+  if(!profitable.length)continue;
+  const avg=n=>Math.round(profitable.reduce((a,x)=>a+(+x[n]||0),0)/profitable.length);
+  const buy=avg('purchase'),sell=avg('sale'),ship=avg('shipping');
+  const feeRate=Math.round(profitable.reduce((a,x)=>a+(+x.feeRate||10),0)/profitable.length);
+  const profit=sell-buy-ship-Math.round(sell*feeRate/100);
+  if(profit<200)continue;
+  candidates.push({id:uid('auto'),name:g.name,cat:g.cat,buy,sell,ship,fee:feeRate,avail:3,fresh:2,storeId:'',hot:Math.min(5,2+profitable.length),today:false,autoFromSales:true,historyCount:profitable.length});
+  existing.add(g.name.toLowerCase().replace(/\s+/g,' '));added++;
+ }
+ if(added)jsave(K.candidates,candidates);
+ return added;
+}
+const autoAdded=autoCandidatesFromSales();
 function updateSalePreview(){
  const b=+$("saleBuy").value||0,s=+$("saleSell").value||0,sh=+$("saleShip").value||0,su=+$("saleSupplies").value||0,rate=+$("saleFee").value||0,fee=Math.round(s*rate/100),p=s-b-sh-su-fee;
  $("salePreview").innerHTML=`<div class="kpi">手数料<b>${yen(fee)}</b></div><div class="kpi greenish">利益<b>${yen(p)}</b></div><div class="kpi">利益率<b>${b?((p/b)*100).toFixed(1):0}%</b></div>`;
@@ -599,7 +629,7 @@ $("regionPill").textContent="📍 "+pref;$("saleDate").value=new Date().toISOStr
 $("todayText").textContent=new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"})+"｜"+pref+"の仕入れ候補";
 if(gps)$("gpsText").textContent=`GPS保存済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;
 renderTabs();fillStores();renderHome();renderSearch();renderRaffles();renderStores();renderSales();renderRoute();renderHoldings();renderMarketAnalysis();updateSalePreview();
-// X APIは従量課金のため自動検索しません。ユーザー操作時のみ取得します。
+// v10 完全無料優先: X API 0回、Worker自動通信0回。候補は端末内の売上実績・登録データから生成。
 </script>
 </body>
 </html>
