@@ -81,13 +81,13 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
     <h2>⚡ X速報・長崎優先</h2>
     <div class="sub">Cloudflare経由でXの最新情報を取得。長崎情報を優先表示します。</div>
    </div>
-   <button class="btn primary" onclick="loadXSignals()">更新</button>
+   <button class="btn primary" onclick="loadAllGenres()">全ジャンル検索</button>
   </div>
   <div class="grid2" style="margin-top:12px">
-   <div class="field"><label>検索商品</label><input id="xProduct" value="ポケモンカード"></div>
+   <div class="field"><label>個別検索（任意）</label><input id="xProduct" value="" placeholder="例：一番くじ、ガチャ、商品名"><button class="btn soft" style="margin-top:7px;width:100%" onclick="loadXSignals()">このキーワードだけ検索</button></div>
    <div class="field"><label>地域</label><input id="xArea" value="長崎"></div>
   </div>
-  <div id="xSignalStatus" class="sub" style="margin-top:10px">「更新」を押すとX速報を取得します。</div>
+  <div id="xSignalStatus" class="sub" style="margin-top:10px">「全ジャンル検索」でトレカ以外も横断検索します。※複数回API検索を行います。</div>
   <div id="xSignalList" style="margin-top:10px"></div>
  </div>
 
@@ -536,6 +536,7 @@ function extractProductName(p){
  const patterns=[
   /(ポケモンカード(?:ゲーム)?\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー×Xx ]{2,45}?(?:BOX|パック|セット|デッキ|ex))/i,
   /(ワンピースカード(?:ゲーム)?\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー× ]{2,45}?(?:BOX|パック|セット|カード))/i,
+  /((?:遊戯王|デュエル・マスターズ|デュエマ|ドラゴンボール|ヴァイスシュヴァルツ)[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー× ]{2,45}?(?:BOX|パック|デッキ|セット))/i,
   /(一番くじ\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー～〜× ]{2,50})/i,
   /((?:Nintendo Switch|Switch|PS5|PlayStation 5)\s*[A-Za-z0-9ぁ-んァ-ヶ一-龠・ー× ]{2,45})/i,
   /([ぁ-んァ-ヶ一-龠A-Za-z0-9・ー]+\s*\d+巻(?:\s*\([^)]*\))?)/,
@@ -552,8 +553,15 @@ function priceForSignal(title){
  const hits=candidates.filter(c=>{const cn=normalizeProductName(c.name);return cn&&(n.includes(cn)||cn.includes(n))});
  if(!hits.length)return null; const c=hits.sort((a,b)=>score(b)-score(a))[0];return {buy:+c.buy||0,sell:+c.sell||0,profit:calcProfit(c),candidate:c};
 }
+function isSpecificProductName(title,p){
+ const t=String(title||'').trim(); if(t.length<4)return false;
+ const generic=/^(入荷|在庫|予約|抽選|再販|販売|買取|お知らせ|商品情報|本日|更新|速報|情報|全国情報)/;
+ if(generic.test(t))return false;
+ if(/(買取表|本日有効|更新いたしました|お問い合わせ|お申し込み|大変増えております)/.test(t)&&!/(BOX|デッキ|フィギュア|一番くじ|ガチャ|巻|Switch|PS5|Tシャツ|ぬいぐるみ|アクスタ|プラモデル)/i.test(t))return false;
+ return true;
+}
 function productGroupSignals(posts){
- const map=new Map(); posts.forEach(p=>{const title=extractProductName(p),key=normalizeProductName(title)||('signal'+map.size);if(!map.has(key))map.set(key,{title,posts:[]});map.get(key).posts.push(p)});
+ const map=new Map(); posts.forEach(p=>{const title=extractProductName(p); if(!isSpecificProductName(title,p))return; const key=normalizeProductName(title)||('signal'+map.size);if(!map.has(key))map.set(key,{title,posts:[]});map.get(key).posts.push(p)});
  return [...map.values()].map(g=>{g.posts.sort((a,b)=>Number(b.local_rank_score||b.score||0)-Number(a.local_rank_score||a.score||0));g.best=g.posts[0];g.price=priceForSignal(g.title);g.groupScore=Math.min(99,Number(g.best.local_rank_score||g.best.score||0)+Math.min(10,(g.posts.length-1)*2));return g}).sort((a,b)=>b.groupScore-a.groupScore).slice(0,20);
 }
 function productLiveCard(g,i){
@@ -575,8 +583,22 @@ async function fetchSignals(product,area,limit=20){
  if(!response.ok||!data.ok) throw new Error(data.error||("APIエラー "+response.status));
  return data;
 }
+const GENRE_QUERIES=[
+ {cat:"トレカ",q:"トレーディングカード"},{cat:"一番くじ",q:"一番くじ"},{cat:"ガチャ",q:"ガチャ"},{cat:"フィギュア",q:"フィギュア"},{cat:"プラモデル",q:"プラモデル"},{cat:"漫画・本",q:"漫画 特典"},{cat:"ゲーム",q:"ゲーム 再販"},{cat:"限定コラボ",q:"限定 コラボ"},{cat:"100均",q:"100均"},{cat:"アニメグッズ",q:"アニメグッズ"}
+];
+function signalIdentity(p){return String(p.id||p.tweet_id||p.x_url||p.text||'').slice(0,300)}
+async function loadAllGenres(){
+ const area=($('xArea')?.value||pref.replace(/[都道府県府]$/,'')).trim();
+ const status=$('xSignalStatus'),list=$('xSignalList'); status.textContent='全ジャンルを検索中… 0/'+GENRE_QUERIES.length; list.innerHTML='';
+ let all=[],errors=0;
+ for(let i=0;i<GENRE_QUERIES.length;i++){const g=GENRE_QUERIES[i];try{const d=await fetchSignals(g.q,area,12);(Array.isArray(d.posts)?d.posts:[]).forEach(p=>all.push({...p,genre_hint:g.cat}))}catch(e){errors++}status.textContent=`全ジャンルを検索中… ${i+1}/${GENRE_QUERIES.length}`;}
+ const seen=new Set(); all=all.filter(p=>{const k=signalIdentity(p);if(seen.has(k))return false;seen.add(k);return true});
+ liveSignals=rankLiveSignals(all); const groups=productGroupSignals(liveSignals);
+ status.textContent=`全ジャンル実投稿 ${liveSignals.length}件 → 具体的商品 ${groups.length}件｜${new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}更新${errors?'｜取得失敗 '+errors+'ジャンル':''}`;
+ list.innerHTML=groups.length?groups.map(productLiveCard).join(''):'<div class="empty">具体的な商品名まで特定できる投稿がありません。</div>'; renderHome();
+}
 async function loadXSignals(){
- const product=($('xProduct')?.value||'ポケモンカード').trim(), area=($('xArea')?.value||pref.replace(/[都道府県府]$/,'')).trim();
+ const product=($('xProduct')?.value||'').trim(), area=($('xArea')?.value||pref.replace(/[都道府県府]$/,'')).trim();
  const status=$('xSignalStatus'),list=$('xSignalList'); if(!product)return toast('商品名を入力してください');
  status.textContent='X実データを取得中…'; list.innerHTML='';
  try{const data=await fetchSignals(product,area,20); liveSignals=rankLiveSignals(Array.isArray(data.posts)?data.posts:[]); const local=Number(data.summary?.local||0);
@@ -609,7 +631,7 @@ $("regionPill").textContent="📍 "+pref;$("saleDate").value=new Date().toISOStr
 $("todayText").textContent=new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"})+"｜"+pref+"の仕入れ候補";
 if(gps)$("gpsText").textContent=`GPS保存済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;
 renderTabs();fillStores();renderHome();renderSearch();renderRaffles();renderStores();renderSales();renderRoute();renderHoldings();renderMarketAnalysis();updateSalePreview();
-setTimeout(()=>{loadXSignals().catch(()=>{});},500);
+// X APIは従量課金のため自動検索しません。ユーザー操作時のみ取得します。
 </script>
 </body>
 </html>
