@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#071a33">
-<title>転売君 Pro 商品TOP20</title>
+<title>転売君 Pro v9｜TOP100 無料優先版</title>
 <style>
 :root{
  --navy:#071a33;--navy2:#0b2a52;--blue:#1677ff;--cyan:#18b6d9;--green:#16a765;
@@ -57,38 +57,33 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 .live-grid{display:grid;grid-template-columns:46px minmax(0,1fr);gap:10px}.rank-medal{width:42px;height:42px;border-radius:13px;background:#eef4ff;color:#173c70;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:1000}.rank-medal.top{background:#fff3c4;color:#8a5b00}
 .live-title{font-size:17px;font-weight:1000;line-height:1.35}.live-source{font-size:12px;color:#66758b;margin-top:5px;line-height:1.45}.live-alert{font-size:12px;font-weight:900;color:#e33b42;margin-top:5px}.live-money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.live-money>div{background:#f6f8fc;border-radius:11px;padding:8px;text-align:center;font-size:10px;color:#6a788b}.live-money b{display:block;font-size:15px;color:#172033;margin-top:2px}.live-money .profitbox{background:#e9fbef}.live-money .profitbox b{color:#087c35}.decision-row{display:flex;gap:7px;align-items:center;margin-top:9px}.decision-big{border-radius:11px;padding:8px 12px;font-size:17px;font-weight:1000;color:#fff}.decision-big.go{background:#10ad46}.decision-big.wait{background:#f6b900;color:#1d1d1d}.decision-big.stop{background:#e94a50}.evidence{flex:1;background:#fff0f1;color:#e33b42;border-radius:10px;padding:8px;font-size:11px;font-weight:800;text-align:center}.source-count{font-size:11px;color:#5d6c82}.no-price{font-size:11px;color:#6b7789;margin-top:7px;background:#f7f8fb;border-radius:9px;padding:7px}.product-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.product-tags span{background:#eaf3ff;color:#1769c2;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:800}
 @media(min-width:700px){.product-live{padding:14px}.live-grid{grid-template-columns:54px minmax(0,1fr)}.live-title{font-size:18px}}
+
+/* v9 image-target polish */
+@media (min-width:900px){main{max-width:1220px}.hero{padding:22px 26px}.product{box-shadow:none;border:1px solid #e5eaf2}.money{grid-template-columns:repeat(3,1fr)}}
+.card{border:1px solid #e5eaf2;box-shadow:0 8px 24px rgba(7,26,51,.06)}
+.product-title{font-weight:900}.rank{background:#fff7d6;color:#8a5b00}.status-go{background:#16a765;color:#fff}.status-wait{background:#f59e0b;color:#fff}.status-stop{background:#ef4444;color:#fff}
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro</div><div class="tag">見つける・仕入れる・売る・続けて稼ぐ</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料優先版</span></div><div class="tag">X API 不使用｜登録データ・売上データで利益候補を管理</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
  <div class="hero">
   <h1>今日、動く価値がある情報だけ。</h1><p id="todayText"></p>
-  <div class="quick"><div class="q"><b id="qNow">0</b><span>今から狙える</span></div><div class="q"><b id="qToday">0</b><span>本日入荷候補</span></div><div class="q"><b id="qRaffle">0</b><span>抽選・予約</span></div><div class="q"><b id="qHot">0</b><span>SNS急上昇候補</span></div></div>
+  <div class="quick"><div class="q"><b id="qNow">0</b><span>今から狙える</span></div><div class="q"><b id="qToday">0</b><span>本日入荷候補</span></div><div class="q"><b id="qRaffle">0</b><span>抽選・予約</span></div><div class="q"><b id="qHot">0</b><span>注目度が高い</span></div></div>
  </div>
 
  <div class="card">
-  <div class="row between"><div><h2>🔥 今日の仕入れ候補 TOP20</h2><div class="sub">X実データ＋登録済み候補を、鮮度・地域・根拠で優先表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="row between"><div><h2>👑 利益候補 TOP100</h2><div class="sub">X APIは使用しません。登録した価格・店舗情報と売上データから、利益候補を最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
   <div class="tabs" id="categoryTabs"></div>
-  <div id="top20"></div>
+  <div class="sub" style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:12px;color:#166534"><b>🌿 無料優先モード</b>：X API 0回・Workerへの自動通信 0回。価格未確認の商品に架空の利益は表示しません。</div><div id="top20"></div>
  </div>
 
  <div class="card">
-  <div class="row between">
-   <div>
-    <h2>⚡ X速報・長崎優先</h2>
-    <div class="sub">Cloudflare経由でXの最新情報を取得。長崎情報を優先表示します。</div>
-   </div>
-   <button class="btn primary" onclick="loadAllGenres()">全ジャンル検索</button>
-  </div>
-  <div class="grid2" style="margin-top:12px">
-   <div class="field"><label>個別検索（任意）</label><input id="xProduct" value="" placeholder="例：一番くじ、ガチャ、商品名"><button class="btn soft" style="margin-top:7px;width:100%" onclick="loadXSignals()">このキーワードだけ検索</button></div>
-   <div class="field"><label>地域</label><input id="xArea" value="長崎"></div>
-  </div>
-  <div id="xSignalStatus" class="sub" style="margin-top:10px">「全ジャンル検索」でトレカ以外も横断検索します。※複数回API検索を行います。</div>
-  <div id="xSignalList" style="margin-top:10px"></div>
+  <div class="row between"><div><h2>🌿 無料データモード</h2><div class="sub">X APIを完全に停止しています。Cloudflare Workerへの自動アクセスも行いません。</div></div><span class="status-go">FREE</span></div>
+  <div class="grid2" style="margin-top:12px"><div class="q"><b>0回</b><span>X API呼び出し</span></div><div class="q"><b>0回</b><span>Worker自動通信</span></div></div>
+  <div class="sub" style="margin-top:12px">利益候補は「候補登録」で仕入価格・販売相場・店舗を登録するとTOP100に反映されます。既存の売上データはそのまま保持します。</div>
  </div>
 
  <div class="card">
@@ -104,13 +99,13 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 
 <section class="page" id="page-search">
  <div class="card">
-  <h2>🔎 X実データ商品サーチ</h2><div class="sub">Xの最新投稿を直接検索。入荷・再販・抽選・予約・販売開始を拾い、地域・鮮度・信頼度で判定します。</div>
+  <h2>🔎 登録済み商品サーチ</h2><div class="sub">登録済み候補から商品名・カテゴリで検索します。外部APIへの通信はありません。</div>
   <div class="grid2" style="margin-top:12px">
    <div class="field"><label>キーワード</label><input id="searchKeyword" placeholder="例：ポケモン、一番くじ"></div>
    <div class="field"><label>最低利益</label><input id="searchProfit" type="number" value="200"></div>
   </div>
-  <button class="btn primary" style="width:100%;margin-top:10px" onclick="searchLiveFromSearchPage()">Xの最新情報を検索する</button>
-  <div id="liveSearchStatus" class="sub" style="margin-top:10px">商品名や「再販」「抽選」などを入力してください。</div>
+  <button class="btn primary" style="width:100%;margin-top:10px" onclick="renderSearch()">登録データを検索する</button>
+  <div id="liveSearchStatus" class="sub" style="margin-top:10px">商品名やカテゴリを入力してください。</div>
   <div id="searchResults"></div>
  </div>
  <div class="card">
@@ -344,19 +339,18 @@ function renderHome(){
  renderTabs();
  let a=candidates.filter(c=>calcProfit(c)>=200&&(activeCat==="すべて"||c.cat===activeCat));
  a.sort((x,y)=>score(y)-score(x));
- const liveTop=productGroupSignals(liveSignals);
- $("top20").innerHTML=liveTop.length?`<div class="sub" style="margin:8px 0 12px">🎯 X実投稿を商品名ごとにまとめた「具体的な商品TOP20」です。同じ商品の投稿は1枠に統合し、価格根拠がない商品には利益を作りません。</div>`+liveTop.map(productLiveCard).join(""):(a.length?a.slice(0,20).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">まだ実データ候補がありません。「X速報を更新」またはサーチから検索してください。</div>`);
- $("qNow").textContent=liveSignals.length?liveSignals.filter(p=>p.decision==="GO").length:a.filter(c=>verdict(c)[0]==="GO").length;
+ $("top20").innerHTML=a.length?a.slice(0,100).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">利益候補はまだありません。候補を登録すると、ここに最大100件表示されます。</div>`;
+ $("qNow").textContent=a.filter(c=>verdict(c)[0]==="GO").length;
  $("qToday").textContent=a.filter(c=>c.today).length;
  $("qRaffle").textContent=raffles.filter(r=>/受付|予定/.test(r.status)).length;
- $("qHot").textContent=liveSignals.length?liveSignals.filter(p=>Number(p.score||0)>=70).length:a.filter(c=>(+c.hot||0)>=4).length;
+ $("qHot").textContent=a.filter(c=>(+c.hot||0)>=4).length;
  renderToday();
  renderHomeSell();
 }
 function addToday(id){if(!todayIds.includes(id))todayIds.push(id);else todayIds=todayIds.filter(x=>x!==id);jsave(K.today,todayIds);renderHome();toast("今日行く候補を更新しました")}
 function renderToday(){
  const list=todayIds.map(id=>candidates.find(c=>c.id===id)).filter(Boolean);
- $("todayList").innerHTML=list.length?list.map(c=>{const st=storeFor(c);return `<div class="store"><div class="store-icon">⭐</div><div class="grow"><b>${esc(c.name)}</b><div class="small">${esc(st?.name||"店舗未設定")}・想定利益 ${yen(calcProfit(c))}</div></div><button class="btn danger" onclick="addToday('${c.id}')">外す</button></div>`}).join(""):`<div class="list-empty">TOP20から「今日行く」を押してください。</div>`;
+ $("todayList").innerHTML=list.length?list.map(c=>{const st=storeFor(c);return `<div class="store"><div class="store-icon">⭐</div><div class="grow"><b>${esc(c.name)}</b><div class="small">${esc(st?.name||"店舗未設定")}・想定利益 ${yen(calcProfit(c))}</div></div><button class="btn danger" onclick="addToday('${c.id}')">外す</button></div>`}).join(""):`<div class="list-empty">TOP100から「今日行く」を押してください。</div>`;
 }
 function renderSearch(){
  const kw=$("searchKeyword").value.trim().toLowerCase(),min=+$("searchProfit").value||0;
@@ -576,43 +570,17 @@ function productLiveCard(g,i){
 }
 function liveSignalCard(p,i){return productLiveCard({title:extractProductName(p),posts:[p],best:p,price:priceForSignal(extractProductName(p)),groupScore:Number(p.local_rank_score||p.score||0)},i||0)}
 
-async function fetchSignals(product,area,limit=20){
- const endpoint=TENBAIKUN_API+"/signals?product="+encodeURIComponent(product)+"&area="+encodeURIComponent(area)+"&limit="+limit;
- const response=await fetch(endpoint,{method:"GET",cache:"no-store"});
- const data=await response.json();
- if(!response.ok||!data.ok) throw new Error(data.error||("APIエラー "+response.status));
- return data;
+async function fetchSignals(){ throw new Error("無料優先モードではX API・外部API通信を使用しません");
 }
 const GENRE_QUERIES=[
  {cat:"トレカ",q:"トレーディングカード"},{cat:"一番くじ",q:"一番くじ"},{cat:"ガチャ",q:"ガチャ"},{cat:"フィギュア",q:"フィギュア"},{cat:"プラモデル",q:"プラモデル"},{cat:"漫画・本",q:"漫画 特典"},{cat:"ゲーム",q:"ゲーム 再販"},{cat:"限定コラボ",q:"限定 コラボ"},{cat:"100均",q:"100均"},{cat:"アニメグッズ",q:"アニメグッズ"}
 ];
 function signalIdentity(p){return String(p.id||p.tweet_id||p.x_url||p.text||'').slice(0,300)}
-async function loadAllGenres(){
- const area=($('xArea')?.value||pref.replace(/[都道府県府]$/,'')).trim();
- const status=$('xSignalStatus'),list=$('xSignalList'); status.textContent='全ジャンルを検索中… 0/'+GENRE_QUERIES.length; list.innerHTML='';
- let all=[],errors=0;
- for(let i=0;i<GENRE_QUERIES.length;i++){const g=GENRE_QUERIES[i];try{const d=await fetchSignals(g.q,area,12);(Array.isArray(d.posts)?d.posts:[]).forEach(p=>all.push({...p,genre_hint:g.cat}))}catch(e){errors++}status.textContent=`全ジャンルを検索中… ${i+1}/${GENRE_QUERIES.length}`;}
- const seen=new Set(); all=all.filter(p=>{const k=signalIdentity(p);if(seen.has(k))return false;seen.add(k);return true});
- liveSignals=rankLiveSignals(all); const groups=productGroupSignals(liveSignals);
- status.textContent=`全ジャンル実投稿 ${liveSignals.length}件 → 具体的商品 ${groups.length}件｜${new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}更新${errors?'｜取得失敗 '+errors+'ジャンル':''}`;
- list.innerHTML=groups.length?groups.map(productLiveCard).join(''):'<div class="empty">具体的な商品名まで特定できる投稿がありません。</div>'; renderHome();
+async function loadAllGenres(){ toast("無料優先モード：X APIは使用しません"); renderHome();
 }
-async function loadXSignals(){
- const product=($('xProduct')?.value||'').trim(), area=($('xArea')?.value||pref.replace(/[都道府県府]$/,'')).trim();
- const status=$('xSignalStatus'),list=$('xSignalList'); if(!product)return toast('商品名を入力してください');
- status.textContent='X実データを取得中…'; list.innerHTML='';
- try{const data=await fetchSignals(product,area,20); liveSignals=rankLiveSignals(Array.isArray(data.posts)?data.posts:[]); const local=Number(data.summary?.local||0);
- status.textContent=`X実投稿 ${liveSignals.length}件｜地域一致 ${local}件｜${new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}更新`;
- list.innerHTML=liveSignals.length?productGroupSignals(liveSignals).map(productLiveCard).join(''):'<div class="empty">現在、条件に合うX実投稿はありません。</div>';
- // Home TOP20 is no longer populated by fabricated examples. Real X signals appear first.
- renderHome();
- }catch(e){status.textContent='取得できませんでした。';list.innerHTML=`<div class="empty">通信エラー：${esc(e.message||String(e))}</div>`}
+async function loadXSignals(){ toast("X APIは完全停止中です");
 }
-async function searchLiveFromSearchPage(){
- const product=($('searchKeyword').value||'').trim(), area=pref.replace(/[都道府県府]$/,''); const status=$('liveSearchStatus'), list=$('searchResults');
- if(!product)return toast('キーワードを入力してください'); status.textContent='Xから最新情報を検索中…';list.innerHTML='';
- try{const data=await fetchSignals(product,area,20);const posts=rankLiveSignals(Array.isArray(data.posts)?data.posts:[]);status.textContent=`X実投稿 ${posts.length}件｜地域一致 ${Number(data.summary?.local||0)}件`;list.innerHTML=posts.length?productGroupSignals(posts).map(productLiveCard).join(''):'<div class="list-empty">該当するX実投稿はありません。</div>'}
- catch(e){status.textContent='検索失敗';list.innerHTML=`<div class="list-empty">${esc(e.message||String(e))}</div>`}
+async function searchLiveFromSearchPage(){ renderSearch();
 }
 
 function showPage(name){
