@@ -65,7 +65,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">v14・現在価格確認 修正版</span></div><div class="tag">v14｜X API 0回｜現在価格確認ボタン修正済み</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">v15・相場確認リンク版</span></div><div class="tag">v15｜X API 0回｜相場・仕入先をブラウザで確認</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
@@ -265,12 +265,17 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 
 
 <div class="modal" id="verifyModal"><div class="sheet"><button class="close" onclick="closeModal('verifyModal')">×</button><h3>🔎 現在価格を確認</h3>
- <div class="sub" id="verifyGuide">店頭・公式通販・実際の販売相場を確認して入力してください。入力した価格だけで再判定します。</div>
+ <div class="sub" id="verifyGuide">下の確認ボタンで相場・仕入先を確認し、現在価格を入力してください。過去価格は自動入力しません。</div>
  <input type="hidden" id="verifyId">
  <div class="grid2" style="margin-top:12px">
   <div class="field" style="grid-column:1/-1"><label>商品名</label><input id="verifyName" readonly></div>
-  <div class="field"><label>現在の仕入価格</label><input id="verifyBuy" type="number" inputmode="numeric"></div>
-  <div class="field"><label>現在の販売相場</label><input id="verifySell" type="number" inputmode="numeric"></div>
+  <div class="field"><label>現在の仕入価格</label><input id="verifyBuy" type="number" inputmode="numeric" placeholder="確認後に入力"></div>
+  <div class="field"><label>現在の販売相場</label><input id="verifySell" type="number" inputmode="numeric" placeholder="確認後に入力"></div>
+  <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:9px">
+   <button class="btn soft" type="button" onclick="openMercariCheck()">🔎 メルカリで相場確認</button>
+   <button class="btn outline" type="button" onclick="openStockCheck()">🏪 店舗・通販を確認</button>
+  </div>
+  <div class="sub" style="grid-column:1/-1">検索結果は参考情報です。実際の売却済み価格・在庫・送料などを確認してから価格を入力してください。</div>
   <div class="field"><label>送料</label><input id="verifyShip" type="number" inputmode="numeric" value="210"></div>
   <div class="field"><label>手数料%</label><input id="verifyFee" type="number" inputmode="decimal" value="10"></div>
   <div class="field"><label>入手可能性</label><select id="verifyAvail"><option value="5">非常に高い</option><option value="4">高い</option><option value="3" selected>中</option><option value="2">低い</option></select></div>
@@ -278,7 +283,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
   <div class="field" style="grid-column:1/-1"><label>確認メモ（任意）</label><input id="verifyMemo" placeholder="例：長崎市内の店舗で在庫確認、販売相場は直近成約"></div>
  </div>
  <div id="verifyPreview" class="grid3" style="margin-top:12px"></div>
- <div class="warning">価格を確認した時点の情報です。在庫や相場は変動します。確認済みにすると過去実績ではなく現在価格でGO / WAIT / STOPを判定します。</div>
+ <div class="warning">現在の仕入価格と販売相場を入力するまでは未判定です。価格・在庫を確認した時点の情報として保存し、現在価格でGO / WAIT / STOPを判定します。</div>
  <button class="btn green" style="width:100%;margin-top:10px" onclick="confirmCurrentPrice()">この現在価格で判定する</button>
 </div></div>
 
@@ -357,8 +362,8 @@ function openVerifyModal(id){
  if(!modal){toast("現在価格画面を開けませんでした");return;}
  $("verifyId").value=c.id;
  $("verifyName").value=c.name||"";
- $("verifyBuy").value=(c.currentVerified?c.buy:(c.historyBuy??c.buy??""));
- $("verifySell").value=(c.currentVerified?c.sell:(c.historySell??c.sell??""));
+ $("verifyBuy").value=c.currentVerified?c.buy:"";
+ $("verifySell").value=c.currentVerified?c.sell:"";
  $("verifyShip").value=c.ship??210;
  $("verifyFee").value=c.fee??10;
  $("verifyAvail").value=c.avail||3;
@@ -369,8 +374,21 @@ function openVerifyModal(id){
  updateVerifyPreview();
 }
 function updateVerifyPreview(){
- const b=+$("verifyBuy").value||0,s=+$("verifySell").value||0,sh=+$("verifyShip").value||0,r=+$("verifyFee").value||0,fee=Math.round(s*r/100),p=s-b-sh-fee;
+ const bv=$("verifyBuy").value,sv=$("verifySell").value;
+ if(bv===""||sv===""){
+  $("verifyPreview").innerHTML=`<div class="kpi" style="grid-column:1/-1">現在価格<b>未入力・利益 未判定</b><div class="small" style="margin-top:5px">仕入価格と販売相場の両方を確認・入力すると計算します。</div></div>`;return;
+ }
+ const b=+bv||0,s=+sv||0,sh=+$("verifyShip").value||0,r=+$("verifyFee").value||0,fee=Math.round(s*r/100),p=s-b-sh-fee;
  $("verifyPreview").innerHTML=`<div class="kpi">手数料<b>${yen(fee)}</b></div><div class="kpi greenish">現在の予想利益<b>${yen(p)}</b></div><div class="kpi">利益率<b>${b?((p/b)*100).toFixed(1):0}%</b></div>`;
+}
+function currentVerifyName(){return ($("verifyName").value||"").trim()}
+function openMercariCheck(){
+ const q=currentVerifyName();if(!q){toast("商品名がありません");return}
+ window.open("https://jp.mercari.com/search?keyword="+encodeURIComponent(q),"_blank","noopener,noreferrer");
+}
+function openStockCheck(){
+ const q=currentVerifyName();if(!q){toast("商品名がありません");return}
+ window.open("https://www.google.com/search?q="+encodeURIComponent(q+" 在庫 公式通販 長崎"),"_blank","noopener,noreferrer");
 }
 function confirmCurrentPrice(){
  const id=$("verifyId").value,c=candidates.find(x=>x.id===id);if(!c)return;
@@ -690,6 +708,7 @@ function openStoreModal(){openModal("storeModal")}function openRaffleModal(){ope
 document.querySelectorAll(".nav").forEach(n=>n.onclick=()=>showPage(n.dataset.page));
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
 ["saleBuy","saleSell","saleShip","saleSupplies","saleFee"].forEach(id=>$(id).addEventListener("input",updateSalePreview));
+["verifyBuy","verifySell","verifyShip","verifyFee"].forEach(id=>$(id).addEventListener("input",updateVerifyPreview));
 ["verifyBuy","verifySell","verifyShip","verifyFee"].forEach(id=>$(id).addEventListener("input",updateVerifyPreview));
 prefs.forEach(p=>{$("prefSelect").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`);$("storePref").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`)});
 $("prefSelect").onchange=e=>{pref=e.target.value;localStorage.setItem(K.pref,pref);$("regionPill").textContent="📍 "+pref;$("storePref").value=pref;renderStores();fillStores();renderHome();toast(pref+"に切り替えました")};
