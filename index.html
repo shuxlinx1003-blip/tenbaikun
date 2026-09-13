@@ -65,7 +65,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・現在価格確認版</span></div><div class="tag">X API 0回｜現在候補と過去実績を分離して安全判定</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">v14・現在価格確認 修正版</span></div><div class="tag">v14｜X API 0回｜現在価格確認ボタン修正済み</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
@@ -75,7 +75,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
  </div>
 
  <div class="card">
-  <div class="row between"><div><h2>👑 利益候補 TOP100</h2><div class="sub">X APIは使用しません。現在確認済みの候補を優先し、過去実績は「参考」として最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="row between"><div><h2>👑 利益候補 TOP100 <span style="font-size:11px;background:#e0f2fe;color:#075985;padding:4px 7px;border-radius:999px;vertical-align:middle">v14</span></h2><div class="sub">X APIは使用しません。現在確認済みの候補を優先し、過去実績は「参考」として最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
   <div class="tabs" id="categoryTabs"></div>
   <div class="sub" style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:12px;color:#166534"><b>🌿 無料優先モード</b>：X API 0回・Workerへの自動通信 0回。価格未確認の商品に架空の利益は表示しません。</div><div id="top20"></div>
  </div>
@@ -347,12 +347,26 @@ function candidateCard(c,rank){
  <div class="badges"><span class="badge">${esc(c.cat)}</span>${isRef?`<span class="badge b-purple">過去実績・参考</span><span class="badge b-orange">現在価格 未確認</span>`:`<span class="badge b-green">${c.currentVerified?'現在価格 確認済み':'登録候補'}</span><span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span>`}<span class="${vc}">${v}</span></div>
  <div class="small">${isRef?`📊 過去の売上実績 ${c.historyCount||1}件から算出した参考値です。現在も同じ価格で仕入れ・販売できるとは限りません。`:c.currentVerified?`✅ ${esc(c.verifySource||'現在価格')}で確認 ${checked}${c.verifyMemo?'｜'+esc(c.verifyMemo):''}`:`📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}`}</div>
  <div class="money"><div class="m">${isRef?'過去仕入':'現在仕入'}<b>${yen(c.buy)}</b></div><div class="m">${isRef?'過去販売':'現在相場'}<b>${yen(c.sell)}</b></div><div class="m profit">${isRef?'過去利益':'予想利益'}<b>${yen(p)}</b></div></div>
- <div class="actions">${isRef?`<button class="btn soft" onclick="openVerifyModal('${c.id}')">🔎 現在価格を確認</button>`:`<button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button>`}<button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
+ <div class="actions">${isRef?`<button class="btn soft" type="button" onclick="event.preventDefault();event.stopPropagation();openVerifyModal('${c.id}')">🔎 現在価格を入力・判定</button>`:`<button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button>`}<button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
  </div></div></div>`;
 }
 function openVerifyModal(id){
- const c=candidates.find(x=>x.id===id);if(!c)return;
- $("verifyId").value=id;$("verifyName").value=c.name;$("verifyBuy").value=c.buy||"";$("verifySell").value=c.sell||"";$("verifyShip").value=c.ship??210;$("verifyFee").value=c.fee??10;$("verifyAvail").value=c.avail||3;$("verifySource").value=c.verifySource||"実店舗";$("verifyMemo").value=c.verifyMemo||"";updateVerifyPreview();openModal("verifyModal");
+ const c=candidates.find(x=>String(x.id)===String(id));
+ if(!c){toast("商品データを確認できませんでした");return;}
+ const modal=$("verifyModal");
+ if(!modal){toast("現在価格画面を開けませんでした");return;}
+ $("verifyId").value=c.id;
+ $("verifyName").value=c.name||"";
+ $("verifyBuy").value=(c.currentVerified?c.buy:(c.historyBuy??c.buy??""));
+ $("verifySell").value=(c.currentVerified?c.sell:(c.historySell??c.sell??""));
+ $("verifyShip").value=c.ship??210;
+ $("verifyFee").value=c.fee??10;
+ $("verifyAvail").value=c.avail||3;
+ $("verifySource").value=c.verifySource||"実店舗";
+ $("verifyMemo").value=c.verifyMemo||"";
+ modal.classList.add("show");
+ const sheet=modal.querySelector(".sheet");if(sheet)sheet.scrollTop=0;
+ updateVerifyPreview();
 }
 function updateVerifyPreview(){
  const b=+$("verifyBuy").value||0,s=+$("verifySell").value||0,sh=+$("verifyShip").value||0,r=+$("verifyFee").value||0,fee=Math.round(s*r/100),p=s-b-sh-fee;
