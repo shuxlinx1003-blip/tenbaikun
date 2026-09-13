@@ -1,525 +1,576 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>転売君 Ver.4.3</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#071a33">
+<title>転売君 Pro</title>
 <style>
 :root{
-  --navy:#0f2a4b;--navy2:#16395f;--blue:#1578f6;--orange:#ff8a00;
-  --green:#19a44a;--purple:#6447dd;--red:#ef2b2d;--bg:#f4f6f9;
-  --line:#dbe2ea;--text:#0f1827;--muted:#718096;
+ --navy:#071a33;--navy2:#0b2a52;--blue:#1677ff;--cyan:#18b6d9;--green:#16a765;
+ --orange:#f59e0b;--red:#ef4444;--purple:#7c3aed;--pink:#ec4899;
+ --bg:#f3f6fa;--card:#fff;--text:#172033;--muted:#718096;--line:#e4eaf2;
+ --shadow:0 10px 30px rgba(16,35,62,.08)
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
-header{
-  background:linear-gradient(135deg,var(--navy),var(--navy2));
-  color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;
-  position:sticky;top:0;z-index:30;box-shadow:0 2px 12px #0002
-}
-.brand{font-size:28px;font-weight:900;letter-spacing:.2px}
-.brand small{font-size:14px;font-weight:700;margin-left:8px;opacity:.95}
-.ver{font-size:18px;font-weight:800}
-main{max-width:1120px;margin:auto;padding:18px 14px 95px}
-.card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 3px 16px #21324610;margin-bottom:16px}
-.topnav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
-.navbtn{border:1px solid #e4e9ef;background:#fff;border-radius:14px;padding:13px 7px;font-weight:900;color:#314054}
-.navbtn.active{background:linear-gradient(135deg,#1380ff,#0e6ee7);color:#fff;border-color:transparent}
-.page{display:none}.page.active{display:block}
-h2{margin:0;font-size:24px}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-label{display:block;font-weight:900;margin:9px 0 6px}
-input,select{width:100%;padding:13px;border:1.4px solid #cbd5e1;border-radius:11px;font-size:17px;background:#fff}
-.btn{border:0;border-radius:11px;padding:11px 14px;font-weight:900}
-.btn.gray{background:#f4f6f8;color:#4a5a6d;border:1px solid #ccd6e1}
-.btn.green{width:100%;background:linear-gradient(135deg,#1faf4a,#179b40);color:#fff;font-size:18px;padding:15px;margin-top:16px}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
-.metric{border-radius:14px;padding:14px;text-align:center;font-weight:900}
-.metric .label{font-size:15px}.metric .value{font-size:28px;margin-top:6px}
-.m1{background:#edf6ff;color:#0b72e6}.m2{background:#fff5e8;color:#f07f00}.m3{background:#edfaef;color:#14913e}.m4{background:#f3efff;color:#593bd2}
-.calendar-wrap{overflow:hidden;border:1px solid var(--line);border-radius:14px}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr)}
-.dow,.day{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-.dow:nth-child(7n),.day:nth-child(7n){border-right:0}
-.dow{padding:9px 2px;text-align:center;background:#f9fbfd;font-weight:900}
-.dow.sun{color:var(--red)}.dow.sat{color:var(--blue)}
-.day{min-height:112px;padding:7px;background:#fff;cursor:pointer}
-.day.other{background:#fafbfd;color:#b9c1cc}
-.day.selected{background:#eaf4ff;box-shadow:inset 0 0 0 2px var(--blue)}
-.date{font-weight:900;font-size:16px}
-.day.sun .date{color:var(--red)} .day.sat .date{color:var(--blue)}
-.daystats{margin-top:6px;font-size:12px;line-height:1.6;font-weight:900}
-.sale{color:var(--blue)}.cost{color:var(--orange)}.profit{color:var(--green)}
-.legend{text-align:center;margin-top:12px;font-weight:800;font-size:13px}
-.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin:0 5px 0 14px;vertical-align:-1px}
-.calnav{display:flex;align-items:center;gap:8px}
-.calnav button{width:44px;height:44px;border:1px solid #cbd5e1;background:#fff;border-radius:11px;font-size:23px;font-weight:900}
-.calnav span{min-width:120px;text-align:center;font-weight:900}
-.tablewrap{overflow:auto}
-table{border-collapse:collapse;width:100%;min-width:730px}
-th,td{border:1px solid var(--line);padding:10px;text-align:center}
-th{background:#f7f9fc}
-.edit,.del{border:0;border-radius:8px;color:#fff;padding:7px 10px;font-weight:900}
-.edit{background:var(--blue)}.del{background:var(--red)}
-.chart{height:300px;border-left:1px solid #aeb9c7;border-bottom:1px solid #aeb9c7;display:flex;align-items:flex-end;gap:12px;overflow-x:auto;padding:20px 10px 0}
-.monthbar{height:100%;min-width:66px;display:flex;align-items:flex-end;justify-content:center;gap:3px;position:relative;padding-bottom:30px}
-.bar{width:16px;border-radius:5px 5px 0 0}.bar.blue{background:var(--blue)}.bar.orange{background:var(--orange)}.bar.green{background:var(--green)}
-.mlabel{position:absolute;bottom:4px;font-weight:900;font-size:12px}
-.history-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px}
-.btn.redline{background:#fff;color:var(--red);border:1px solid var(--red)}
-.btn.blueline{background:#fff;color:var(--blue);border:1px solid var(--blue)}
-@media(max-width:720px){
-  header{padding:14px}.brand{font-size:24px}.brand small{display:none}.ver{font-size:15px}
-  main{padding:12px 9px 90px}.card{padding:13px;border-radius:16px}.topnav{position:sticky;top:58px;z-index:20;background:var(--bg);padding:5px 0}
-  .navbtn{font-size:12px;padding:11px 3px}.grid2,.grid3{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.metric .value{font-size:23px}
-  .section-head{align-items:flex-start}.section-head.stack{flex-direction:column}.calnav{align-self:flex-end}
-  .day{min-height:88px;padding:4px}.date{font-size:14px}.daystats{font-size:10px;line-height:1.5}
-  h2{font-size:20px}
-}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;padding-bottom:88px}
+button,input,select,textarea{font:inherit}
+header{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,#06162c,#0a2c56);color:#fff;box-shadow:0 3px 14px rgba(0,0,0,.2)}
+.head{max-width:1080px;margin:auto;padding:12px 15px;display:flex;align-items:center;gap:10px}
+.logo{font-size:24px;font-weight:1000}.tag{font-size:12px;opacity:.8;flex:1}.pill{font-size:12px;background:#ffffff18;border:1px solid #ffffff25;border-radius:999px;padding:7px 9px}
+main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{display:block}
+.hero{background:linear-gradient(135deg,#08234a,#0b3b73);color:white;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#20b8ff22;right:-70px;top:-80px}
+.hero h1{font-size:26px;margin:0 0 4px}.hero p{margin:0;opacity:.82;font-size:13px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:15px}
+.q{background:#ffffff14;border:1px solid #ffffff18;border-radius:15px;padding:11px 8px;text-align:center}.q b{display:block;font-size:20px}.q span{font-size:11px;opacity:.85}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:15px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card h2{font-size:20px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:4px}.row{display:flex;gap:9px;align-items:center}.between{justify-content:space-between}
+.tabs{display:flex;gap:7px;overflow:auto;padding:2px 0 9px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;border:1px solid #d8e0ec;background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;font-size:13px;color:#4b5d76}.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:900;cursor:pointer}.primary{background:var(--blue);color:white}.green{background:var(--green);color:white}.soft{background:#eef4ff;color:#1667c9}.danger{background:#fff0f1;color:#d9363e;border:1px solid #ffd1d4}.outline{background:white;border:1px solid #cfd8e6;color:#43536b}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.field label{display:block;font-size:12px;font-weight:900;margin:0 0 6px;color:#42526a}.field input,.field select,.field textarea{width:100%;border:1px solid #cfd8e6;border-radius:12px;padding:12px;background:#fff;outline:none}.field textarea{min-height:80px;resize:vertical}
+.product{border:1px solid var(--line);border-radius:17px;padding:12px;margin-top:10px;background:#fff}
+.rank{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:1000;background:#f3f6fb}
+.product-top{display:flex;gap:10px}.product-info{flex:1;min-width:0}.product-title{font-weight:1000;font-size:16px;line-height:1.25}.badges{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}.badge{font-size:11px;font-weight:900;border-radius:999px;padding:5px 8px;background:#eef4ff;color:#1765bf}.b-green{background:#e9f8ef;color:#13804b}.b-red{background:#fff0f0;color:#dc3535}.b-orange{background:#fff4e5;color:#c67605}.b-purple{background:#f3edff;color:#6b35c9}
+.money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.m{background:#f7f9fc;border-radius:10px;padding:8px;text-align:center;font-size:11px;color:#66758b}.m b{display:block;color:#18263a;font-size:14px;margin-top:3px}.profit b{color:var(--green)}
+.score{font-size:25px;font-weight:1000;color:#173b69}.actions{display:flex;gap:7px;margin-top:9px}.actions .btn{flex:1;padding:10px;font-size:12px}
+.status-go{color:#fff;background:var(--green);border-radius:12px;padding:8px 11px;font-weight:1000}.status-wait{color:#805200;background:#fff2cc;border-radius:12px;padding:8px 11px;font-weight:1000}.status-stop{color:#b42318;background:#fee4e2;border-radius:12px;padding:8px 11px;font-weight:1000}
+.store{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.store:last-child{border-bottom:0}.store-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#eef4ff;font-size:21px}.grow{flex:1}.small{font-size:12px;color:var(--muted)}
+.route-stop{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}.route-n{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#fff;font-weight:1000}
+.kpi{border-radius:15px;padding:12px;background:#f7f9fc}.kpi b{display:block;font-size:20px;margin-top:4px}.kpi.greenish{background:#edf9f2;color:#137a49}
+.list-empty{color:var(--muted);font-size:13px;text-align:center;padding:20px}.warning{background:#fff8e7;border:1px solid #ffe4a8;color:#7d5a10;border-radius:14px;padding:11px;font-size:12px;margin-top:10px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#fffffff4;backdrop-filter:blur(12px);border-top:1px solid var(--line);z-index:50}
+.bottom-in{max-width:1080px;margin:auto;display:grid;grid-template-columns:repeat(7,1fr);padding:5px 5px calc(5px + env(safe-area-inset-bottom))}
+.nav{border:0;background:transparent;color:#697a91;border-radius:10px;padding:6px 2px;font-size:10px;font-weight:800}.nav i{font-style:normal;font-size:20px;display:block}.nav.active{color:#116ee8;background:#eef5ff}
+.modal{position:fixed;inset:0;background:#09152588;z-index:80;display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{width:min(720px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h3{margin:0 0 14px}.sheet .close{float:right;border:0;background:#eef1f5;border-radius:50%;width:34px;height:34px}
+.toast{position:fixed;left:50%;bottom:94px;transform:translateX(-50%);background:#10243e;color:#fff;border-radius:999px;padding:11px 15px;font-size:13px;font-weight:900;opacity:0;pointer-events:none;z-index:100;transition:.2s}.toast.show{opacity:1}
+.table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}.table th,.table td{padding:9px;border-bottom:1px solid var(--line);text-align:center}.scroll{overflow:auto}
+@media(max-width:720px){.tag{display:none}.quick{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}.money{grid-template-columns:repeat(3,1fr)}.bottom-in{grid-template-columns:repeat(7,1fr)}.nav{font-size:9px}.nav i{font-size:18px}}
 </style>
 </head>
 <body>
-<header>
-  <div class="brand">転売君 📊 <small>利益を見える化、もっと簡単に。</small></div>
-  <div class="ver">Ver.4.3 ⚙️</div>
-</header>
+<header><div class="head"><div class="logo">👑 転売君 Pro</div><div class="tag">見つける・仕入れる・売る・続けて稼ぐ</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
-  <div class="topnav">
-    <button class="navbtn active" data-page="home">🏠 ホーム</button>
-    <button class="navbtn" data-page="history">☷ 売上履歴</button>
-    <button class="navbtn" data-page="chartPage">▥ 月別グラフ</button>
-    <button class="navbtn" data-page="calendarPage">📅 カレンダー</button>
+<section class="page active" id="page-home">
+ <div class="hero">
+  <h1>今日も、仕入れをもっと効率よく。</h1><p id="todayText"></p>
+  <div class="quick"><div class="q"><b id="qNow">0</b><span>今から狙える</span></div><div class="q"><b id="qToday">0</b><span>本日入荷候補</span></div><div class="q"><b id="qRaffle">0</b><span>抽選・予約</span></div><div class="q"><b id="qHot">0</b><span>SNS急上昇候補</span></div></div>
+ </div>
+
+ <div class="card">
+  <div class="row between"><div><h2>🔥 今日の仕入れ候補 TOP20</h2><div class="sub">今日入手できる可能性・利益・鮮度・距離で優先表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="tabs" id="categoryTabs"></div>
+  <div id="top20"></div>
+ </div>
+
+ <div class="card">
+  <div class="row between">
+   <div>
+    <h2>⚡ X速報・長崎優先</h2>
+    <div class="sub">Cloudflare経由でXの最新情報を取得。長崎情報を優先表示します。</div>
+   </div>
+   <button class="btn primary" onclick="loadXSignals()">更新</button>
   </div>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>検索商品</label><input id="xProduct" value="ポケモンカード"></div>
+   <div class="field"><label>地域</label><input id="xArea" value="長崎"></div>
+  </div>
+  <div id="xSignalStatus" class="sub" style="margin-top:10px">「更新」を押すとX速報を取得します。</div>
+  <div id="xSignalList" style="margin-top:10px"></div>
+ </div>
 
-  <section id="home" class="page active">
-    <div class="card">
-      <div class="section-head">
-        <h2>✏️ 商品を登録する</h2>
-        <button class="btn gray" id="clearBtn">↻ 入力をクリア</button>
-      </div>
+ <div class="card">
+  <div class="row between"><div><h2>📦 今売るべき所持品</h2><div class="sub">X相場記録・利益・値動きからSELL/HOLD/WATCHを判定</div></div><button class="btn soft" onclick="showPage('holdings')">所持品を見る</button></div>
+  <div id="homeSellList"></div>
+ </div>
 
-      <div class="grid2">
-        <div>
-          <label>商品名</label>
-          <input id="name" placeholder="商品名を入力（例：ポケモンカード）">
-        </div>
-        <div>
-          <label>仕入れ価格（円）</label>
-          <input id="purchase" type="number" inputmode="numeric" placeholder="例）1000">
-        </div>
-      </div>
+ <div class="card">
+  <div class="row between"><div><h2>🚗 今日行く候補</h2><div class="sub">候補を追加すると、近い順＋販売開始時刻を考慮して並べます</div></div><button class="btn green" onclick="buildRoute()">ルート作成</button></div>
+  <div id="todayList"></div>
+ </div>
+</section>
 
-      <div class="grid3">
-        <div>
-          <label>販売価格（円）</label>
-          <input id="salePrice" type="number" inputmode="numeric" placeholder="例）2000">
-        </div>
-        <div>
-          <label>送料（円）</label>
-          <input id="shipping" type="number" inputmode="numeric" placeholder="例）210（手入力）">
-        </div>
-        <div>
-          <label>📦 備品代（円）</label>
-          <input id="supplies" type="number" inputmode="numeric" placeholder="例）30">
-        </div>
-        <div>
-          <label>販売日</label>
-          <input id="saleDate" type="date">
-        </div>
-      </div>
+<section class="page" id="page-search">
+ <div class="card">
+  <h2>🔎 利益商品サーチ</h2><div class="sub">現時点では候補データ＋手入力。将来X/Instagram/公式情報APIを接続できます。</div>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>キーワード</label><input id="searchKeyword" placeholder="例：ポケモン、一番くじ"></div>
+   <div class="field"><label>最低利益</label><input id="searchProfit" type="number" value="200"></div>
+  </div>
+  <button class="btn primary" style="width:100%;margin-top:10px" onclick="renderSearch()">検索する</button>
+  <div id="searchResults"></div>
+ </div>
+ <div class="card">
+  <div class="row between"><div><h2>＋ 候補商品を追加</h2><div class="sub">SNSや店舗で見つけた情報を自分で登録できます</div></div></div>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>商品名</label><input id="candName"></div>
+   <div class="field"><label>カテゴリー</label><select id="candCat"></select></div>
+   <div class="field"><label>仕入価格</label><input id="candBuy" type="number"></div>
+   <div class="field"><label>想定販売価格</label><input id="candSell" type="number"></div>
+   <div class="field"><label>送料</label><input id="candShip" type="number" value="210"></div>
+   <div class="field"><label>店舗</label><select id="candStore"></select></div>
+   <div class="field"><label>情報鮮度</label><select id="candFresh"><option value="5">速報</option><option value="4">新鮮</option><option value="3">通常</option><option value="2">やや古い</option></select></div>
+   <div class="field"><label>本日入手可能性</label><select id="candAvail"><option value="5">非常に高い</option><option value="4">高い</option><option value="3">中</option><option value="2">低い</option></select></div>
+  </div>
+  <button class="btn green" style="width:100%;margin-top:10px" onclick="addCandidate()">候補商品を登録</button>
+ </div>
+</section>
 
-      <label>販売手数料（%）</label>
-      <input id="feeRate" type="number" inputmode="decimal" value="10" style="max-width:220px">
+<section class="page" id="page-raffle">
+ <div class="card">
+  <div class="row between"><div><h2>🎯 抽選・予約監視</h2><div class="sub">GEO・エディオン・ポケセン・ヤマダ・イオン・Amazonなど</div></div><button class="btn primary" onclick="openRaffleModal()">＋追加</button></div>
+  <div class="tabs" id="raffleTabs"></div>
+  <div id="raffleList"></div>
+  <div class="warning">自動監視は外部API/サーバー接続後に有効化できます。今は登録・締切管理・通知対象管理ができます。</div>
+ </div>
+</section>
 
-      <button class="btn green" id="addBtn">＋ 売れた商品として記録する</button>
-      <div id="calcPreview" style="margin-top:12px;font-weight:900"></div>
-    </div>
+<section class="page" id="page-stores">
+ <div class="card">
+  <div class="row between"><div><h2>🏪 店舗マスタ</h2><div class="sub">販売開始時間、取扱カテゴリー、店舗メモを自分で登録</div></div><button class="btn primary" onclick="openStoreModal()">＋店舗追加</button></div>
+  <div id="storeList"></div>
+ </div>
+ <div class="card">
+  <h2>🗺️ 現在地・地域設定</h2>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>都道府県</label><select id="prefSelect"></select></div>
+   <div class="field"><label>検索半径</label><select id="radiusSelect"><option value="5">5km</option><option value="10" selected>10km</option><option value="20">20km</option><option value="30">30km</option><option value="50">50km</option></select></div>
+  </div>
+  <button class="btn soft" style="width:100%;margin-top:10px" onclick="requestGPS()">📍 GPSで現在地を取得</button>
+  <div class="sub" id="gpsText" style="margin-top:8px">GPS未取得</div>
+ </div>
+</section>
 
-    <div class="card">
-      <h2>📅 今月の売上</h2>
-      <div class="metrics" id="homeMetrics"></div>
-    </div>
-  </section>
+<section class="page" id="page-route">
+ <div class="card">
+  <div class="row between"><div><h2>🚗 最適仕入れルート</h2><div class="sub">距離・販売開始時刻・期待利益を参考に簡易最適化</div></div><button class="btn green" onclick="buildRoute()">再計算</button></div>
+  <div id="routeSummary" class="grid3" style="margin-top:12px"></div>
+  <div id="routeList"></div>
+  <button id="mapsBtn" class="btn primary" style="width:100%;margin-top:12px;display:none" onclick="openMaps()">地図アプリで開く</button>
+ </div>
+</section>
 
-  <section id="history" class="page">
-    <div class="card">
-      <div class="section-head"><h2>📚 売上履歴</h2></div>
-      <div class="history-actions">
-        <button class="btn redline" id="deleteAll">🗑 すべて削除</button>
-        <button class="btn blueline" id="csvImportBtn">⬆ CSV読込</button>
-        <input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
-        <button class="btn blueline" id="csvBtn">⬇ CSV出力</button>
-      </div>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>日付</th><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>備品代</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<section class="page" id="page-holdings">
+ <div class="card">
+  <div class="row between"><div><h2>📦 所持品・売り時判断</h2><div class="sub">Xで見つけた価格情報を蓄積し、相場表と売り時を自動計算</div></div><button class="btn primary" onclick="openHoldingModal()">＋所持品追加</button></div>
+  <div id="holdingSummary" class="grid3" style="margin-top:12px"></div>
+  <div id="holdingList"></div>
+ </div>
+ <div class="card">
+  <h2>📈 相場分析</h2><div class="sub">所持品を選ぶと、7日・30日・90日の価格推移を確認できます。</div>
+  <div class="field" style="margin-top:12px"><label>分析する所持品</label><select id="marketHoldingSelect" onchange="renderMarketAnalysis()"></select></div>
+  <div id="marketKpis" class="grid3" style="margin-top:12px"></div>
+  <canvas id="marketCanvas" height="220" style="width:100%;background:#fff;border:1px solid var(--line);border-radius:16px;margin-top:12px"></canvas>
+  <div id="marketBreakdown" style="margin-top:10px"></div>
+  <button class="btn soft" style="width:100%;margin-top:10px" onclick="openMarketModal()">＋ X相場情報を記録</button>
+  <div class="warning">Xの完全自動収集にはX APIとサーバー接続が必要です。この画面はその接続先になるデータ構造まで実装済みです。</div>
+ </div>
+</section>
 
-  <section id="chartPage" class="page">
-    <div class="card">
-      <div class="section-head">
-        <h2>📊 月別 売上・仕入れ・利益</h2>
-        <select id="chartYear" style="width:auto"></select>
-      </div>
-      <div class="legend">
-        <span class="dot" style="background:#1578f6"></span>売上
-        <span class="dot" style="background:#ff8a00"></span>仕入れ
-        <span class="dot" style="background:#19a44a"></span>利益
-      </div>
-      <div class="chart" id="chart"></div>
-      <div class="metrics" id="chartMetrics"></div>
-    </div>
-  </section>
-
-  <section id="calendarPage" class="page">
-    <div class="card">
-      <div class="section-head stack">
-        <h2>📅 <span id="calTitle"></span>のカレンダー</h2>
-        <div class="calnav">
-          <button id="prevMonth">‹</button>
-          <span id="calMonth"></span>
-          <button id="nextMonth">›</button>
-        </div>
-      </div>
-
-      <div class="metrics" id="calMetrics"></div>
-
-      <div class="calendar-wrap">
-        <div class="calendar" id="calendar"></div>
-      </div>
-
-      <div class="legend">
-        <span class="dot" style="background:#1578f6"></span>売上（円）
-        <span class="dot" style="background:#ff8a00"></span>仕入れ（円）
-        <span class="dot" style="background:#19a44a"></span>利益（円）
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-head">
-        <h2>📅 <span id="detailTitle">日付を選択</span>の売上詳細</h2>
-        <button class="btn" style="background:#1578f6;color:#fff" id="addForSelected">＋ この日に商品を登録</button>
-      </div>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>商品名</th><th>仕入れ価格</th><th>送料</th><th>備品代</th><th>販売価格</th><th>利益</th><th>編集</th></tr></thead>
-          <tbody id="detailBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<section class="page" id="page-sales">
+ <div class="card">
+  <h2>💰 仕入れ・売上・利益管理</h2><div class="sub">旧転売君の保存キーを維持して、既存データを引き継ぎます</div>
+  <div class="grid2" style="margin-top:12px">
+   <div class="field"><label>商品名</label><input id="saleName"></div>
+   <div class="field"><label>カテゴリー</label><select id="saleCat"></select></div>
+   <div class="field"><label>仕入れ価格</label><input id="saleBuy" type="number"></div>
+   <div class="field"><label>販売価格</label><input id="saleSell" type="number"></div>
+   <div class="field"><label>送料</label><input id="saleShip" type="number" value="210"></div>
+   <div class="field"><label>備品代</label><input id="saleSupplies" type="number" value="0"></div>
+   <div class="field"><label>手数料%</label><input id="saleFee" type="number" value="10"></div>
+   <div class="field"><label>販売日</label><input id="saleDate" type="date"></div>
+  </div>
+  <div class="grid3" id="salePreview" style="margin-top:10px"></div>
+  <button class="btn green" style="width:100%;margin-top:10px" onclick="saveSale()">売上として記録</button>
+ </div>
+ <div class="card">
+  <div class="row between"><div><h2>📊 今月の実績</h2></div><button class="btn soft" onclick="exportCSV()">CSV出力</button></div>
+  <div class="grid3" id="monthKpis" style="margin-top:12px"></div>
+ </div>
+ <div class="card">
+  <h2>📚 売上履歴</h2>
+  <div class="scroll"><table class="table"><thead><tr><th>日付</th><th>商品</th><th>仕入</th><th>送料</th><th>備品</th><th>販売</th><th>利益</th><th></th></tr></thead><tbody id="salesBody"></tbody></table></div>
+ </div>
+</section>
 </main>
+
+<nav class="bottom"><div class="bottom-in">
+ <button class="nav active" data-page="home"><i>🏠</i>ホーム</button>
+ <button class="nav" data-page="search"><i>🔎</i>サーチ</button>
+ <button class="nav" data-page="raffle"><i>🎯</i>抽選</button>
+ <button class="nav" data-page="stores"><i>🏪</i>店舗</button>
+ <button class="nav" data-page="route"><i>🚗</i>ルート</button>
+ <button class="nav" data-page="holdings"><i>📦</i>所持品</button>
+ <button class="nav" data-page="sales"><i>📊</i>売上</button>
+</div></nav>
+
+<div class="modal" id="storeModal"><div class="sheet"><button class="close" onclick="closeModal('storeModal')">×</button><h3>店舗を追加</h3>
+ <div class="grid2">
+  <div class="field"><label>店舗名</label><input id="storeName" placeholder="例：ファミリーマート ○○店"></div>
+  <div class="field"><label>種別</label><select id="storeType"><option>コンビニ</option><option>GEO</option><option>家電量販店</option><option>本屋</option><option>100均</option><option>トレカ</option><option>ショッピングモール</option><option>その他</option></select></div>
+  <div class="field"><label>販売開始時間</label><input id="storeTime" type="time" value="10:00"></div>
+  <div class="field"><label>都道府県</label><select id="storePref"></select></div>
+  <div class="field"><label>緯度（任意）</label><input id="storeLat" inputmode="decimal" placeholder="32.xxxx"></div>
+  <div class="field"><label>経度（任意）</label><input id="storeLng" inputmode="decimal" placeholder="129.xxxx"></div>
+  <div class="field" style="grid-column:1/-1"><label>メモ</label><textarea id="storeMemo" placeholder="例：一番くじは基本10時開始。トレカは入荷曜日要確認。"></textarea></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addStore()">保存</button>
+</div></div>
+
+<div class="modal" id="raffleModal"><div class="sheet"><button class="close" onclick="closeModal('raffleModal')">×</button><h3>抽選・予約を追加</h3>
+ <div class="grid2">
+  <div class="field"><label>ショップ</label><select id="raffleShop"><option>GEO</option><option>エディオン</option><option>ポケモンセンターオンライン</option><option>ヤマダデンキ</option><option>イオン</option><option>Amazon</option><option>プレミアムバンダイ</option><option>その他</option></select></div>
+  <div class="field"><label>カテゴリー</label><select id="raffleCat"></select></div>
+  <div class="field"><label>商品名</label><input id="raffleName"></div>
+  <div class="field"><label>状態</label><select id="raffleStatus"><option>抽選受付中</option><option>予約受付中</option><option>再販予定</option><option>結果発表待ち</option></select></div>
+  <div class="field"><label>締切日</label><input id="raffleDeadline" type="datetime-local"></div>
+  <div class="field"><label>通知</label><select id="raffleNotify"><option value="1">ON</option><option value="0">OFF</option></select></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addRaffle()">保存</button>
+</div></div>
+
+<div class="modal" id="categoryModal"><div class="sheet"><button class="close" onclick="closeModal('categoryModal')">×</button><h3>カテゴリーを追加</h3>
+ <div class="field"><label>カテゴリー名</label><input id="newCat" placeholder="例：LEGO、食品限定、ホビー"></div>
+ <button class="btn green" style="width:100%;margin-top:10px" onclick="addCategory()">追加</button>
+</div></div>
+
+<div class="modal" id="holdingModal"><div class="sheet"><button class="close" onclick="closeModal('holdingModal')">×</button><h3>所持品を追加</h3>
+ <div class="grid2">
+  <div class="field"><label>商品名</label><input id="holdingName" placeholder="例：ポケモンカード ○○BOX"></div>
+  <div class="field"><label>カテゴリー</label><select id="holdingCat"></select></div>
+  <div class="field"><label>仕入価格</label><input id="holdingBuy" type="number"></div>
+  <div class="field"><label>目標売価</label><input id="holdingTarget" type="number"></div>
+  <div class="field"><label>保有数</label><input id="holdingQty" type="number" value="1" min="1"></div>
+  <div class="field"><label>購入日</label><input id="holdingDate" type="date"></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addHolding()">保存</button>
+</div></div>
+
+<div class="modal" id="marketModal"><div class="sheet"><button class="close" onclick="closeModal('marketModal')">×</button><h3>X相場情報を記録</h3>
+ <div class="grid2">
+  <div class="field"><label>所持品</label><select id="marketHolding"></select></div>
+  <div class="field"><label>価格タイプ</label><select id="marketType"><option value="buyback">買取価格</option><option value="asking">出品希望価格</option><option value="sold">成約報告価格</option></select></div>
+  <div class="field"><label>価格</label><input id="marketPrice" type="number"></div>
+  <div class="field"><label>情報日時</label><input id="marketDate" type="datetime-local"></div>
+  <div class="field"><label>信頼度</label><select id="marketTrust"><option value="5">5：店舗公式/明確な成約</option><option value="4">4：信頼性高め</option><option value="3" selected>3：通常</option><option value="2">2：未確認</option><option value="1">1：予想・噂</option></select></div>
+  <div class="field"><label>再販/供給情報</label><select id="marketSupply"><option value="0">通常</option><option value="1">再販・供給増加</option><option value="-1">品薄・供給減少</option></select></div>
+  <div class="field" style="grid-column:1/-1"><label>メモ</label><textarea id="marketMemo" placeholder="例：Xの店舗公式買取表、売れた報告など"></textarea></div>
+ </div><button class="btn green" style="width:100%;margin-top:10px" onclick="addMarketPoint()">相場に追加</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const $=id=>document.getElementById(id);
-const STORAGE_KEY="tenbaikun_sales";
-const ALT_KEYS=["salesData","tenbaikun_sales_v3","tenbaikun_sales_v4","tenbaikun_sales_v5"];
+const K={
+ sales:"tenbaikun_sales",
+ cats:"tenbaikun_pro_categories",
+ stores:"tenbaikun_pro_stores",
+ candidates:"tenbaikun_pro_candidates",
+ raffles:"tenbaikun_pro_raffles",
+ today:"tenbaikun_pro_today",
+ pref:"tenbaikun_pro_pref",
+ gps:"tenbaikun_pro_gps",
+ holdings:"tenbaikun_pro_holdings",
+ market:"tenbaikun_pro_market"
+};
+const defaultCats=["すべて","一番くじ","ガチャガチャ","トレーディングカード","100均","本屋","ゲーム","フィギュア","プラモデル","アニメグッズ","アパレル","限定コラボ","ご当地・イベント","抽選・予約","その他"];
+const prefs=["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+const jload=(k,d)=>{try{const x=JSON.parse(localStorage.getItem(k));return x??d}catch(e){return d}};
+const jsave=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+let categories=jload(K.cats,defaultCats);
+if(!categories.includes("すべて"))categories.unshift("すべて");
+let stores=jload(K.stores,[
+ {id:"s1",name:"ファミリーマート 上戸町周辺店",type:"コンビニ",pref:"長崎県",time:"10:00",memo:"一番くじ販売開始時間は店舗確認。",lat:null,lng:null},
+ {id:"s2",name:"GEO 長崎エリア店舗",type:"GEO",pref:"長崎県",time:"10:00",memo:"ゲーム・トレカ・抽選情報を確認。",lat:null,lng:null},
+ {id:"s3",name:"長崎エリア 本屋",type:"本屋",pref:"長崎県",time:"10:00",memo:"初版・特典・付録付き雑誌を確認。",lat:null,lng:null},
+ {id:"s4",name:"長崎エリア 100均",type:"100均",pref:"長崎県",time:"10:00",memo:"コラボ・SNS話題・廃盤候補を確認。",lat:null,lng:null}
+]);
+let candidates=jload(K.candidates,[
+ {id:"c1",name:"トレーディングカード 新商品候補",cat:"トレーディングカード",buy:5400,sell:7980,ship:210,fee:10,avail:5,fresh:5,storeId:"s2",hot:5,today:true},
+ {id:"c2",name:"一番くじ 上位賞狙い候補",cat:"一番くじ",buy:790,sell:2200,ship:750,fee:10,avail:4,fresh:5,storeId:"s1",hot:4,today:true},
+ {id:"c3",name:"100均 SNS話題グッズ",cat:"100均",buy:110,sell:700,ship:210,fee:10,avail:4,fresh:4,storeId:"s4",hot:5,today:true},
+ {id:"c4",name:"コミック 初版・特典候補",cat:"本屋",buy:770,sell:1800,ship:210,fee:10,avail:4,fresh:4,storeId:"s3",hot:4,today:true}
+]);
+let raffles=jload(K.raffles,[
+ {id:"r1",shop:"ポケモンセンターオンライン",name:"ポケモンカード 抽選候補",cat:"トレーディングカード",status:"抽選受付中",deadline:"",notify:1},
+ {id:"r2",shop:"GEO",name:"ゲーム機・人気ソフト抽選候補",cat:"ゲーム",status:"抽選受付中",deadline:"",notify:1}
+]);
+let todayIds=jload(K.today,[]);
+let sales=jload(K.sales,[]);
+let pref=localStorage.getItem(K.pref)||"長崎県";
+let gps=jload(K.gps,null);
+let holdings=jload(K.holdings,[]);
+let marketData=jload(K.market,[]);
+let activeCat="すべて",activeRaffle="すべて",currentRoute=[];
 
-function localISO(d=new Date()){
-  const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);
-  return x.toISOString().slice(0,10);
-}
-function normalizeDate(v){
-  if(!v) return localISO();
-  let s=String(v).trim();
-
-  // 2026/09/08, 2026.09.08, 2026年9月8日 → 2026-09-08
-  let m=s.match(/^(\d{4})[\/.\-年](\d{1,2})[\/.\-月](\d{1,2})日?/);
-  if(m){
-    return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
-  }
-
-  // ISO日時など
-  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
-
-  const d=new Date(s);
-  if(!Number.isNaN(d.getTime())) return localISO(d);
-
-  return localISO();
-}
 function yen(n){return Math.round(Number(n)||0).toLocaleString("ja-JP")+"円"}
-function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-
-let sales=[];
-try{
-  const x=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
-  sales=Array.isArray(x)?x:[];
-}catch(e){
-  sales=[];
+function uid(p){return p+"-"+Date.now()+"-"+Math.random().toString(16).slice(2)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function toast(s){$("toast").textContent=s;$("toast").classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),1900)}
+function calcProfit(c){const fee=Math.round((+c.sell||0)*(+c.fee||10)/100);return (+c.sell||0)-(+c.buy||0)-(+c.ship||0)-fee}
+function score(c){
+ const p=calcProfit(c);
+ const profitScore=Math.min(35,Math.max(0,p/50));
+ const av=(+c.avail||1)*7,fr=(+c.fresh||1)*4,hot=(+c.hot||3)*3;
+ let distanceBonus=5;
+ const st=stores.find(s=>s.id===c.storeId);
+ if(gps&&st&&st.lat&&st.lng){const d=distance(gps.lat,gps.lng,+st.lat,+st.lng);distanceBonus=Math.max(0,8-d/3)}
+ return Math.max(1,Math.min(99,Math.round(profitScore+av+fr+hot+distanceBonus)));
 }
-
-sales=sales.map((s,i)=>{
-  const sale=+(s.sale??s.salePrice??s.price??0);
-  const purchase=+(s.purchase??s.cost??s.purchasePrice??0);
-  const shipping=+(s.shipping??s.postage??0);
-  const supplies=+(s.supplies??s.supplyCost??s.materialCost??0);
-  const feeRate=+(s.feeRate??10);
-  const feeRaw=s.fee??s.feeAmount;
-  const fee=Number.isFinite(Number(feeRaw)) ? Number(feeRaw) : Math.round(sale*feeRate/100);
-  const profitRaw=s.profit??s.profitAmount;
-  const profit=Number.isFinite(Number(profitRaw)) ? Number(profitRaw) : sale-purchase-shipping-supplies-fee;
-
-  return {
-    id:s.id||Date.now()+i,
-    name:s.name||s.productName||s.itemName||"商品",
-    purchase,
-    sale,
-    shipping,
-    supplies,
-    fee,
-    profit,
-    date:normalizeDate(s.date||s.saleDate||s.soldDate)
-  };
-});
-
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(sales))}
-function totals(arr){
-  return arr.reduce((a,s)=>{
-    a.count++;a.sale+=s.sale;a.purchase+=s.purchase;a.profit+=s.profit;return a
-  },{count:0,sale:0,purchase:0,profit:0});
+function verdict(c){const s=score(c),p=calcProfit(c);if(p<200||s<45)return["STOP","status-stop"];if(s<72)return["WAIT","status-wait"];return["GO","status-go"]}
+function distance(a,b,c,d){const R=6371,toRad=x=>x*Math.PI/180;const dLat=toRad(c-a),dLon=toRad(d-b);const q=Math.sin(dLat/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
+function storeFor(c){return stores.find(s=>s.id===c.storeId)}
+function candidateCard(c,rank){
+ const p=calcProfit(c),s=score(c),st=storeFor(c),[v,vc]=verdict(c);
+ return `<div class="product"><div class="product-top"><div class="rank">${rank??"★"}</div><div class="product-info"><div class="row between"><div class="product-title">${esc(c.name)}</div><div class="score">${s}<span style="font-size:11px">点</span></div></div>
+ <div class="badges"><span class="badge">${esc(c.cat)}</span><span class="badge b-green">入手可能性 ${["","低","低","中","高","非常に高"][+c.avail||1]}</span><span class="badge b-orange">${+c.fresh>=5?"速報":+c.fresh>=4?"新鮮":"通常"}</span><span class="${vc}">${v}</span></div>
+ <div class="small">📍 ${esc(st?.name||"店舗未設定")} ${st?.time?"・"+esc(st.time)+"〜":""}</div>
+ <div class="money"><div class="m">仕入<b>${yen(c.buy)}</b></div><div class="m">想定販売<b>${yen(c.sell)}</b></div><div class="m profit">想定利益<b>${yen(p)}</b></div></div>
+ <div class="actions"><button class="btn soft" onclick="addToday('${c.id}')">${todayIds.includes(c.id)?"✅追加済み":"⭐今日行く"}</button><button class="btn outline" onclick="duplicateToSale('${c.id}')">仕入れ記録へ</button></div>
+ </div></div></div>`;
 }
-function metricsHTML(t){
-  return `
-  <div class="metric m1"><div class="label">📊 月の売上</div><div class="value">${yen(t.sale)}</div></div>
-  <div class="metric m2"><div class="label">🛒 月の仕入れ</div><div class="value">${yen(t.purchase)}</div></div>
-  <div class="metric m3"><div class="label">💰 月の利益</div><div class="value">${yen(t.profit)}</div></div>
-  <div class="metric m4"><div class="label">📦 販売数</div><div class="value">${t.count}件</div></div>`;
+function renderTabs(){
+ $("categoryTabs").innerHTML=categories.map(c=>`<button class="tab ${c===activeCat?"active":""}" onclick="setCat('${encodeURIComponent(c)}')">${esc(c)}</button>`).join("")+`<button class="tab" onclick="openModal('categoryModal')">＋追加</button>`;
+ ["candCat","saleCat","raffleCat","holdingCat"].forEach(id=>$(id).innerHTML=categories.filter(c=>c!=="すべて").map(c=>`<option>${esc(c)}</option>`).join(""));
 }
-
-$("saleDate").value=localISO();
-
-function calc(){
-  const purchase=+$("purchase").value||0;
-  const sale=+$("salePrice").value||0;
-  const shipping=+$("shipping").value||0;
-  const supplies=+$("supplies").value||0;
-  const feeRate=+$("feeRate").value||0;
-  const fee=Math.round(sale*feeRate/100);
-  const profit=sale-purchase-shipping-supplies-fee;
-  $("calcPreview").textContent=sale?`販売手数料 ${yen(fee)}　／　予想利益 ${yen(profit)}`:"";
-  return {purchase,sale,shipping,supplies,feeRate,fee,profit};
-}
-["purchase","salePrice","shipping","supplies","feeRate"].forEach(id=>$(id).addEventListener("input",calc));
-
-$("clearBtn").onclick=()=>{
-  ["name","purchase","salePrice","shipping","supplies"].forEach(id=>$(id).value="");
-  $("feeRate").value=10;$("saleDate").value=localISO();calc();
-};
-
-$("addBtn").onclick=()=>{
-  const c=calc();
-  if(!c.sale){alert("販売価格を入力してください");return}
-  sales.push({
-    id:Date.now(),
-    name:$("name").value.trim()||"商品",
-    purchase:c.purchase,
-    sale:c.sale,
-    shipping:c.shipping,
-    supplies:c.supplies,
-    fee:c.fee,
-    profit:c.profit,
-    date:$("saleDate").value||localISO()
-  });
-  save();renderAll();$("clearBtn").click();alert("売上を記録しました！");
-};
-
-document.querySelectorAll(".navbtn").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");$(btn.dataset.page).classList.add("active");
-    if(btn.dataset.page==="calendarPage")renderCalendar();
-  };
-});
-
+window.setCat=x=>{activeCat=decodeURIComponent(x);renderHome()}
 function renderHome(){
-  const d=new Date(),ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-  $("homeMetrics").innerHTML=metricsHTML(totals(sales.filter(s=>s.date.startsWith(ym))));
+ renderTabs();
+ let a=candidates.filter(c=>calcProfit(c)>=200&&(activeCat==="すべて"||c.cat===activeCat));
+ a.sort((x,y)=>score(y)-score(x));
+ $("top20").innerHTML=a.length?a.slice(0,20).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">条件に合う候補がありません。</div>`;
+ $("qNow").textContent=a.filter(c=>verdict(c)[0]==="GO").length;
+ $("qToday").textContent=a.filter(c=>c.today).length;
+ $("qRaffle").textContent=raffles.filter(r=>/受付|予定/.test(r.status)).length;
+ $("qHot").textContent=a.filter(c=>(+c.hot||0)>=4).length;
+ renderToday();
+ renderHomeSell();
+}
+function addToday(id){if(!todayIds.includes(id))todayIds.push(id);else todayIds=todayIds.filter(x=>x!==id);jsave(K.today,todayIds);renderHome();toast("今日行く候補を更新しました")}
+function renderToday(){
+ const list=todayIds.map(id=>candidates.find(c=>c.id===id)).filter(Boolean);
+ $("todayList").innerHTML=list.length?list.map(c=>{const st=storeFor(c);return `<div class="store"><div class="store-icon">⭐</div><div class="grow"><b>${esc(c.name)}</b><div class="small">${esc(st?.name||"店舗未設定")}・想定利益 ${yen(calcProfit(c))}</div></div><button class="btn danger" onclick="addToday('${c.id}')">外す</button></div>`}).join(""):`<div class="list-empty">TOP20から「今日行く」を押してください。</div>`;
+}
+function renderSearch(){
+ const kw=$("searchKeyword").value.trim().toLowerCase(),min=+$("searchProfit").value||0;
+ const a=candidates.filter(c=>(!kw||c.name.toLowerCase().includes(kw)||c.cat.toLowerCase().includes(kw))&&calcProfit(c)>=min).sort((x,y)=>score(y)-score(x));
+ $("searchResults").innerHTML=a.length?a.map(c=>candidateCard(c)).join(""):`<div class="list-empty">該当なし</div>`;
+}
+function fillStores(){
+ $("candStore").innerHTML=stores.filter(s=>s.pref===pref).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("")||stores.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+}
+function addCandidate(){
+ const name=$("candName").value.trim(),buy=+$("candBuy").value,sell=+$("candSell").value,ship=+$("candShip").value;
+ if(!name||!sell){toast("商品名と想定販売価格を入力してください");return}
+ candidates.push({id:uid("c"),name,cat:$("candCat").value,buy,sell,ship,fee:10,avail:+$("candAvail").value,fresh:+$("candFresh").value,storeId:$("candStore").value,hot:3,today:true});
+ jsave(K.candidates,candidates);$("candName").value="";renderHome();renderSearch();toast("候補商品を追加しました");
+}
+function renderStores(){
+ $("storeList").innerHTML=stores.filter(s=>s.pref===pref).map(s=>`<div class="store"><div class="store-icon">${s.type==="本屋"?"📚":s.type==="100均"?"💯":s.type==="GEO"?"🎮":"🏪"}</div><div class="grow"><b>${esc(s.name)}</b><div class="small">${esc(s.type)}・${esc(s.time||"時間未設定")}〜</div><div class="small">${esc(s.memo||"")}</div></div><button class="btn danger" onclick="deleteStore('${s.id}')">削除</button></div>`).join("")||`<div class="list-empty">この地域の店舗がありません。</div>`;
+}
+function addStore(){
+ const name=$("storeName").value.trim();if(!name){toast("店舗名を入力してください");return}
+ stores.push({id:uid("s"),name,type:$("storeType").value,pref:$("storePref").value,time:$("storeTime").value,memo:$("storeMemo").value.trim(),lat:parseFloat($("storeLat").value)||null,lng:parseFloat($("storeLng").value)||null});
+ jsave(K.stores,stores);closeModal("storeModal");renderStores();fillStores();toast("店舗を保存しました");
+}
+function deleteStore(id){if(!confirm("この店舗を削除しますか？"))return;stores=stores.filter(s=>s.id!==id);jsave(K.stores,stores);renderStores();fillStores()}
+function renderRaffles(){
+ const cats=["すべて",...categories.filter(c=>c!=="すべて")];
+ $("raffleTabs").innerHTML=cats.map(c=>`<button class="tab ${c===activeRaffle?"active":""}" onclick="setRaffleCat('${encodeURIComponent(c)}')">${esc(c)}</button>`).join("");
+ const a=raffles.filter(r=>activeRaffle==="すべて"||r.cat===activeRaffle);
+ $("raffleList").innerHTML=a.length?a.map(r=>`<div class="store"><div class="store-icon">🎯</div><div class="grow"><b>${esc(r.shop)}｜${esc(r.name)}</b><div class="badges"><span class="badge b-green">${esc(r.status)}</span><span class="badge">${esc(r.cat)}</span></div><div class="small">${r.deadline?"締切 "+new Date(r.deadline).toLocaleString("ja-JP"):"締切未登録"}・通知 ${r.notify?"ON":"OFF"}</div></div><button class="btn danger" onclick="deleteRaffle('${r.id}')">削除</button></div>`).join(""):`<div class="list-empty">登録なし</div>`;
+}
+window.setRaffleCat=x=>{activeRaffle=decodeURIComponent(x);renderRaffles()}
+function addRaffle(){
+ const name=$("raffleName").value.trim();if(!name){toast("商品名を入力してください");return}
+ raffles.push({id:uid("r"),shop:$("raffleShop").value,name,cat:$("raffleCat").value,status:$("raffleStatus").value,deadline:$("raffleDeadline").value,notify:+$("raffleNotify").value});
+ jsave(K.raffles,raffles);closeModal("raffleModal");renderRaffles();renderHome();toast("抽選・予約を追加しました");
+}
+function deleteRaffle(id){raffles=raffles.filter(r=>r.id!==id);jsave(K.raffles,raffles);renderRaffles();renderHome()}
+function addCategory(){
+ const c=$("newCat").value.trim();if(!c||categories.includes(c)){toast("別のカテゴリー名を入力してください");return}
+ categories.push(c);jsave(K.cats,categories);$("newCat").value="";closeModal("categoryModal");renderTabs();renderRaffles();toast("カテゴリーを追加しました");
+}
+function buildRoute(){
+ let list=todayIds.map(id=>candidates.find(c=>c.id===id)).filter(Boolean).map(c=>({c,st:storeFor(c)})).filter(x=>x.st);
+ if(!list.length){toast("今日行く候補を追加してください");return}
+ let route=[],remaining=[...list],cur=gps;
+ if(cur){
+  while(remaining.length){
+   remaining.sort((a,b)=>{
+    const da=a.st.lat&&a.st.lng?distance(cur.lat,cur.lng,+a.st.lat,+a.st.lng):999;
+    const db=b.st.lat&&b.st.lng?distance(cur.lat,cur.lng,+b.st.lat,+b.st.lng):999;
+    const ta=(a.st.time||"23:59"),tb=(b.st.time||"23:59");
+    return da-db || ta.localeCompare(tb) || score(b.c)-score(a.c);
+   });
+   const n=remaining.shift();route.push(n);
+   if(n.st.lat&&n.st.lng)cur={lat:+n.st.lat,lng:+n.st.lng};
+  }
+ }else route=list.sort((a,b)=>(a.st.time||"23:59").localeCompare(b.st.time||"23:59")||score(b.c)-score(a.c));
+ currentRoute=route;renderRoute();showPage("route");
+}
+function renderRoute(){
+ let km=0,prev=gps;
+ if(gps)currentRoute.forEach(x=>{if(x.st.lat&&x.st.lng){km+=distance(prev.lat,prev.lng,+x.st.lat,+x.st.lng);prev={lat:+x.st.lat,lng:+x.st.lng}}});
+ const profit=currentRoute.reduce((a,x)=>a+calcProfit(x.c),0),gas=Math.round(km/15*180),net=profit-gas;
+ $("routeSummary").innerHTML=`<div class="kpi">走行距離<b>${km?km.toFixed(1):"未計算"}${km?"km":""}</b></div><div class="kpi">推定移動費<b>${km?yen(gas):"GPS/座標必要"}</b></div><div class="kpi greenish">実質期待利益<b>${yen(net)}</b></div>`;
+ $("routeList").innerHTML=currentRoute.length?currentRoute.map((x,i)=>`<div class="route-stop"><div class="route-n">${i+1}</div><div class="grow"><b>${esc(x.st.name)}</b><div class="small">${esc(x.st.time||"時間未設定")}〜 ｜ ${esc(x.c.name)} ｜ ${yen(calcProfit(x.c))}</div></div></div>`).join(""):`<div class="list-empty">ルート未作成</div>`;
+ $("mapsBtn").style.display=currentRoute.length?"block":"none";
+}
+function openMaps(){
+ const dest=currentRoute.find(x=>x.st.lat&&x.st.lng)?.st;
+ if(!dest){toast("店舗の緯度・経度を登録してください");return}
+ location.href=`https://maps.apple.com/?daddr=${dest.lat},${dest.lng}&dirflg=d`;
+}
+function requestGPS(){
+ if(!navigator.geolocation){toast("この端末ではGPSを利用できません");return}
+ navigator.geolocation.getCurrentPosition(p=>{gps={lat:p.coords.latitude,lng:p.coords.longitude,at:Date.now()};jsave(K.gps,gps);$("gpsText").textContent=`GPS取得済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;toast("現在地を取得しました");renderHome()},e=>toast("GPSを取得できませんでした"),{enableHighAccuracy:true,timeout:10000});
+}
+function normalizeSale(s,i){
+ const sale=+(s.sale??s.salePrice??s.price??0),purchase=+(s.purchase??s.cost??s.purchasePrice??0),shipping=+(s.shipping??s.postage??0),supplies=+(s.supplies??s.supplyCost??s.materialCost??0),feeRate=+(s.feeRate??10);
+ const fee=Number.isFinite(Number(s.fee))?+s.fee:Math.round(sale*feeRate/100);
+ const profit=Number.isFinite(Number(s.profit))?+s.profit:sale-purchase-shipping-supplies-fee;
+ return {id:s.id||uid("old"),name:s.name||s.productName||"商品",purchase,sale,shipping,supplies,feeRate,fee,profit,date:s.date||new Date().toISOString().slice(0,10),cat:s.cat||"その他"};
+}
+sales=Array.isArray(sales)?sales.map(normalizeSale):[];
+jsave(K.sales,sales);
+function updateSalePreview(){
+ const b=+$("saleBuy").value||0,s=+$("saleSell").value||0,sh=+$("saleShip").value||0,su=+$("saleSupplies").value||0,rate=+$("saleFee").value||0,fee=Math.round(s*rate/100),p=s-b-sh-su-fee;
+ $("salePreview").innerHTML=`<div class="kpi">手数料<b>${yen(fee)}</b></div><div class="kpi greenish">利益<b>${yen(p)}</b></div><div class="kpi">利益率<b>${b?((p/b)*100).toFixed(1):0}%</b></div>`;
+}
+function saveSale(){
+ const name=$("saleName").value.trim();if(!name){toast("商品名を入力してください");return}
+ const purchase=+$("saleBuy").value||0,sale=+$("saleSell").value||0,shipping=+$("saleShip").value||0,supplies=+$("saleSupplies").value||0,feeRate=+$("saleFee").value||0,fee=Math.round(sale*feeRate/100),profit=sale-purchase-shipping-supplies-fee;
+ sales.push({id:uid("sale"),name,cat:$("saleCat").value,purchase,sale,shipping,supplies,feeRate,fee,profit,date:$("saleDate").value||new Date().toISOString().slice(0,10)});
+ jsave(K.sales,sales);renderSales();["saleName","saleBuy","saleSell"].forEach(id=>$(id).value="");updateSalePreview();toast("売上を記録しました");
+}
+function duplicateToSale(id){
+ const c=candidates.find(x=>x.id===id);if(!c)return;showPage("sales");$("saleName").value=c.name;$("saleCat").value=c.cat;$("saleBuy").value=c.buy;$("saleSell").value=c.sell;$("saleShip").value=c.ship;updateSalePreview();
+}
+function renderSales(){
+ const d=new Date(),key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),m=sales.filter(x=>String(x.date).startsWith(key));
+ const total=m.reduce((a,x)=>({sale:a.sale+x.sale,buy:a.buy+x.purchase,profit:a.profit+x.profit}),{sale:0,buy:0,profit:0});
+ $("monthKpis").innerHTML=`<div class="kpi">売上<b>${yen(total.sale)}</b></div><div class="kpi">仕入れ<b>${yen(total.buy)}</b></div><div class="kpi greenish">利益<b>${yen(total.profit)}</b></div>`;
+ $("salesBody").innerHTML=[...sales].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.name)}</td><td>${yen(x.purchase)}</td><td>${yen(x.shipping)}</td><td>${yen(x.supplies||0)}</td><td>${yen(x.sale)}</td><td><b>${yen(x.profit)}</b></td><td><button class="btn danger" onclick="deleteSale('${x.id}')">削除</button></td></tr>`).join("")||`<tr><td colspan="8">売上記録なし</td></tr>`;
+}
+function deleteSale(id){if(!confirm("削除しますか？"))return;sales=sales.filter(x=>String(x.id)!==String(id));jsave(K.sales,sales);renderSales()}
+function exportCSV(){
+ if(!sales.length){toast("売上履歴がありません");return}
+ const head=["日付","商品名","カテゴリー","仕入れ価格","送料","備品代","販売価格","手数料","利益"];
+ const rows=sales.map(x=>[x.date,x.name,x.cat||"",x.purchase,x.shipping,x.supplies||0,x.sale,x.fee,x.profit]);
+ const csv="\uFEFF"+[head,...rows].map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="tenbaikun_sales.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+function avg(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0}
+function pointsFor(id,days=9999){const cutoff=Date.now()-days*86400000;return marketData.filter(x=>x.holdingId===id&&new Date(x.date).getTime()>=cutoff).sort((a,b)=>new Date(a.date)-new Date(b.date))}
+function weightedPrice(points,type){const a=points.filter(x=>!type||x.type===type);if(!a.length)return 0;let n=0,d=0;a.forEach(x=>{const w=+x.trust||1;n+=(+x.price||0)*w;d+=w});return d?n/d:0}
+function currentMarket(h){const p=pointsFor(h.id,30);const sold=weightedPrice(p,'sold'),ask=weightedPrice(p,'asking'),buy=weightedPrice(p,'buyback');return sold||ask||buy||0}
+function trendPct(h,days=7){const p=pointsFor(h.id,days);if(p.length<2)return 0;const half=Math.max(1,Math.floor(p.length/2));const a=avg(p.slice(0,half).map(x=>+x.price||0)),b=avg(p.slice(half).map(x=>+x.price||0));return a?((b-a)/a*100):0}
+function holdingSignal(h){const cur=currentMarket(h),t7=trendPct(h,7),p30=pointsFor(h.id,30);const supply=p30.slice(-5).reduce((a,x)=>a+(+x.supply||0),0);const fee=Math.round(cur*.10),profit=cur-(+h.buy||0)-fee-210;let signal='WAIT',cls='status-wait',reason='相場データを蓄積中';if(cur>0){if((h.target&&cur>=h.target)||profit>=Math.max(1000,(+h.buy||0)*.25)){signal='SELL';cls='status-go';reason='利益目標に到達'}if(t7>8&&supply<=0){signal='HOLD';cls='status-wait';reason='7日相場が上昇中'}if(supply>=2||t7<-8){signal='WATCH';cls='status-stop';reason='再販・価格下落に注意'}if((h.target&&cur>=h.target)&&t7<=3){signal='SELL';cls='status-go';reason='目標価格到達・上昇鈍化'}}return{signal,cls,reason,cur,t7,profit}}
+function renderHomeSell(){const a=holdings.map(h=>({h,...holdingSignal(h)})).filter(x=>x.signal==='SELL'||x.signal==='WATCH').sort((a,b)=>b.profit-a.profit).slice(0,5);$('homeSellList').innerHTML=a.length?a.map(x=>`<div class="store"><div class="store-icon">${x.signal==='SELL'?'🔥':'⚠️'}</div><div class="grow"><b>${esc(x.h.name)}</b><div class="small">現在参考相場 ${yen(x.cur)}・想定利益 ${yen(x.profit)}・7日 ${x.t7>=0?'+':''}${x.t7.toFixed(1)}%</div><div class="small">${esc(x.reason)}</div></div><span class="${x.cls}">${x.signal}</span></div>`).join(''):`<div class="list-empty">所持品と相場を登録すると売り時候補を表示します。</div>`}
+function openHoldingModal(){openModal('holdingModal')}
+function openMarketModal(){if(!holdings.length){toast('先に所持品を登録してください');return}fillHoldingSelects();openModal('marketModal')}
+function fillHoldingSelects(){const opts=holdings.map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join('');$('marketHolding').innerHTML=opts;$('marketHoldingSelect').innerHTML=opts}
+function addHolding(){const name=$('holdingName').value.trim();if(!name){toast('商品名を入力してください');return}holdings.push({id:uid('h'),name,cat:$('holdingCat').value,buy:+$('holdingBuy').value||0,target:+$('holdingTarget').value||0,qty:+$('holdingQty').value||1,date:$('holdingDate').value||new Date().toISOString().slice(0,10)});jsave(K.holdings,holdings);closeModal('holdingModal');$('holdingName').value='';renderHoldings();renderHome();toast('所持品を追加しました')}
+function deleteHolding(id){if(!confirm('この所持品と相場履歴を削除しますか？'))return;holdings=holdings.filter(h=>h.id!==id);marketData=marketData.filter(x=>x.holdingId!==id);jsave(K.holdings,holdings);jsave(K.market,marketData);renderHoldings();renderHome()}
+function addMarketPoint(){const holdingId=$('marketHolding').value,price=+$('marketPrice').value;if(!holdingId||!price){toast('所持品と価格を入力してください');return}marketData.push({id:uid('m'),holdingId,type:$('marketType').value,price,date:$('marketDate').value||new Date().toISOString(),trust:+$('marketTrust').value||3,supply:+$('marketSupply').value||0,memo:$('marketMemo').value.trim()});jsave(K.market,marketData);closeModal('marketModal');$('marketPrice').value='';renderHoldings();renderMarketAnalysis();renderHome();toast('X相場情報を追加しました')}
+function renderHoldings(){fillHoldingSelects();const rows=holdings.map(h=>({h,...holdingSignal(h)}));$('holdingSummary').innerHTML=`<div class="kpi">所持品<b>${holdings.reduce((a,h)=>a+(+h.qty||1),0)}点</b></div><div class="kpi greenish">SELL候補<b>${rows.filter(x=>x.signal==='SELL').length}件</b></div><div class="kpi">WATCH<b>${rows.filter(x=>x.signal==='WATCH').length}件</b></div>`;$('holdingList').innerHTML=rows.length?rows.map(x=>{const p=pointsFor(x.h.id,30);return `<div class="product"><div class="product-top"><div class="rank">📦</div><div class="product-info"><div class="row between"><div class="product-title">${esc(x.h.name)}</div><span class="${x.cls}">${x.signal}</span></div><div class="badges"><span class="badge">${esc(x.h.cat)}</span><span class="badge b-green">X相場 ${p.length}件</span><span class="badge ${p.length>=10?'b-green':p.length>=4?'b-orange':'b-red'}">信頼度 ${p.length>=10?'高':p.length>=4?'中':'低'}</span></div><div class="money"><div class="m">仕入<b>${yen(x.h.buy)}</b></div><div class="m">参考相場<b>${yen(x.cur)}</b></div><div class="m profit">想定利益<b>${yen(x.profit)}</b></div></div><div class="small" style="margin-top:8px">7日変動 ${x.t7>=0?'+':''}${x.t7.toFixed(1)}% ｜ ${esc(x.reason)}</div><div class="actions"><button class="btn soft" onclick="selectHoldingAnalysis('${x.h.id}')">相場を見る</button><button class="btn outline" onclick="quickMarket('${x.h.id}')">相場追加</button><button class="btn danger" onclick="deleteHolding('${x.h.id}')">削除</button></div></div></div></div>`}).join(''):`<div class="list-empty">所持品を登録してください。</div>`;renderMarketAnalysis()}
+function selectHoldingAnalysis(id){$('marketHoldingSelect').value=id;renderMarketAnalysis();showPage('holdings')}
+function quickMarket(id){fillHoldingSelects();$('marketHolding').value=id;openModal('marketModal')}
+function renderMarketAnalysis(){if(!holdings.length){$('marketKpis').innerHTML='';$('marketBreakdown').innerHTML='<div class="list-empty">所持品を登録してください。</div>';drawMarket([]);return}const id=$('marketHoldingSelect').value||holdings[0].id,h=holdings.find(x=>x.id===id)||holdings[0];$('marketHoldingSelect').value=h.id;const p30=pointsFor(h.id,30),p7=pointsFor(h.id,7),sig=holdingSignal(h);const buy=weightedPrice(p30,'buyback'),ask=weightedPrice(p30,'asking'),sold=weightedPrice(p30,'sold');$('marketKpis').innerHTML=`<div class="kpi">現在参考相場<b>${yen(sig.cur)}</b></div><div class="kpi">7日変動<b>${sig.t7>=0?'+':''}${sig.t7.toFixed(1)}%</b></div><div class="kpi greenish">判定<b>${sig.signal}</b></div>`;$('marketBreakdown').innerHTML=`<div class="grid3"><div class="kpi">買取平均<b>${yen(buy)}</b></div><div class="kpi">出品希望平均<b>${yen(ask)}</b></div><div class="kpi">成約報告平均<b>${yen(sold)}</b></div></div><div class="small" style="margin-top:10px">30日データ ${p30.length}件｜${esc(sig.reason)}</div>`;drawMarket(pointsFor(h.id,90))}
+function drawMarket(points){const c=$('marketCanvas'),ctx=c.getContext('2d'),w=c.clientWidth||320,h=220,dpr=window.devicePixelRatio||1;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);ctx.strokeStyle='#e4eaf2';ctx.lineWidth=1;for(let i=0;i<5;i++){let y=20+i*(h-40)/4;ctx.beginPath();ctx.moveTo(35,y);ctx.lineTo(w-12,y);ctx.stroke()}if(!points.length){ctx.fillStyle='#718096';ctx.font='13px sans-serif';ctx.fillText('相場データを追加するとグラフを表示します',45,h/2);return}const vals=points.map(x=>+x.price||0),min=Math.min(...vals)*.95,max=Math.max(...vals)*1.05||1;ctx.strokeStyle='#1677ff';ctx.lineWidth=3;ctx.beginPath();points.forEach((p,i)=>{const x=35+(w-50)*(points.length===1?.5:i/(points.length-1)),y=20+(h-40)*(1-((p.price-min)/(max-min||1)));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();ctx.fillStyle='#172033';ctx.font='11px sans-serif';ctx.fillText(yen(max),4,24);ctx.fillText(yen(min),4,h-16)}
+
+
+// ============================================================
+// X LIVE SIGNALS - Cloudflare Worker Version 5.0
+// 既存の tenbaikun_sales 等のlocalStorageは変更しません。
+// ============================================================
+const TENBAIKUN_API="https://tenbaikun-api.shuxlinx1003.workers.dev";
+
+function signalBadgeClass(decision){
+  if(decision==="GO") return "green";
+  if(decision==="STOP") return "red";
+  return "orange";
 }
 
-function renderHistory(){
-  const body=$("historyBody");
-  const arr=[...sales].sort((a,b)=>b.date.localeCompare(a.date));
-  body.innerHTML=arr.length?arr.map(s=>`
-    <tr>
-      <td>${s.date.replaceAll("-","/")}</td><td>${escapeHtml(s.name)}</td>
-      <td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td><td>${yen(s.supplies||0)}</td><td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
-      <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
-    </tr>`).join(""):'<tr><td colspan="8">まだ売上記録がありません。</td></tr>';
-}
-window.deleteSale=id=>{
-  if(confirm("この売上記録を削除しますか？")){
-    sales=sales.filter(s=>s.id!==id);save();renderAll();
-  }
-};
-window.editSale=id=>{
-  const s=sales.find(x=>x.id===id);if(!s)return;
-  $("name").value=s.name;$("purchase").value=s.purchase;$("salePrice").value=s.sale;
-  $("shipping").value=s.shipping;$("supplies").value=s.supplies||0;$("saleDate").value=s.date;
-  sales=sales.filter(x=>x.id!==id);save();calc();
-  document.querySelector('[data-page="home"]').click();scrollTo({top:0,behavior:"smooth"});
-};
+async function loadXSignals(){
+  const product=($("xProduct")?.value||"ポケモンカード").trim();
+  const area=($("xArea")?.value||"長崎").trim();
+  const status=$("xSignalStatus");
+  const list=$("xSignalList");
+  if(!product){toast("商品名を入力してください");return}
 
-$("deleteAll").onclick=()=>{
-  if(sales.length&&confirm("売上履歴をすべて削除しますか？")){
-    sales=[];save();renderAll();
-  }
-};
+  status.textContent="Xから最新情報を取得中…";
+  list.innerHTML="";
 
-function parseCSVLine(line){
-  const out=[];let cur="",quoted=false;
-  for(let i=0;i<line.length;i++){
-    const ch=line[i];
-    if(ch==='"'){
-      if(quoted && line[i+1]==='"'){cur+='"';i++;}
-      else quoted=!quoted;
-    }else if(ch==="," && !quoted){out.push(cur);cur="";}
-    else cur+=ch;
-  }
-  out.push(cur);
-  return out;
-}
+  try{
+    const endpoint=TENBAIKUN_API+"/signals?product="+encodeURIComponent(product)+"&area="+encodeURIComponent(area)+"&limit=20";
+    const response=await fetch(endpoint,{method:"GET",cache:"no-store"});
+    const data=await response.json();
 
-$("csvImportBtn").onclick=()=>$("csvFile").click();
-
-$("csvFile").onchange=e=>{
-  const file=e.target.files&&e.target.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const content=String(ev.target.result||"").replace(/^\uFEFF/,"");
-      const lines=content.split(/\r?\n/).filter(x=>x.trim()!=="");
-      if(lines.length<2)throw new Error("CSVに売上データがありません");
-      const headers=parseCSVLine(lines[0]).map(x=>x.trim());
-      const need=["日付","商品名","仕入れ価格","送料","備品代","販売価格","手数料","利益"];
-      if(!need.every(h=>headers.includes(h)))throw new Error("転売君のCSV形式ではありません");
-
-      const imported=lines.slice(1).map((line,i)=>{
-        const vals=parseCSVLine(line);
-        const r={};headers.forEach((h,j)=>r[h]=vals[j]??"");
-        return {
-          id:Date.now()+i,
-          date:normalizeDate(r["日付"]),
-          name:r["商品名"]||"商品",
-          purchase:+r["仕入れ価格"]||0,
-          shipping:+r["送料"]||0,
-          supplies:+r["備品代"]||0,
-          sale:+r["販売価格"]||0,
-          fee:+r["手数料"]||0,
-          profit:+r["利益"]||0
-        };
-      });
-
-      if(!confirm(`CSVの${imported.length}件で現在の売上履歴を置き換えます。\nよろしいですか？`))return;
-      sales=imported;
-      save();
-      renderAll();
-      alert(`CSVから${sales.length}件を読み込みました！`);
-    }catch(err){
-      alert("CSVを読み込めませんでした。\n"+err.message);
-    }finally{
-      e.target.value="";
+    if(!response.ok || !data.ok){
+      throw new Error(data.error||("APIエラー "+response.status));
     }
-  };
-  reader.readAsText(file,"UTF-8");
-};
 
-$("csvBtn").onclick=()=>{
-  const rows=[["日付","商品名","仕入れ価格","送料","備品代","販売価格","手数料","利益"],...sales.map(s=>[s.date,s.name,s.purchase,s.shipping,s.supplies||0,s.sale,s.fee,s.profit])];
-  const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
-  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="tenbaikun_sales.csv";a.click();
-};
+    const posts=Array.isArray(data.posts)?data.posts:[];
+    const localCount=Number(data.summary?.local||0);
+    status.textContent=`取得 ${posts.length}件｜長崎関連 ${localCount}件｜最終更新 ${new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}`;
 
-function availableYears(){
-  const y=new Date().getFullYear();
-  return [...new Set([y,...sales.map(s=>+s.date.slice(0,4))])].sort((a,b)=>b-a);
-}
-function renderChart(){
-  const sel=$("chartYear"),keep=+sel.value||new Date().getFullYear();
-  sel.innerHTML=availableYears().map(y=>`<option ${y===keep?"selected":""}>${y}</option>`).join("");
-  const year=+sel.value;
-  const arr=sales.filter(s=>+s.date.slice(0,4)===year);
-  const monthTotals=Array.from({length:12},(_,m)=>totals(arr.filter(s=>+s.date.slice(5,7)===m+1)));
-  const max=Math.max(1,...monthTotals.flatMap(t=>[t.sale,t.purchase,Math.max(0,t.profit)]));
-  $("chart").innerHTML=monthTotals.map((t,m)=>`
-    <div class="monthbar">
-      <div class="bar blue" style="height:${t.sale?Math.max(5,t.sale/max*235):0}px" title="売上 ${yen(t.sale)}"></div>
-      <div class="bar orange" style="height:${t.purchase?Math.max(5,t.purchase/max*235):0}px" title="仕入れ ${yen(t.purchase)}"></div>
-      <div class="bar green" style="height:${t.profit>0?Math.max(5,t.profit/max*235):0}px" title="利益 ${yen(t.profit)}"></div>
-      <div class="mlabel">${m+1}月</div>
-    </div>`).join("");
-  $("chartMetrics").innerHTML=metricsHTML(totals(arr));
-}
-$("chartYear").onchange=renderChart;
+    if(!posts.length){
+      list.innerHTML='<div class="empty">現在、条件に合うX速報はありません。時間を置いて再検索してください。</div>';
+      return;
+    }
 
-let calDate=new Date();calDate.setDate(1);
-let selectedDate=localISO();
-
-$("prevMonth").onclick=()=>{calDate.setMonth(calDate.getMonth()-1);renderCalendar()};
-$("nextMonth").onclick=()=>{calDate.setMonth(calDate.getMonth()+1);renderCalendar()};
-
-function renderCalendar(){
-  const y=calDate.getFullYear(),m=calDate.getMonth();
-  const ym=`${y}-${String(m+1).padStart(2,"0")}`;
-  $("calTitle").textContent=`${y}年${m+1}月`;
-  $("calMonth").textContent=`${y}年${m+1}月`;
-  $("calMetrics").innerHTML=metricsHTML(totals(sales.filter(s=>s.date.startsWith(ym))));
-
-  const first=new Date(y,m,1);
-  const start=new Date(y,m,1-first.getDay());
-
-  let h='<div class="dow sun">日</div><div class="dow">月</div><div class="dow">火</div><div class="dow">水</div><div class="dow">木</div><div class="dow">金</div><div class="dow sat">土</div>';
-
-  for(let i=0;i<42;i++){
-    const d=new Date(start);d.setDate(start.getDate()+i);
-    const ds=localISO(d),same=d.getMonth()===m;
-    const t=totals(sales.filter(s=>s.date===ds));
-    const cls=`day ${same?"":"other"} ${d.getDay()===0?"sun":d.getDay()===6?"sat":""} ${ds===selectedDate?"selected":""}`;
-    h+=`<div class="${cls}" onclick="selectDay('${ds}')">
-      <div class="date">${d.getDate()}</div>
-      ${t.count?`<div class="daystats"><div class="sale">売 ${t.sale.toLocaleString()}</div><div class="cost">仕 ${t.purchase.toLocaleString()}</div><div class="profit">利 ${t.profit.toLocaleString()}</div></div>`:""}
-    </div>`;
+    list.innerHTML=posts.map((p,i)=>{
+      const author=p.author?.name||p.author?.username||"Xユーザー";
+      const age=Number.isFinite(Number(p.age_minutes))?`${p.age_minutes}分前`:"";
+      const local=p.local_match?`📍 ${esc((p.matched_locations||[]).join("・")||p.detected_area||area)}`:"🌐 全国情報";
+      const stores=(p.matched_stores||[]).length?`｜🏪 ${esc(p.matched_stores.join("・"))}`:"";
+      const words=(p.matched_words||[]).length?`｜${esc(p.matched_words.join("・"))}`:"";
+      const decision=esc(p.decision||"WAIT");
+      const url=esc(p.x_url||"#");
+      const text=esc(String(p.text||"").replace(/\s+/g," ").slice(0,220));
+      return `
+       <div class="item" style="margin-top:10px">
+        <div class="row between">
+         <div><b>${i+1}. ${esc(p.type||"情報")}</b> <span class="badge ${signalBadgeClass(p.decision)}">${decision}</span></div>
+         <b>${Number(p.score||0)}点</b>
+        </div>
+        <div class="sub" style="margin-top:5px">${local}${stores}｜⚡ ${esc(p.freshness||"")}${age?"・"+age:""}${words}</div>
+        <div style="margin-top:8px;line-height:1.55">${text}</div>
+        <div class="row between" style="margin-top:9px">
+         <span class="sub">${esc(author)}｜信頼度 ${esc(p.confidence||"可能性中")}</span>
+         <a class="btn soft" href="${url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Xで確認</a>
+        </div>
+       </div>`;
+    }).join("");
+  }catch(e){
+    status.textContent="取得できませんでした。";
+    list.innerHTML=`<div class="empty">通信エラー：${esc(e.message||String(e))}</div>`;
   }
-  $("calendar").innerHTML=h;
-  renderDetail();
 }
 
-window.selectDay=ds=>{
-  selectedDate=ds;
-  const d=new Date(ds+"T00:00:00");
-  calDate=new Date(d.getFullYear(),d.getMonth(),1);
-  renderCalendar();
-};
-
-$("addForSelected").onclick=()=>{
-  $("saleDate").value=selectedDate;
-  document.querySelector('[data-page="home"]').click();
-  scrollTo({top:0,behavior:"smooth"});
-};
-
-function renderDetail(){
-  const arr=sales.filter(s=>s.date===selectedDate);
-  const d=new Date(selectedDate+"T00:00:00");
-  $("detailTitle").textContent=`${d.getMonth()+1}月${d.getDate()}日`;
-  $("detailBody").innerHTML=arr.length?arr.map(s=>`
-    <tr>
-      <td>${escapeHtml(s.name)}</td><td>${yen(s.purchase)}</td><td>${yen(s.shipping)}</td><td>${yen(s.supplies||0)}</td>
-      <td>${yen(s.sale)}</td><td>${yen(s.profit)}</td>
-      <td><button class="edit" onclick="editSale(${s.id})">✏️</button> <button class="del" onclick="deleteSale(${s.id})">🗑</button></td>
-    </tr>`).join(""):'<tr><td colspan="7">この日の売上記録はありません。</td></tr>';
+function showPage(name){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("page-"+name).classList.add("active");
+ document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===name));
+ if(name==="route")renderRoute();if(name==="holdings"){renderHoldings();renderMarketAnalysis()}window.scrollTo({top:0,behavior:"smooth"});
 }
-
-function renderAll(){renderHome();renderHistory();renderChart();renderCalendar()}
-renderAll();
+function openModal(id){$(id).classList.add("show")}function closeModal(id){$(id).classList.remove("show")}
+function openStoreModal(){openModal("storeModal")}function openRaffleModal(){openModal("raffleModal")}
+document.querySelectorAll(".nav").forEach(n=>n.onclick=()=>showPage(n.dataset.page));
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
+["saleBuy","saleSell","saleShip","saleSupplies","saleFee"].forEach(id=>$(id).addEventListener("input",updateSalePreview));
+prefs.forEach(p=>{$("prefSelect").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`);$("storePref").insertAdjacentHTML("beforeend",`<option ${p===pref?"selected":""}>${p}</option>`)});
+$("prefSelect").onchange=e=>{pref=e.target.value;localStorage.setItem(K.pref,pref);$("regionPill").textContent="📍 "+pref;$("storePref").value=pref;renderStores();fillStores();renderHome();toast(pref+"に切り替えました")};
+$("regionPill").textContent="📍 "+pref;$("saleDate").value=new Date().toISOString().slice(0,10);$("holdingDate").value=new Date().toISOString().slice(0,10);$("marketDate").value=new Date().toISOString().slice(0,16);
+$("todayText").textContent=new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"})+"｜"+pref+"の仕入れ候補";
+if(gps)$("gpsText").textContent=`GPS保存済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;
+renderTabs();fillStores();renderHome();renderSearch();renderRaffles();renderStores();renderSales();renderRoute();renderHoldings();renderMarketAnalysis();updateSalePreview();
+setTimeout(()=>{loadXSignals().catch(()=>{});},500);
 </script>
 </body>
 </html>
