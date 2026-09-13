@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#071a33">
-<title>転売君 Pro v10｜TOP100 無料自動版</title>
+<title>転売君 Pro v11｜TOP100 売上連動修正版</title>
 <style>
 :root{
  --navy:#071a33;--navy2:#0b2a52;--blue:#1677ff;--cyan:#18b6d9;--green:#16a765;
@@ -65,7 +65,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・自動候補版</span></div><div class="tag">X API 0回｜過去の売上実績から利益候補を自動生成</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">完全無料・売上連動版</span></div><div class="tag">X API 0回｜過去の売上実績から利益候補を自動生成</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
@@ -439,30 +439,48 @@ jsave(K.sales,sales);
 // v10: X APIや外部APIを一切使わず、自分の過去売上から利益候補を自動生成。
 // tenbaikun_sales は読み取るだけで、既存データを削除・変更しません。
 function autoCandidatesFromSales(){
+ // 売上実績を商品名ごとに集計し、利益200円以上の実績がある商品をTOP100候補へ反映。
+ // 以前のバージョンで同名の「価格0円候補」が残っていても、売上実績で安全に更新する。
  const groups=new Map();
  for(const x of sales){
   const name=String(x.name||'').trim();
-  if(!name||(+x.sale||0)<=0)continue;
-  const key=name.toLowerCase().replace(/\s+/g,' ');
-  if(!groups.has(key))groups.set(key,{name,cat:x.cat||'その他',rows:[]});
+  const sale=+x.sale||0;
+  const profit=+x.profit||0;
+  if(!name||sale<=0)continue;
+  const key=normalizeProductName(name)||name.toLowerCase().replace(/\s+/g,' ');
+  if(!groups.has(key))groups.set(key,{key,name,cat:x.cat||'その他',rows:[]});
   groups.get(key).rows.push(x);
  }
- const existing=new Set(candidates.map(c=>String(c.name||'').toLowerCase().replace(/\s+/g,' ')));
- let added=0;
+ let changed=0;
  for(const g of groups.values()){
-  if(existing.has(g.name.toLowerCase().replace(/\s+/g,' ')))continue;
-  const profitable=g.rows.filter(x=>(+x.profit||0)>=200);
+  const profitable=g.rows.filter(x=>(+x.profit||0)>=200 && (+x.sale||0)>0);
   if(!profitable.length)continue;
-  const avg=n=>Math.round(profitable.reduce((a,x)=>a+(+x[n]||0),0)/profitable.length);
-  const buy=avg('purchase'),sell=avg('sale'),ship=avg('shipping');
-  const feeRate=Math.round(profitable.reduce((a,x)=>a+(+x.feeRate||10),0)/profitable.length);
-  const profit=sell-buy-ship-Math.round(sell*feeRate/100);
-  if(profit<200)continue;
-  candidates.push({id:uid('auto'),name:g.name,cat:g.cat,buy,sell,ship,fee:feeRate,avail:3,fresh:2,storeId:'',hot:Math.min(5,2+profitable.length),today:false,autoFromSales:true,historyCount:profitable.length});
-  existing.add(g.name.toLowerCase().replace(/\s+/g,' '));added++;
+  const avg=fn=>Math.round(profitable.reduce((a,x)=>a+fn(x),0)/profitable.length);
+  const buy=avg(x=>+x.purchase||0);
+  const sell=avg(x=>+x.sale||0);
+  // 候補側には備品代欄がないため、送料に備品代を合算して利益を過大表示しない。
+  const ship=avg(x=>(+x.shipping||0)+(+x.supplies||0));
+  const actualFee=avg(x=>Number.isFinite(+x.fee)?(+x.fee||0):Math.round((+x.sale||0)*.10));
+  const feeRate=sell>0?Math.max(0,Math.min(30,actualFee/sell*100)):10;
+  const expectedProfit=Math.round(sell-buy-ship-sell*feeRate/100);
+  if(expectedProfit<200)continue;
+
+  const idx=candidates.findIndex(c=>{
+   const ck=normalizeProductName(c.name)||String(c.name||'').toLowerCase().replace(/\s+/g,' ');
+   return ck===g.key;
+  });
+  const base={name:g.name,cat:g.cat||'その他',buy,sell,ship,fee:feeRate,avail:3,fresh:2,storeId:'',hot:Math.min(5,2+profitable.length),today:false,autoFromSales:true,historyCount:profitable.length,lastAutoAt:Date.now()};
+  if(idx>=0){
+   // 手動で価格が入っている候補は尊重。0円/旧自動候補だけ売上実績で更新。
+   const old=candidates[idx];
+   const stale=!old.buy||!old.sell||old.autoFromSales;
+   if(stale){candidates[idx]={...old,...base,id:old.id||uid('auto')};changed++;}
+  }else{
+   candidates.push({id:uid('auto'),...base});changed++;
+  }
  }
- if(added)jsave(K.candidates,candidates);
- return added;
+ if(changed)jsave(K.candidates,candidates);
+ return changed;
 }
 const autoAdded=autoCandidatesFromSales();
 function updateSalePreview(){
@@ -629,7 +647,7 @@ $("regionPill").textContent="📍 "+pref;$("saleDate").value=new Date().toISOStr
 $("todayText").textContent=new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"})+"｜"+pref+"の仕入れ候補";
 if(gps)$("gpsText").textContent=`GPS保存済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;
 renderTabs();fillStores();renderHome();renderSearch();renderRaffles();renderStores();renderSales();renderRoute();renderHoldings();renderMarketAnalysis();updateSalePreview();
-// v10 完全無料優先: X API 0回、Worker自動通信0回。候補は端末内の売上実績・登録データから生成。
+// v11 完全無料・売上連動: X API 0回、Worker自動通信0回。候補は端末内の売上実績・登録データから生成。
 </script>
 </body>
 </html>
