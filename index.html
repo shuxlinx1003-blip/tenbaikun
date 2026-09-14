@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#071a33">
-<title>転売君 Pro v11｜TOP100 売上連動修正版</title>
+<title>転売君 Pro v17｜これから売れそうTOP100</title>
 <style>
 :root{
  --navy:#071a33;--navy2:#0b2a52;--blue:#1677ff;--cyan:#18b6d9;--green:#16a765;
@@ -18,8 +18,10 @@
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;padding-bottom:88px}
 button,input,select,textarea{font:inherit}
 header{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,#06162c,#0a2c56);color:#fff;box-shadow:0 3px 14px rgba(0,0,0,.2)}
-.head{max-width:1080px;margin:auto;padding:12px 15px;display:flex;align-items:center;gap:10px}
-.logo{font-size:24px;font-weight:1000}.tag{font-size:12px;opacity:.8;flex:1}.pill{font-size:12px;background:#ffffff18;border:1px solid #ffffff25;border-radius:999px;padding:7px 9px}
+.head{max-width:1080px;margin:auto;padding:11px 12px;display:flex;align-items:center;gap:7px;min-width:0}
+.logo{font-size:20px;font-weight:1000;white-space:nowrap;display:flex;align-items:center;gap:6px;min-width:0}.logo span{font-size:10px!important;padding:4px 6px!important;white-space:nowrap}.tag{font-size:10px;opacity:.8;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pill{font-size:11px;background:#ffffff18;border:1px solid #ffffff25;border-radius:999px;padding:6px 8px;white-space:nowrap;flex:0 0 auto}
+@media(max-width:600px){.head{padding:10px 10px;gap:6px}.logo{font-size:18px}.logo span{font-size:9px!important;padding:4px 5px!important}.tag{display:none}.pill{font-size:10px;padding:6px 7px}}
+@media(max-width:390px){.logo{font-size:17px}.logo span{font-size:8px!important}.pill{font-size:9px}}
 main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{display:block}
 .hero{background:linear-gradient(135deg,#08234a,#0b3b73);color:white;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden;position:relative}
 .hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#20b8ff22;right:-70px;top:-80px}
@@ -65,7 +67,7 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
 </style>
 </head>
 <body>
-<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">v15・相場確認リンク版</span></div><div class="tag">v15｜X API 0回｜相場・仕入先をブラウザで確認</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
+<header><div class="head"><div class="logo">👑 転売君 Pro <span style="font-size:12px;background:#dcfce7;color:#166534;padding:5px 8px;border-radius:10px;vertical-align:middle">v17・自動発見版</span></div><div class="tag">v17｜X API 0回｜これから売れそうTOP100</div><div class="pill" id="regionPill">📍 長崎県</div></div></header>
 
 <main>
 <section class="page active" id="page-home">
@@ -75,15 +77,15 @@ main{max-width:1080px;margin:auto;padding:14px}.page{display:none}.page.active{d
  </div>
 
  <div class="card">
-  <div class="row between"><div><h2>👑 利益候補 TOP100 <span style="font-size:11px;background:#e0f2fe;color:#075985;padding:4px 7px;border-radius:999px;vertical-align:middle">v14</span></h2><div class="sub">X APIは使用しません。現在確認済みの候補を優先し、過去実績は「参考」として最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
+  <div class="row between"><div><h2>🚀 これから売れそう TOP100 <span style="font-size:11px;background:#e0f2fe;color:#075985;padding:4px 7px;border-radius:999px;vertical-align:middle">v17</span></h2><div class="sub">X API 0回。公開情報から新発売・予約・再販・抽選・限定などを自動発見し、売れそう度順に最大100件表示</div></div><button class="btn soft" onclick="requestGPS()">📍GPS</button></div>
   <div class="tabs" id="categoryTabs"></div>
-  <div class="sub" style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:12px;color:#166534"><b>🌿 無料優先モード</b>：X API 0回・Workerへの自動通信 0回。価格未確認の商品に架空の利益は表示しません。</div><div id="top20"></div>
+  <div class="sub" style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:12px;color:#166534"><b>🌐 自動発見モード</b>：X API 0回。公開情報を15分キャッシュで取得します。価格・在庫未確認の商品に架空の利益は表示しません。 <button class="btn soft" style="margin-left:6px" onclick="loadDiscovery(true)">↻ 更新</button></div><div id="discoveryStatus" class="small" style="margin:8px 0">公開情報を取得しています…</div><div id="top20"></div>
  </div>
 
  <div class="card">
-  <div class="row between"><div><h2>🌿 無料データモード</h2><div class="sub">X APIを完全に停止しています。Cloudflare Workerへの自動アクセスも行いません。</div></div><span class="status-go">FREE</span></div>
-  <div class="grid2" style="margin-top:12px"><div class="q"><b>0回</b><span>X API呼び出し</span></div><div class="q"><b>0回</b><span>Worker自動通信</span></div></div>
-  <div class="sub" style="margin-top:12px">過去の売上実績は「参考」として候補化します。過去実績だけではGO判定にしません。現在価格・在庫を確認して登録した候補だけGO/WAIT/STOP判定します。既存の売上データは保持します。</div>
+  <div class="row between"><div><h2>🌐 自動発見データ</h2><div class="sub">Cloudflare Worker経由で公開情報を取得。X APIは使用しません。</div></div><span class="status-go">v17</span></div>
+  <div class="grid2" style="margin-top:12px"><div class="q"><b>0回</b><span>X API呼び出し</span></div><div class="q"><b>15分</b><span>公開情報キャッシュ</span></div></div>
+  <div class="sub" style="margin-top:12px">「売れそう度」は新しさ・予約・再販・抽選・限定・品薄などのシグナルです。利益保証ではありません。現在価格を確認した商品だけ利益判定します。既存の売上データは保持します。</div>
  </div>
 
  <div class="card">
@@ -402,15 +404,40 @@ function renderTabs(){
  ["candCat","saleCat","raffleCat","holdingCat"].forEach(id=>$(id).innerHTML=categories.filter(c=>c!=="すべて").map(c=>`<option>${esc(c)}</option>`).join(""));
 }
 window.setCat=x=>{activeCat=decodeURIComponent(x);renderHome()}
+const DISCOVERY_API="https://tenbaikun-api.shuxlinx1003.workers.dev/discover";
+let discoveryItems=[];
+let discoveryLoadedAt=0;
+function discoveryCard(d,rank){
+ const dt=d.published_at?new Date(d.published_at).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"時刻不明";
+ const rs=(d.reasons||[]).slice(0,4);
+ const lv=d.sell_score>=75?"status-go":d.sell_score>=55?"status-wait":"badge";
+ return `<div class="product"><div class="product-top"><div class="rank">${rank}</div><div class="product-info"><div class="row between"><div class="product-title">${esc(d.title)}</div><div class="score">${Number(d.sell_score)||0}<span style="font-size:11px">点</span></div></div><div class="badges"><span class="badge">${esc(d.category||"その他")}</span><span class="${lv}">${esc(d.level||"ウォッチ")}</span>${d.local_match?'<span class="badge b-green">長崎関連</span>':'<span class="badge">全国情報</span>'}<span class="badge b-orange">利益 未判定</span></div><div class="small">🕒 ${esc(dt)}｜情報元 ${esc(d.source||"公開情報")}<br>${rs.length?'🔎 '+rs.map(esc).join('・'):'🔎 新商品情報を検出'}</div><div class="money"><div class="m">仕入価格<b>未確認</b></div><div class="m">販売相場<b>未確認</b></div><div class="m profit">予想利益<b>未判定</b></div></div><div class="actions"><button class="btn soft" onclick="registerDiscovery('${esc(d.id)}')">💰 現在価格を確認</button><a class="btn outline" href="${esc(d.url||'#')}" target="_blank" rel="noopener noreferrer" style="text-decoration:none">情報元を開く</a></div></div></div></div>`;
+}
+function registerDiscovery(id){
+ const d=discoveryItems.find(x=>String(x.id)===String(id));if(!d)return;
+ let c=candidates.find(x=>x.discoveryId===d.id);
+ if(!c){c={id:uid("disc"),discoveryId:d.id,name:d.title,cat:categories.includes(d.category)?d.category:"その他",buy:0,sell:0,ship:210,fee:10,avail:d.local_match?3:2,fresh:5,hot:Math.max(3,Math.ceil((+d.sell_score||0)/20)),today:false,discoverySource:d.source,discoveryUrl:d.url};candidates.push(c);jsave(K.candidates,candidates)}
+ openVerifyModal(c.id);
+}
+async function loadDiscovery(force=false){
+ const st=$("discoveryStatus");if(st)st.textContent="公開情報を取得しています…";
+ try{
+  const u=DISCOVERY_API+"?limit=100&area="+encodeURIComponent(pref)+(force?"&t="+Date.now():"");
+  const r=await fetch(u,{cache:force?"no-store":"default"});if(!r.ok)throw new Error("HTTP "+r.status);
+  const data=await r.json();if(!data.ok||!Array.isArray(data.items))throw new Error("取得データを確認できません");
+  discoveryItems=data.items;discoveryLoadedAt=Date.now();renderHome();
+  if(st)st.textContent=`${data.count}件取得｜最終更新 ${new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}｜X API 0回`;
+ }catch(e){if(st)st.textContent="取得できませんでした。通信状況を確認して「更新」を押してください。";toast("自動発見データを取得できませんでした")}
+}
 function renderHome(){
  renderTabs();
- let a=candidates.filter(c=>calcProfit(c)>=200&&(activeCat==="すべて"||c.cat===activeCat));
- a.sort((x,y)=>(Number(x.autoFromSales)-Number(y.autoFromSales)) || score(y)-score(x));
- $("top20").innerHTML=a.length?a.slice(0,100).map((c,i)=>candidateCard(c,i+1)).join(""):`<div class="list-empty">まだ利益候補を作れる売上実績がありません。売上を登録すると、自動でTOP100候補が作られます。</div>`;
- $("qNow").textContent=a.filter(c=>verdict(c)[0]==="GO").length;
- $("qToday").textContent=a.filter(c=>c.today).length;
- $("qRaffle").textContent=raffles.filter(r=>/受付|予定/.test(r.status)).length;
- $("qHot").textContent=a.filter(c=>(+c.hot||0)>=4).length;
+ let a=discoveryItems.filter(d=>activeCat==="すべて"||d.category===activeCat);
+ a.sort((x,y)=>(+y.sell_score||0)-(+x.sell_score||0));
+ $("top20").innerHTML=a.length?a.slice(0,100).map((d,i)=>discoveryCard(d,i+1)).join(""):`<div class="list-empty">公開情報を取得中です。しばらく待つか「更新」を押してください。</div>`;
+ $("qNow").textContent=a.filter(d=>(+d.sell_score||0)>=75).length;
+ $("qToday").textContent=a.filter(d=>d.local_match).length;
+ $("qRaffle").textContent=a.filter(d=>(d.reasons||[]).some(x=>/抽選|予約/.test(x))).length;
+ $("qHot").textContent=a.filter(d=>(+d.sell_score||0)>=70).length;
  renderToday();
  renderHomeSell();
 }
@@ -715,8 +742,8 @@ $("prefSelect").onchange=e=>{pref=e.target.value;localStorage.setItem(K.pref,pre
 $("regionPill").textContent="📍 "+pref;$("saleDate").value=new Date().toISOString().slice(0,10);$("holdingDate").value=new Date().toISOString().slice(0,10);$("marketDate").value=new Date().toISOString().slice(0,16);
 $("todayText").textContent=new Date().toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"})+"｜"+pref+"の仕入れ候補";
 if(gps)$("gpsText").textContent=`GPS保存済み：${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;
-renderTabs();fillStores();renderHome();renderSearch();renderRaffles();renderStores();renderSales();renderRoute();renderHoldings();renderMarketAnalysis();updateSalePreview();
-// v11 完全無料・売上連動: X API 0回、Worker自動通信0回。候補は端末内の売上実績・登録データから生成。
+renderTabs();fillStores();renderHome();renderSearch();renderRaffles();renderStores();renderSales();renderRoute();renderHoldings();renderMarketAnalysis();updateSalePreview();loadDiscovery();
+// v17 自動発見版: X API 0回。Workerから公開情報を取得し、これから売れそうな商品TOP100を表示。既存売上データは保持。
 </script>
 </body>
 </html>
